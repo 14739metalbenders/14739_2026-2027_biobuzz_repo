@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.metalBenders.season.decode.sample;
+package com.metalbenders.samples;
 
 import static com.qualcomm.hardware.rev.RevHubOrientationOnRobot.UsbFacingDirection.LEFT;
 import static com.qualcomm.hardware.rev.RevHubOrientationOnRobot.LogoFacingDirection.UP;
@@ -21,7 +21,7 @@ import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
-import org.firstinspires.ftc.teamcode.metalBenders.season.decode.hardware.StudicaLidar;
+import com.metalbenders.hardware.StudicaLidar;
 
 import java.util.List;
 
