@@ -41,7 +41,7 @@ public class LidarTest extends LinearOpMode{
         while (opModeIsActive()) {
             controlLoopStart = System.currentTimeMillis();
 
-            double[] latestRanges = studicaLidar.getRanges();
+            double[] latestRanges = studicaLidar.getRanges(true);
 
             double deg0 = latestRanges[0];   // 0° (Straight Forward)
             double deg45 = latestRanges[45];

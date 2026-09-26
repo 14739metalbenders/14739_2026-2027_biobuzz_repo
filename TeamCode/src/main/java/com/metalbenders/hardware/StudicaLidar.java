@@ -65,9 +65,9 @@ public class StudicaLidar {
      *
      * @return double array of length 360 (values in millimeters)
      */
-    public double[] getRanges() {
+    public double[] getRanges(boolean inverted) {
         if (lidarThread != null) {
-            return lidarThread.getRanges();
+            return lidarThread.getRanges(inverted);
         }
         return new double[360];
     }
@@ -78,9 +78,9 @@ public class StudicaLidar {
      * @param degree Degree index (0 = Forward, 90 = Right, 180 = Rear, 270 = Left)
      * @return Distance in millimeters, or 0.0 if invalid/out of range
      */
-    public double getDistanceAt(int degree) {
+    public double getDistanceAt(int degree, boolean inverted) {
         int index = Math.floorMod(degree, 360);
-        double[] ranges = getRanges();
+        double[] ranges = getRanges(inverted);
         return ranges[index];
     }
 
@@ -269,12 +269,32 @@ public class StudicaLidar {
             }
         }
 
-        public double[] getRanges() {
+        public double[] getRanges(boolean inverted) {
             double[] snapshot = new double[360];
             synchronized (ranges360) {
-                System.arraycopy(ranges360, 0, snapshot, 0, 360);
+                if (inverted)
+                {
+                    System.arraycopy(ranges360, 0, snapshot, 0, 360);
+                    snapshot = reverseSensorArray(snapshot);
+                } else {
+                    System.arraycopy(ranges360, 0, snapshot, 0, 360);
+                }
+
             }
             return snapshot;
+        }
+
+        private double[] reverseSensorArray(double[] array) {
+            int left = 0;
+            int right = array.length - 1;
+            while (left < right) {
+                double temp = array[left];
+                array[left] = array[right];
+                array[right] = temp;
+                left++;
+                right--;
+            }
+            return array;
         }
 
         public long getPacketCount() {

@@ -63,7 +63,6 @@ public class DriveTest extends LinearOpMode {
         studicaLidar.start();
         resetRuntime();
         while (opModeIsActive()) {
-            double[] latestRanges = studicaLidar.getRanges();
             double axial = -gamepad1.left_stick_y;
             double lateral = gamepad1.left_stick_x;
             double yaw = gamepad1.right_stick_x * 0.4;
@@ -80,12 +79,10 @@ public class DriveTest extends LinearOpMode {
 
             // Get commanded direction relative to bot
             double movementAngle = Math.floor(Math.toDegrees(getMovementDirectionRelativeToRobot(lateral, axial, botHeading))) - 90;
-            movementAngle = (movementAngle % 360 + 360) % 360;
-            // Flip rotation
-            movementAngle = (360 - movementAngle) % 360;
-            double lidarDistance = latestRanges[(int) movementAngle];
+            movementAngle = (movementAngle % 360 + 360) % 360; // Normalize the angle to keep it strictly within the 0 to 360 range
 
-            if (lidarDistance > 300) {
+            //findClosestPointOnPath(movementAngle, 450, 400);
+            if (findClosestPointOnPath(movementAngle, 450, 400)) {
 
                 //calculate power
                 double denominator = Math.max(Math.abs(rotY) + Math.abs(rotX) + Math.abs(yaw), 1);
@@ -114,7 +111,6 @@ public class DriveTest extends LinearOpMode {
             rightRearMotor.setPower(rightRearPower*1.00);
 
             telemetry.addData("Relative Bot Direction","%.2f", movementAngle);
-            telemetry.addData("Distance in direction of travel", lidarDistance > 0 ? String.format("%.1f mm", lidarDistance) : "Scanning...");
             telemetry.addData("Motor (Left Front)", "%.2f", leftFrontPower);
             telemetry.addData("Motor (Right Front)", "%.2f", rightFrontPower);
             telemetry.addData("Motor (Left Rear)","%.2f", leftRearPower);
@@ -153,7 +149,15 @@ public class DriveTest extends LinearOpMode {
         }
     }
 
-    public double getMovementDirectionRelativeToRobot(double stickX, double stickY, double robotHeading) {
+    /**
+     * Get Robot Direction of travel in Robot Reference Frame.
+     *
+     * @param stickX value from gamepad left stick X
+     * @param stickY value from gamepad left stick Y
+     * @param robotHeading from IMU in radians
+     * @return robot direction of travel robot reference frame
+     */
+    private double getMovementDirectionRelativeToRobot(double stickX, double stickY, double robotHeading) {
         if (Math.hypot(stickX, stickY) < 0.05) {
             return 0.0;
         }
@@ -165,5 +169,30 @@ public class DriveTest extends LinearOpMode {
         double robotY = -stickX * sinHeading + stickY * cosHeading;  // Robot-centric forward (Y)
 
         return Math.atan2(robotY, robotX);
+    }
+
+    /**
+     * Gets closest lidar ping +/- offset degrees from bot heading. Offset should be
+     *
+     * @param heading current robot movement direction in degrees (robot reference frame)
+     * @param robotDiameter the circular diameter of the robot in mm (corner to corner)
+     * @param distance the distance in mm that we want to stop before running into object
+     * @return True for OK to proceed or False for not OK.
+     */
+    private boolean findClosestPointOnPath(double heading, double robotDiameter, double distance) {
+        double[] latestRanges = studicaLidar.getRanges(true);
+        int offset = (int) Math.toDegrees(Math.asin((robotDiameter / 2) / distance));
+
+
+        for (int i = offset; i >= -offset; i--) {
+            double targetAngle = ((heading + i) % 360 + 360) % 360; // Normalize the angle to keep it strictly within the 0 to 360 range
+
+            targetAngle = (360 - targetAngle) % 360;
+
+            if (latestRanges[(int) targetAngle] < distance) {
+                return false;
+            }
+        }
+        return true;
     }
 }
