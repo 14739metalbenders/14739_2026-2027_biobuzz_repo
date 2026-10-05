@@ -1,4 +1,4 @@
-package com.metalbenders.enums;
+package com.metalbenders.constants;
 
 public enum GobildaMotorEnum {
     YELLOWJACKET_30(5281.1),

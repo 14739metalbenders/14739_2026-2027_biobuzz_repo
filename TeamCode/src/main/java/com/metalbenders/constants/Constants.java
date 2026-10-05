@@ -1,13 +1,15 @@
 package com.metalbenders.constants;
 
-public class Constants {
-    //LIMELIGHT
-    final double CAMERA_HEIGHT = 12.0; // number of inches from center of lens to floor
-    final double CAMERA_PITCH_RAD = Math.toRadians(0); // degrees tilt of the camera, negative for downward pitch
-    final double CAMERA_X_OFFSET = 6.0; // 6 inches forward from center
-    final double CAMERA_Y_OFFSET = 0.0; // centered left/right
+import com.pedropathing.math.Pose;
 
-    //GAME ELEMENT CONSTANTS
-    final double POLLEN_RADIUS = 1.4;
-    final double NECTAR_RADIUS = 1.8;
+public class Constants {
+
+    public enum AllianceColor {
+        RED,
+        BLUE
+    }
+
+    public static final double AUTONOMOUS_DURATION_SECONDS = 30l;
+
+    public static final Pose DEFAULT_POSE = new Pose(0,0,0);
 }

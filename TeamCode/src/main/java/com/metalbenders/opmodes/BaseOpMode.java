@@ -1,34 +1,16 @@
 package com.metalbenders.opmodes;
 
-import com.metalbenders.constants.AllianceColor;
-import com.metalbenders.subsystems.Subsystem;
-import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.arcrobotics.ftclib.command.CommandOpMode;
+import com.metalbenders.constants.Constants.AllianceColor;
+import com.pedropathing.math.Pose;
 
-public abstract class BaseOpMode extends LinearOpMode {
+public abstract class BaseOpMode extends CommandOpMode {
 
-    abstract Subsystem[] getSubsystems();
-    abstract AllianceColor getAllianceColor();
+    public abstract AllianceColor getAllianceColor();
 
-    @Override
-    public void runOpMode() throws InterruptedException {
-        for(Subsystem subsystem : getSubsystems()) {
-            subsystem.init(hardwareMap);
-        }
-        waitForStart();
-        resetRuntime();
-        while(opModeIsActive()) {
-            for(Subsystem subsystem : getSubsystems()) {
-                subsystem.update(telemetry);
-            }
-            updateRuntime();
-            telemetry.update();
-        }
-        for(Subsystem subsystem : getSubsystems()) {
-            subsystem.stop();
-        }
-    }
+    public abstract Pose getInitialPose();
 
-    private void updateRuntime() {
+    public void updateRuntime() {
         double totalSeconds = getRuntime();
         telemetry.addData(
                 "Runtime",
