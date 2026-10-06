@@ -12,4 +12,6 @@ public class Constants {
     public static final double AUTONOMOUS_DURATION_SECONDS = 30l;
 
     public static final Pose DEFAULT_POSE = new Pose(0,0,0);
+
+    private static final int TEST = 1;
 }
