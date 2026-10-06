@@ -5,21 +5,21 @@ import com.metalbenders.control.subsystems.DriveSubsystem;
 
 import java.util.function.DoubleSupplier;
 
-public class DefaultDriveCommand extends CommandBase {
+public class DriveCommand extends CommandBase {
+
     private final DriveSubsystem driveSubsystem;
     private final DoubleSupplier forwardSupplier;
     private final DoubleSupplier strafeSupplier;
     private final DoubleSupplier headingSupplier;
 
-    public DefaultDriveCommand(DriveSubsystem driveSubsystem,
-                               DoubleSupplier forwardSupplier,
-                               DoubleSupplier strafeSupplier,
-                               DoubleSupplier headingSupplier) {
+    public DriveCommand(DriveSubsystem driveSubsystem,
+                        DoubleSupplier forwardSupplier,
+                        DoubleSupplier strafeSupplier,
+                        DoubleSupplier headingSupplier) {
         this.driveSubsystem = driveSubsystem;
         this.forwardSupplier = forwardSupplier;
         this.strafeSupplier = strafeSupplier;
         this.headingSupplier = headingSupplier;
-
         addRequirements(driveSubsystem);
     }
 
