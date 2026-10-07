@@ -7,6 +7,7 @@ import com.arcrobotics.ftclib.gamepad.GamepadEx;
 import com.arcrobotics.ftclib.gamepad.GamepadKeys;
 import com.metalbenders.control.commands.DriveCommand;
 import com.metalbenders.control.commands.IntakeCommand;
+import com.metalbenders.control.commands.ResetHeadingCommand;
 import com.metalbenders.control.commands.ReverseIntakeCommand;
 import com.metalbenders.control.subsystems.IntakeSubsystem;
 import com.metalbenders.opmodes.BaseOpMode;
@@ -40,11 +41,10 @@ public abstract class BaseTeleop extends BaseOpMode {
         ));
 
         driverGamepad.getGamepadButton(GamepadKeys.Button.DPAD_RIGHT)
-                .whenPressed(driveSubsystem::resetHeading);
+                .whenPressed(new ResetHeadingCommand(driveSubsystem));
 
         driverGamepad.getGamepadButton(GamepadKeys.Button.LEFT_BUMPER)
                 .whileHeld(new ReverseIntakeCommand(intakeSubsystem));
-
 
         Trigger leftTrigger = new Trigger(() ->
                 driverGamepad.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER) > 0.2);
