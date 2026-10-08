@@ -43,7 +43,7 @@ public class DriveSubsystem extends SubsystemBase {
         follower.setPose(new Pose(
                 follower.pose().x(),
                 follower.pose().y(),
-                0.0 // Resets angle to zero
+                Math.toRadians(180)
         ));
     }
 

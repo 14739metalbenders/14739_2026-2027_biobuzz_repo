@@ -35,9 +35,9 @@ public abstract class BaseTeleop extends BaseOpMode {
 
         driveSubsystem.setDefaultCommand(new DriveCommand(
                 driveSubsystem,
-                () -> driverGamepad.getLeftY(),  // Positive value is forward
-                () -> driverGamepad.getLeftX(),  // Positive value is strafe left
-                () -> driverGamepad.getRightX()  // Positive value is turn counter-clockwise
+                () -> -driverGamepad.getLeftY(),
+                () -> driverGamepad.getLeftX(),
+                () -> driverGamepad.getRightX()
         ));
 
         driverGamepad.getGamepadButton(GamepadKeys.Button.DPAD_RIGHT)
