@@ -9,6 +9,11 @@ public class Constants {
         BLUE
     }
 
+    public enum FieldSide {
+        SCORE_SIDE,
+        AUDIENCE_SIDE
+    }
+
     public enum HivePosition {
         SCORE_SIDE_UP_AUDIENCE_SIDE_DOWN,
         AUDIENCE_SIDE_UP_SCORE_SIDE_DOWN
