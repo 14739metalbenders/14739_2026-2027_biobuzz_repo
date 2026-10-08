@@ -11,8 +11,8 @@ public abstract class BaseAuto extends BaseOpMode {
 
     @Override
     public void initialize() {
-        driveSubsystem = new DriveSubsystem(getInitialPose());
-        intakeSubsystem = new IntakeSubsystem(hardwareMap);
+        driveSubsystem = new DriveSubsystem(getInitialPose(), telemetry);
+        intakeSubsystem = new IntakeSubsystem(hardwareMap, telemetry);
     }
 
     @Override

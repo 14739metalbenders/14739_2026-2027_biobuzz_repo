@@ -18,4 +18,11 @@ public abstract class BaseOpMode extends CommandOpMode {
                 totalSeconds / 60,
                 totalSeconds % 60);
     }
+
+    @Override
+    public void run() {
+        super.run();
+        updateRuntime();
+        telemetry.update();
+    }
 }

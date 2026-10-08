@@ -9,6 +9,7 @@ import com.pedropathing.follower.Follower;
 import com.pedropathing.follower.ManualDrive;
 import com.pedropathing.math.Pose;
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.pedro.Constants;
 
 import java.util.List;
@@ -17,9 +18,11 @@ public class DriveSubsystem extends SubsystemBase {
 
     private final Follower follower;
     private final RotatingBuffer<TimedEntity<Pose>> poseHistory = new RotatingBuffer<>(10);
+    private final Telemetry telemetry;
 
-    public DriveSubsystem(Pose initialPose) {
-        follower = Constants.create(hardwareMap);
+    public DriveSubsystem(Pose initialPose, Telemetry telemetry) {
+        this.telemetry = telemetry;
+        this.follower = Constants.create(hardwareMap);
         follower.setPose(initialPose);
     }
 
@@ -44,17 +47,21 @@ public class DriveSubsystem extends SubsystemBase {
         ));
     }
 
-    @Override
-    public void periodic() {
-        poseHistory.put(TimedEntity.of(follower.pose()));
-        follower.update();
-    }
-
     public List<TimedEntity<Pose>> getPoseHistory() {
         return poseHistory.toList();
     }
 
     public Follower getFollower() {
         return follower;
+    }
+
+    @Override
+    public void periodic() {
+        poseHistory.put(TimedEntity.of(follower.pose()));
+        follower.update();
+        telemetry.addLine(this.getClass().getSimpleName());
+        telemetry.addData("Pose",
+                String.format("x: %.2f, y: %.2f, heading: %.2f",
+                        follower.pose().x(), follower.pose().y(), follower.pose().heading()));
     }
 }

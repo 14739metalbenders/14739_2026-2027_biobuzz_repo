@@ -28,8 +28,8 @@ public abstract class BaseTeleop extends BaseOpMode {
 
     @Override
     public void initialize() {
-        driveSubsystem = new DriveSubsystem(getInitialPose());
-        intakeSubsystem = new IntakeSubsystem(hardwareMap);
+        driveSubsystem = new DriveSubsystem(getInitialPose(), telemetry);
+        intakeSubsystem = new IntakeSubsystem(hardwareMap, telemetry);
 
         driverGamepad = new GamepadEx(gamepad1);
 
