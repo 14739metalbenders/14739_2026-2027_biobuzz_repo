@@ -12,4 +12,10 @@ public class TurretSubsystem extends SubsystemBase {
         this.telemetry = telemetry;
     }
 
+    @Override
+    public void periodic() {
+        telemetry.addLine(this.getClass().getSimpleName());
+        telemetry.addLine("--------------------------------");
+        telemetry.addLine();
+    }
 }

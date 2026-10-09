@@ -42,6 +42,8 @@ public class IntakeSubsystem extends SubsystemBase {
     @Override
     public void periodic() {
         telemetry.addLine(this.getClass().getSimpleName());
+        telemetry.addLine("--------------------------------");
         telemetry.addData("Intake State", intakeState);
+        telemetry.addLine();
     }
 }

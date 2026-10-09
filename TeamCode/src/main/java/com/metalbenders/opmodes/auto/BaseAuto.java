@@ -13,9 +13,9 @@ public abstract class BaseAuto extends BaseOpMode {
 
     @Override
     public void initialize() {
-        driveSubsystem = new DriveSubsystem(getInitialPose(), telemetry);
+        driveSubsystem = new DriveSubsystem(hardwareMap, telemetry, getInitialPose());
         intakeSubsystem = new IntakeSubsystem(hardwareMap, telemetry);
-        limelightSubsystem = new LimelightSubsystem(hardwareMap, telemetry, getAllianceColor());
+//        limelightSubsystem = new LimelightSubsystem(hardwareMap, telemetry, getAllianceColor());
     }
 
     @Override

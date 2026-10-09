@@ -8,6 +8,7 @@ import com.metalbenders.util.RotatingBuffer;
 import com.pedropathing.follower.Follower;
 import com.pedropathing.follower.ManualDrive;
 import com.pedropathing.math.Pose;
+import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.pedro.Constants;
@@ -20,7 +21,7 @@ public class DriveSubsystem extends SubsystemBase {
     private final RotatingBuffer<TimedEntity<Pose>> poseHistory = new RotatingBuffer<>(10);
     private final Telemetry telemetry;
 
-    public DriveSubsystem(Pose initialPose, Telemetry telemetry) {
+    public DriveSubsystem(HardwareMap hardwareMap, Telemetry telemetry, Pose initialPose) {
         this.telemetry = telemetry;
         this.follower = Constants.create(hardwareMap);
         follower.setPose(initialPose);
@@ -60,8 +61,10 @@ public class DriveSubsystem extends SubsystemBase {
         poseHistory.put(TimedEntity.of(follower.pose()));
         follower.update();
         telemetry.addLine(this.getClass().getSimpleName());
+        telemetry.addLine("--------------------------------");
         telemetry.addData("Pose",
                 String.format("x: %.2f, y: %.2f, heading: %.2f",
                         follower.pose().x(), follower.pose().y(), follower.pose().heading()));
+        telemetry.addLine();
     }
 }

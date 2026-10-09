@@ -50,7 +50,9 @@ public class LimelightSubsystem extends SubsystemBase {
     public void periodic() {
         processLLResult();
         telemetry.addLine(this.getClass().getSimpleName());
+        telemetry.addLine("--------------------------------");
         telemetry.addData("Total Detections", totalDetections);
         telemetry.addData("Total Detections of Color", totalDetectionsOfColor);
+        telemetry.addLine();
     }
 }
