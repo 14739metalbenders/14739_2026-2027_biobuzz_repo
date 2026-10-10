@@ -16,15 +16,21 @@ public class LimelightSubsystem extends SubsystemBase {
     private Limelight3A limelight;
     private int totalDetections = 0;
     private int totalDetectionsOfColor = 0;
+    private Constants.FieldSide activeHiveCellFieldSide;
 
     public LimelightSubsystem(HardwareMap hardwareMap, Telemetry telemetry, Constants.AllianceColor allianceColor) {
         this.allianceColor = allianceColor;
         this.telemetry = telemetry;
         this.limelight = hardwareMap.get(Limelight3A.class, "limelight");
         this.limelight.pipelineSwitch(0);
+        if (allianceColor == Constants.AllianceColor.RED) {
+            activeHiveCellFieldSide = Constants.FieldSide.SCORE_SIDE;
+        } else {
+            activeHiveCellFieldSide = Constants.FieldSide.AUDIENCE_SIDE;
+        }
     }
 
-    public void processLLResult() {
+    private void processLLResult() {
         LLResult llResult = limelight.getLatestResult();
         if (llResult == null || !llResult.isValid()) {
             return;
@@ -35,6 +41,8 @@ public class LimelightSubsystem extends SubsystemBase {
     }
 
     private void processFiducialResult(LLResultTypes.FiducialResult fiducialResult) {
+        totalDetections = 0;
+        totalDetectionsOfColor = 0;
         if(fiducialResult == null) {
             return;
         }
@@ -44,6 +52,10 @@ public class LimelightSubsystem extends SubsystemBase {
             totalDetectionsOfColor++;
             //todo: process fiducial result of our alliance color
         }
+    }
+
+    public Constants.FieldSide getActiveHiveCellFieldSide() {
+        return activeHiveCellFieldSide;
     }
 
     @Override

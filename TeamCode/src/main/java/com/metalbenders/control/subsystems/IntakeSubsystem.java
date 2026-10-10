@@ -1,7 +1,6 @@
 package com.metalbenders.control.subsystems;
 
 import com.arcrobotics.ftclib.command.SubsystemBase;
-import com.metalbenders.util.TimedEntity;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import org.firstinspires.ftc.robotcore.external.Telemetry;

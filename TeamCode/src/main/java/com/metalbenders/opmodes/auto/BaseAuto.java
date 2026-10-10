@@ -21,6 +21,6 @@ public abstract class BaseAuto extends BaseOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
         super.runOpMode();
-        AutonomousStorage.endPose = driveSubsystem.getFollower().pose();
+        AutonomousStorage.endPose = driveSubsystem.getCurrentPose();
     }
 }
