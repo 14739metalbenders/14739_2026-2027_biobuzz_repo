@@ -12,6 +12,8 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.pedro.Constants;
 
+import java.util.Locale;
+
 public class DriveSubsystem extends SubsystemBase {
 
     private final Follower follower;
@@ -49,7 +51,6 @@ public class DriveSubsystem extends SubsystemBase {
         return follower.isBusy();
     }
 
-    @SuppressLint("DefaultLocale")
     @Override
     public void periodic() {
         poseHistory.put(follower.pose());
@@ -57,7 +58,7 @@ public class DriveSubsystem extends SubsystemBase {
         telemetry.addLine(this.getClass().getSimpleName());
         telemetry.addLine("--------------------------------");
         telemetry.addData("Pose",
-                String.format("x: %.2f, y: %.2f, heading: %.2f",
+                String.format(Locale.ENGLISH, "x: %.2f, y: %.2f, heading: %.2f",
                         follower.pose().x(), follower.pose().y(), follower.pose().heading()));
         telemetry.addData("Driving", follower.isBusy() ? "Yes" : "No");
         telemetry.addLine();

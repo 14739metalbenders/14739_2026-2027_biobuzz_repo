@@ -4,6 +4,11 @@ import com.pedropathing.math.Pose;
 
 public class Constants {
 
+    public enum OpModeType {
+        AUTO,
+        TELEOP
+    }
+
     public enum AllianceColor {
         RED,
         BLUE
@@ -13,8 +18,6 @@ public class Constants {
         SCORE_SIDE,
         AUDIENCE_SIDE
     }
-
-    public static final double AUTONOMOUS_DURATION_SECONDS = 30l;
 
     public static final Pose DEFAULT_POSE = new Pose(0, 0, Math.toRadians(180));
 }

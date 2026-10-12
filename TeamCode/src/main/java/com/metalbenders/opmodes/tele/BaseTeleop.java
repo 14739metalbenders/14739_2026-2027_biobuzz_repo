@@ -5,23 +5,23 @@ import static com.metalbenders.constants.Constants.DEFAULT_POSE;
 import com.arcrobotics.ftclib.command.button.Trigger;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
 import com.arcrobotics.ftclib.gamepad.GamepadKeys;
+import com.metalbenders.constants.Constants;
 import com.metalbenders.control.commands.DriveCommand;
 import com.metalbenders.control.commands.IntakeCommand;
 import com.metalbenders.control.commands.ResetHeadingCommand;
 import com.metalbenders.control.commands.ReverseIntakeCommand;
-import com.metalbenders.control.subsystems.IntakeSubsystem;
-import com.metalbenders.control.subsystems.LimelightSubsystem;
 import com.metalbenders.opmodes.BaseOpMode;
-import com.metalbenders.control.subsystems.DriveSubsystem;
 import com.metalbenders.util.AutonomousStorage;
 import com.pedropathing.math.Pose;
 
 public abstract class BaseTeleop extends BaseOpMode {
 
-    private DriveSubsystem driveSubsystem;
-    private IntakeSubsystem intakeSubsystem;
-    private LimelightSubsystem limelightSubsystem;
     private GamepadEx driverGamepad;
+
+    @Override
+    public Constants.OpModeType getOpModeType() {
+        return Constants.OpModeType.TELEOP;
+    }
 
     @Override
     public Pose getInitialPose() {
@@ -30,9 +30,7 @@ public abstract class BaseTeleop extends BaseOpMode {
 
     @Override
     public void initialize() {
-        driveSubsystem = new DriveSubsystem(hardwareMap, telemetry, getInitialPose());
-        intakeSubsystem = new IntakeSubsystem(hardwareMap, telemetry);
-//        limelightSubsystem = new LimelightSubsystem(hardwareMap, telemetry, getAllianceColor());
+        super.initialize();
 
         driverGamepad = new GamepadEx(gamepad1);
 

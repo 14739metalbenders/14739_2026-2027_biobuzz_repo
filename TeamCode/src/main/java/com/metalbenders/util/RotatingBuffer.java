@@ -35,6 +35,7 @@ public class RotatingBuffer<T> {
     /**
      * Returns a full copy of the timestamped buffer items in order from oldest to newest.
      */
+    @SuppressWarnings("unused")
     public synchronized List<TimedEntity<T>> toList() {
         List<TimedEntity<T>> copy = new ArrayList<>(size);
         for (int i = 0; i < size; i++) {
