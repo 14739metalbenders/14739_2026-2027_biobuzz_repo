@@ -13,27 +13,25 @@ import com.pedropathing.math.Pose;
 
 public abstract class BaseOpMode extends CommandOpMode {
 
+    public abstract AllianceColor getAllianceColor();
+    public abstract Pose getInitialPose();
+    public abstract Constants.OpModeType getOpModeType();
+
     protected DriveSubsystem driveSubsystem;
     protected IntakeSubsystem intakeSubsystem;
     protected LimelightSubsystem limelightSubsystem;
     protected TurretSubsystem turretSubsystem;
-
-    public abstract AllianceColor getAllianceColor();
-    public abstract Pose getInitialPose();
-    public abstract Constants.OpModeType getOpModeType();
 
     @Override
     public void initialize() {
         driveSubsystem = new DriveSubsystem(hardwareMap, telemetry, getInitialPose());
         intakeSubsystem = new IntakeSubsystem(hardwareMap, telemetry);
 //        limelightSubsystem = new LimelightSubsystem(hardwareMap, telemetry, getAllianceColor());
-//        turretSubsystem = new TurretSubsystem(hardwareMap, telemetry);
+        turretSubsystem = new TurretSubsystem(hardwareMap, telemetry);
 
-        CommandScheduler.getInstance().setDefaultCommand(turretSubsystem,
-                new UpdateTurretPositionCommand(turretSubsystem, limelightSubsystem, driveSubsystem));
+//        CommandScheduler.getInstance().setDefaultCommand(turretSubsystem,
+//                new UpdateTurretPositionCommand(turretSubsystem, limelightSubsystem, driveSubsystem));
     }
-
-
 
     public void updateRuntime() {
         double totalSeconds = getRuntime();

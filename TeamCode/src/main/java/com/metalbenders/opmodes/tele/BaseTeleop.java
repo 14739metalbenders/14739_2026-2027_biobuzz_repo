@@ -10,6 +10,7 @@ import com.metalbenders.control.commands.DriveCommand;
 import com.metalbenders.control.commands.IntakeCommand;
 import com.metalbenders.control.commands.ResetHeadingCommand;
 import com.metalbenders.control.commands.ReverseIntakeCommand;
+import com.metalbenders.control.commands.ShootCommand;
 import com.metalbenders.opmodes.BaseOpMode;
 import com.metalbenders.util.AutonomousStorage;
 import com.pedropathing.math.Pose;
@@ -36,9 +37,9 @@ public abstract class BaseTeleop extends BaseOpMode {
 
         driveSubsystem.setDefaultCommand(new DriveCommand(
                 driveSubsystem,
-                () -> -driverGamepad.getLeftY(),
                 () -> driverGamepad.getLeftX(),
-                () -> driverGamepad.getRightX()
+                () -> driverGamepad.getLeftY(),
+                () -> -driverGamepad.getRightX()
         ));
 
         driverGamepad.getGamepadButton(GamepadKeys.Button.DPAD_RIGHT)
@@ -50,5 +51,9 @@ public abstract class BaseTeleop extends BaseOpMode {
         Trigger leftTrigger = new Trigger(() ->
                 driverGamepad.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER) > 0.2);
         leftTrigger.whileActiveContinuous(new IntakeCommand(intakeSubsystem));
+
+        Trigger rightTrigger = new Trigger(() ->
+                driverGamepad.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER) > 0.2);
+        rightTrigger.whileActiveContinuous(new ShootCommand(turretSubsystem));
     }
 }
