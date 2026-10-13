@@ -14,11 +14,11 @@ public class ShootCommand extends CommandBase {
 
     @Override
     public void execute() {
-        turretSubsystem.setLauncherPower(.58);
+        turretSubsystem.setLauncherVelocity(1100);
     }
 
     @Override
     public void end(boolean interrupted) {
-        turretSubsystem.setLauncherPower(.0);
+        turretSubsystem.setLauncherVelocity(0.0);
     }
 }
