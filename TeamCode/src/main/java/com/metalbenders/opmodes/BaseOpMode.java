@@ -1,5 +1,7 @@
 package com.metalbenders.opmodes;
 
+import com.acmerobotics.dashboard.FtcDashboard;
+import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.arcrobotics.ftclib.command.CommandOpMode;
 import com.arcrobotics.ftclib.command.CommandScheduler;
 import com.metalbenders.constants.Constants;
@@ -24,13 +26,30 @@ public abstract class BaseOpMode extends CommandOpMode {
 
     @Override
     public void initialize() {
+        telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
         driveSubsystem = new DriveSubsystem(hardwareMap, telemetry, getInitialPose());
         intakeSubsystem = new IntakeSubsystem(hardwareMap, telemetry);
-//        limelightSubsystem = new LimelightSubsystem(hardwareMap, telemetry, getAllianceColor());
+        limelightSubsystem = new LimelightSubsystem(hardwareMap, telemetry, getAllianceColor());
         turretSubsystem = new TurretSubsystem(hardwareMap, telemetry);
 
 //        CommandScheduler.getInstance().setDefaultCommand(turretSubsystem,
 //                new UpdateTurretPositionCommand(turretSubsystem, limelightSubsystem, driveSubsystem));
+    }
+
+    @Override
+    public void run() {
+        long startTime = System.currentTimeMillis();
+        super.run();
+        updateTelemetry(startTime);
+    }
+
+    private void updateTelemetry(long startTime) {
+        telemetry.addLine(this.getClass().getSimpleName());
+        telemetry.addLine("--------------------------------");
+        updateRuntime();
+        telemetry.addData("Main Loop Time", "%d ms", System.currentTimeMillis() - startTime);
+        telemetry.addLine();
+        telemetry.update();
     }
 
     public void updateRuntime() {
@@ -40,12 +59,5 @@ public abstract class BaseOpMode extends CommandOpMode {
                 "%02.0f:%02.0f",
                 totalSeconds / 60,
                 totalSeconds % 60);
-    }
-
-    @Override
-    public void run() {
-        super.run();
-        updateRuntime();
-        telemetry.update();
     }
 }

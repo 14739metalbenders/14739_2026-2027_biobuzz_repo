@@ -19,7 +19,7 @@ public class LimelightSubsystem extends SubsystemBase {
 
     private final Telemetry telemetry;
     private final Constants.AllianceColor allianceColor;
-    private Limelight3A limelight;
+    private final Limelight3A limelight;
     private Constants.FieldSide activeHiveCellFieldSide;
 
     public LimelightSubsystem(HardwareMap hardwareMap, Telemetry telemetry, Constants.AllianceColor allianceColor) {

@@ -54,6 +54,6 @@ public abstract class BaseTeleop extends BaseOpMode {
 
         Trigger rightTrigger = new Trigger(() ->
                 driverGamepad.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER) > 0.2);
-        rightTrigger.whileActiveContinuous(new ShootCommand(turretSubsystem));
+        rightTrigger.whileActiveContinuous(new ShootCommand(turretSubsystem, intakeSubsystem));
     }
 }

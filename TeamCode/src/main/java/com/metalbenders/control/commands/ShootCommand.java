@@ -1,24 +1,31 @@
 package com.metalbenders.control.commands;
 
 import com.arcrobotics.ftclib.command.CommandBase;
+import com.metalbenders.control.subsystems.IntakeSubsystem;
 import com.metalbenders.control.subsystems.TurretSubsystem;
 
 public class ShootCommand extends CommandBase {
 
-    private TurretSubsystem turretSubsystem;
+    private final TurretSubsystem turretSubsystem;
+    private final IntakeSubsystem intakeSubsystem;
 
-    public ShootCommand(TurretSubsystem turretSubsystem) {
+    public ShootCommand(TurretSubsystem turretSubsystem, IntakeSubsystem intakeSubsystem) {
         this.turretSubsystem = turretSubsystem;
-        addRequirements(turretSubsystem);
+        this.intakeSubsystem = intakeSubsystem;
+        addRequirements(turretSubsystem, intakeSubsystem);
     }
 
     @Override
     public void execute() {
-        turretSubsystem.setLauncherVelocity(1100);
+        if (turretSubsystem.atLaunchVelocity()) {
+            turretSubsystem.openLaunchGate();
+            intakeSubsystem.intake();
+        }
     }
 
     @Override
     public void end(boolean interrupted) {
-        turretSubsystem.setLauncherVelocity(0.0);
+        intakeSubsystem.stop();
+        turretSubsystem.closeLaunchGate();
     }
 }
