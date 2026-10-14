@@ -41,13 +41,17 @@ public class TurretSubsystem extends SubsystemBase {
     }
 
     public void closeLaunchGate() {
-        launchGateState = LaunchGateState.CLOSED;
-        launchGateServo.setPosition(launchGateState.getValue());
+        if (launchGateState == LaunchGateState.OPEN) {
+            launchGateState = LaunchGateState.CLOSED;
+            launchGateServo.setPosition(0.7);
+        }
     }
 
     public void openLaunchGate() {
-        launchGateState = LaunchGateState.OPEN;
-        launchGateServo.setPosition(launchGateState.getValue());
+        if (launchGateState == LaunchGateState.CLOSED) {
+            launchGateState = LaunchGateState.OPEN;
+            launchGateServo.setPosition(0.3);
+        }
     }
 
     @Override
@@ -61,18 +65,8 @@ public class TurretSubsystem extends SubsystemBase {
         telemetry.addLine();
     }
 
-    private enum LaunchGateState {
-        OPEN(0.3),
-        CLOSED(0.7);
-
-        private final double value;
-
-        LaunchGateState(double value) {
-            this.value = value;
-        }
-
-        public double getValue() {
-            return value;
-        }
+    public enum LaunchGateState {
+        OPEN,
+        CLOSED;
     }
 }

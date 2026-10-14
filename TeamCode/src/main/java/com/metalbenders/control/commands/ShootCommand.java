@@ -4,6 +4,8 @@ import com.arcrobotics.ftclib.command.CommandBase;
 import com.metalbenders.control.subsystems.IntakeSubsystem;
 import com.metalbenders.control.subsystems.TurretSubsystem;
 
+import static com.metalbenders.control.subsystems.TurretSubsystem.LaunchGateState.CLOSED;
+
 public class ShootCommand extends CommandBase {
 
     private final TurretSubsystem turretSubsystem;

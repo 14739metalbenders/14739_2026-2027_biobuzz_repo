@@ -24,18 +24,24 @@ public class IntakeSubsystem extends SubsystemBase {
     }
 
     public void intake() {
-        intakeMotor.setPower(1);
-        intakeState = IntakeState.INTAKE;
+        if ( intakeState != IntakeState.INTAKE) {
+            intakeMotor.setPower(1);
+            intakeState = IntakeState.INTAKE;
+        }
     }
 
     public void reverseIntake() {
-        intakeMotor.setPower(-1);
-        intakeState = IntakeState.REVERSE_INTAKE;
+        if (intakeState != IntakeState.REVERSE_INTAKE) {
+            intakeMotor.setPower(-1);
+            intakeState = IntakeState.REVERSE_INTAKE;
+        }
     }
 
     public void stop() {
-        intakeMotor.setPower(0);
-        intakeState = IntakeState.STOPPED;
+        if (intakeState != IntakeState.STOPPED) {
+            intakeMotor.setPower(0);
+            intakeState = IntakeState.STOPPED;
+        }
     }
 
     @Override
