@@ -7,9 +7,9 @@ import com.metalbenders.control.subsystems.TurretSubsystem;
 
 public class UpdateTurretPositionCommand extends CommandBase {
 
-    private TurretSubsystem turretSubsystem;
-    private LimelightSubsystem limelightSubsystem;
-    private DriveSubsystem driveSubsystem;
+    private final TurretSubsystem turretSubsystem;
+    private final LimelightSubsystem limelightSubsystem;
+    private final DriveSubsystem driveSubsystem;
 
     public UpdateTurretPositionCommand(
             TurretSubsystem turretSubsystem, LimelightSubsystem limelightSubsystem, DriveSubsystem driveSubsystem) {
@@ -21,5 +21,9 @@ public class UpdateTurretPositionCommand extends CommandBase {
 
     @Override
     public void execute() {
+        turretSubsystem.determineTargetHeading(
+                limelightSubsystem.getActiveHiveCellFieldSide(),
+                driveSubsystem.getCurrentPose(),
+                limelightSubsystem.getLastActiveSideDetections());
     }
 }

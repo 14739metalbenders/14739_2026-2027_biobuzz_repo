@@ -16,6 +16,9 @@ public enum FieldLocations {
     AUDIENCE_SIDE_WAYPOINT(
             new Pose(0, 0, Math.toRadians(0)),
             new Pose(0, 0, Math.toRadians(0))),
+    AUDIENCE_SIDE_HIVE_CELL(
+            new Pose(0, 0, Math.toRadians(270)),
+            new Pose(0, 0, Math.toRadians(270))),
     SCORE_SIDE_START_POSE(
             new Pose(0, 0, Math.toRadians(0)),
             new Pose(0, 0, Math.toRadians(0))),
@@ -28,6 +31,9 @@ public enum FieldLocations {
     SCORE_SIDE_WAYPOINT(
             new Pose(0, 0, Math.toRadians(0)),
             new Pose(0, 0, Math.toRadians(0))),
+    SCORE_SIDE_HIVE_CELL(
+            new Pose(0, 0, Math.toRadians(90)),
+            new Pose(0, 0, Math.toRadians(90))),
     GARDEN(
             new Pose(0, 0, Math.toRadians(0)),
             new Pose(0, 0, Math.toRadians(0))),

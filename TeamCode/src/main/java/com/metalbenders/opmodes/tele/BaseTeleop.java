@@ -6,11 +6,7 @@ import com.arcrobotics.ftclib.command.button.Trigger;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
 import com.arcrobotics.ftclib.gamepad.GamepadKeys;
 import com.metalbenders.constants.Constants;
-import com.metalbenders.control.commands.DriveCommand;
-import com.metalbenders.control.commands.IntakeCommand;
-import com.metalbenders.control.commands.ResetHeadingCommand;
-import com.metalbenders.control.commands.ReverseIntakeCommand;
-import com.metalbenders.control.commands.ShootCommand;
+import com.metalbenders.control.commands.*;
 import com.metalbenders.opmodes.BaseOpMode;
 import com.metalbenders.util.AutonomousStorage;
 import com.pedropathing.math.Pose;
@@ -45,12 +41,18 @@ public abstract class BaseTeleop extends BaseOpMode {
         driverGamepad.getGamepadButton(GamepadKeys.Button.DPAD_RIGHT)
                 .whenPressed(new ResetHeadingCommand(driveSubsystem));
 
+        driverGamepad.getGamepadButton(GamepadKeys.Button.DPAD_UP)
+                .whenPressed(new SetFieldSideOverrideCommand(limelightSubsystem, Constants.FieldSide.SCORE_SIDE));
+
+        driverGamepad.getGamepadButton(GamepadKeys.Button.DPAD_DOWN)
+                .whenPressed(new SetFieldSideOverrideCommand(limelightSubsystem, Constants.FieldSide.AUDIENCE_SIDE));
+
         driverGamepad.getGamepadButton(GamepadKeys.Button.LEFT_BUMPER)
                 .whileHeld(new ReverseIntakeCommand(intakeSubsystem));
 
         Trigger leftTrigger = new Trigger(() ->
                 driverGamepad.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER) > 0.2);
-        leftTrigger.whileActiveContinuous(new IntakeCommand(intakeSubsystem));
+        leftTrigger.whileActiveContinuous(new IntakeCommand(intakeSubsystem, turretSubsystem));
 
         Trigger rightTrigger = new Trigger(() ->
                 driverGamepad.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER) > 0.2);

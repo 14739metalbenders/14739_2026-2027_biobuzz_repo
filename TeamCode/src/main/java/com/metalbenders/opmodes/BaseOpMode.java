@@ -30,10 +30,10 @@ public abstract class BaseOpMode extends CommandOpMode {
         driveSubsystem = new DriveSubsystem(hardwareMap, telemetry, getInitialPose());
         intakeSubsystem = new IntakeSubsystem(hardwareMap, telemetry);
         limelightSubsystem = new LimelightSubsystem(hardwareMap, telemetry, getAllianceColor());
-        turretSubsystem = new TurretSubsystem(hardwareMap, telemetry);
+        turretSubsystem = new TurretSubsystem(hardwareMap, telemetry, getAllianceColor());
 
-//        CommandScheduler.getInstance().setDefaultCommand(turretSubsystem,
-//                new UpdateTurretPositionCommand(turretSubsystem, limelightSubsystem, driveSubsystem));
+//        turretSubsystem.setDefaultCommand(new UpdateTurretPositionCommand(
+//                turretSubsystem, limelightSubsystem, driveSubsystem));
     }
 
     @Override

@@ -21,6 +21,9 @@ public class RotatingBuffer<T> {
     }
 
     public synchronized void put(T item) {
+        if (item == null) {
+            return;
+        }
         buffer[tail] = TimedEntity.of(item);
         tail = (tail + 1) % capacity;
 
@@ -57,32 +60,17 @@ public class RotatingBuffer<T> {
         long minDiff = (long) maxTimeDiffInMillis + 1;
         for (int i = 0; i < size; i++) {
             TimedEntity<T> timedEntity = buffer[(head + i) % capacity];
-            long diff = timedEntity.time >= time
-                    ? timedEntity.time - time : time - timedEntity.time;
+            long diff = timedEntity.getTime() >= time
+                    ? timedEntity.getTime() - time : time - timedEntity.getTime();
             // Negative differences indicate overflow for timestamps outside the supported tolerance.
             if (diff >= 0 && diff < minDiff) {
                 minDiff = diff;
-                closest = timedEntity.entity;
+                closest = timedEntity.getEntity();
             }
-            if (timedEntity.time >= time) {
+            if (timedEntity.getTime() >= time) {
                 break;
             }
         }
         return closest;
-    }
-
-    public static class TimedEntity<T> {
-
-        private final long time;
-        private final T entity;
-
-        public TimedEntity(T entity) {
-            this.time = System.currentTimeMillis();
-            this.entity = entity;
-        }
-
-        public static <T> TimedEntity<T> of (T entity) {
-            return new TimedEntity<>(entity);
-        }
     }
 }

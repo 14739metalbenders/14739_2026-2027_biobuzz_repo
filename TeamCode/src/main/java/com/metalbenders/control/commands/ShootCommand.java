@@ -26,6 +26,7 @@ public class ShootCommand extends CommandBase {
     @Override
     public void end(boolean interrupted) {
         intakeSubsystem.stop();
+        turretSubsystem.kickLaunchGate();
         turretSubsystem.closeLaunchGate();
     }
 }

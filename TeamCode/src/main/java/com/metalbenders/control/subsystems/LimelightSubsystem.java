@@ -3,6 +3,7 @@ package com.metalbenders.control.subsystems;
 import com.arcrobotics.ftclib.command.SubsystemBase;
 import com.metalbenders.constants.AprilTag;
 import com.metalbenders.constants.Constants;
+import com.metalbenders.util.TimedEntity;
 import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.limelightvision.LLResultTypes;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
@@ -21,6 +22,8 @@ public class LimelightSubsystem extends SubsystemBase {
     private final Constants.AllianceColor allianceColor;
     private final Limelight3A limelight;
     private Constants.FieldSide activeHiveCellFieldSide;
+    private final TimedEntity<List<LLResultTypes.FiducialResult>> lastActiveSideDetections =
+            new TimedEntity<>(new ArrayList<>());
 
     public LimelightSubsystem(HardwareMap hardwareMap, Telemetry telemetry, Constants.AllianceColor allianceColor) {
         this.allianceColor = allianceColor;
@@ -42,9 +45,7 @@ public class LimelightSubsystem extends SubsystemBase {
                 || llResult.getFiducialResults().isEmpty()) {
             return;
         }
-        if (llResult.getFiducialResults() != null && !llResult.getFiducialResults().isEmpty()) {
-            processFiducialResults(llResult.getFiducialResults());
-        }
+        processFiducialResults(llResult.getFiducialResults());
     }
 
     private void processFiducialResults(List<LLResultTypes.FiducialResult> fiducialResults) {
@@ -54,7 +55,7 @@ public class LimelightSubsystem extends SubsystemBase {
         for (LLResultTypes.FiducialResult fiducialResult : fiducialResults) {
             AprilTag aprilTag = AprilTag.getAprilTagById(fiducialResult.getFiducialId());
             if (aprilTag != null && aprilTag.getAllianceColor() == allianceColor) {
-                if(aprilTag.getFieldSide() == SCORE_SIDE) {
+                if (aprilTag.getFieldSide() == SCORE_SIDE) {
                     scoreSideResults.add(fiducialResult);
                 } else if (aprilTag.getFieldSide() == AUDIENCE_SIDE) {
                     audienceSideResults.add(fiducialResult);
@@ -63,15 +64,9 @@ public class LimelightSubsystem extends SubsystemBase {
         }
         updateActiveHiveCellFieldSide(scoreSideResults, audienceSideResults);
         if (activeHiveCellFieldSide == SCORE_SIDE) {
-            processActiveSideResults(scoreSideResults);
+            TimedEntity.of(scoreSideResults);
         } else {
-            processActiveSideResults(audienceSideResults);
-        }
-    }
-
-    private void processActiveSideResults(List<LLResultTypes.FiducialResult> fiducialResults) {
-        for (LLResultTypes.FiducialResult fiducialResult : fiducialResults) {
-            //TODO implement targeting logic
+            TimedEntity.of(audienceSideResults);
         }
     }
 
@@ -102,12 +97,22 @@ public class LimelightSubsystem extends SubsystemBase {
         return activeHiveCellFieldSide;
     }
 
+    public void setFieldSideOverride(Constants.FieldSide fieldSideOverride) {
+        this.activeHiveCellFieldSide = fieldSideOverride;
+    }
+
+    public TimedEntity<List<LLResultTypes.FiducialResult>> getLastActiveSideDetections() {
+        return lastActiveSideDetections;
+    }
+
     @Override
     public void periodic() {
         processLLResult();
         telemetry.addLine(this.getClass().getSimpleName());
         telemetry.addLine("--------------------------------");
-        telemetry.addData("Active Hive Cell Field Side", activeHiveCellFieldSide);
-        telemetry.addLine();
+        telemetry.addData("Active Hive Cell Field Side", getActiveHiveCellFieldSide());
+        for(LLResultTypes.FiducialResult fiducialResult : lastActiveSideDetections.getEntity()) {
+            telemetry.addLine("TAG" + fiducialResult.getFiducialId());
+        }
     }
 }
