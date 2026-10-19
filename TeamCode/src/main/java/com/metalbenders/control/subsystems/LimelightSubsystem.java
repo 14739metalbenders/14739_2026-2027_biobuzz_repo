@@ -30,6 +30,7 @@ public class LimelightSubsystem extends SubsystemBase {
         this.telemetry = telemetry;
         this.limelight = hardwareMap.get(Limelight3A.class, "limelight");
         this.limelight.pipelineSwitch(0);
+        this.limelight.start();
         if (allianceColor == Constants.AllianceColor.RED) {
             this.activeHiveCellFieldSide = SCORE_SIDE;
         } else {
@@ -111,8 +112,10 @@ public class LimelightSubsystem extends SubsystemBase {
         telemetry.addLine(this.getClass().getSimpleName());
         telemetry.addLine("--------------------------------");
         telemetry.addData("Active Hive Cell Field Side", getActiveHiveCellFieldSide());
-        for(LLResultTypes.FiducialResult fiducialResult : lastActiveSideDetections.getEntity()) {
-            telemetry.addLine("TAG" + fiducialResult.getFiducialId());
+        telemetry.addLine("TAGS");
+        for (LLResultTypes.FiducialResult fiducialResult : lastActiveSideDetections.getEntity()) {
+            telemetry.addLine("\t" + fiducialResult.getFiducialId());
         }
+        telemetry.addLine();
     }
 }
