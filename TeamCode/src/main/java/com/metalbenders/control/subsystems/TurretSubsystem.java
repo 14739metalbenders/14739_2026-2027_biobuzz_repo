@@ -16,7 +16,7 @@ import static com.qualcomm.robotcore.hardware.DcMotor.RunMode.RUN_USING_ENCODER;
 public class TurretSubsystem extends SubsystemBase {
 
     private final Telemetry telemetry;
-    private final DcMotorEx turretMotor;
+//    private final DcMotorEx turretMotor;
     private final DcMotorEx launcher;
     private final Servo launchGateServo;
     private double targetLaunchVelocity;
@@ -49,6 +49,7 @@ public class TurretSubsystem extends SubsystemBase {
 //                TURRET_VELOCITY_PID.p, TURRET_VELOCITY_PID.i, TURRET_VELOCITY_PID.d, TURRET_VELOCITY_PID.f));
 
         //TODO: This line will need to be removed and replaced with setting the velocity from the vision system.
+        closeLaunchGate();
         setTargetLaunchVelocity(1300);
     }
 
