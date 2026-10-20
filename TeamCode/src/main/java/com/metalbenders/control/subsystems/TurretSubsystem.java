@@ -25,7 +25,7 @@ public class TurretSubsystem extends SubsystemBase {
     }
 
     private final Telemetry telemetry;
-//    private final DcMotorEx turretMotor;
+    private final DcMotorEx turretMotor;
     private final DcMotorEx launcher;
     private final Servo launchGateServo;
     private LaunchVelocity targetLaunchVelocity = LaunchVelocity.DEFAULT;
@@ -54,10 +54,11 @@ public class TurretSubsystem extends SubsystemBase {
                 LAUNCHER_VELOCITY_PID.p, LAUNCHER_VELOCITY_PID.i, LAUNCHER_VELOCITY_PID.d, LAUNCHER_VELOCITY_PID.f));
 
         //turret motor setup
-//        this.turretMotor = hardwareMap.get(DcMotorEx.class, "turretMotor");
-//        this.turretMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-//        this.turretMotor.setPIDFCoefficients(RUN_USING_ENCODER, new PIDFCoefficients(
-//                TURRET_VELOCITY_PID.p, TURRET_VELOCITY_PID.i, TURRET_VELOCITY_PID.d, TURRET_VELOCITY_PID.f));
+        this.turretMotor = hardwareMap.get(DcMotorEx.class, "turretMotor");
+        this.turretMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        this.turretMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        this.turretMotor.setPIDFCoefficients(RUN_USING_ENCODER, new PIDFCoefficients(
+                TURRET_VELOCITY_PID.p, TURRET_VELOCITY_PID.i, TURRET_VELOCITY_PID.d, TURRET_VELOCITY_PID.f));
     }
 
     public boolean atLaunchVelocity() {
