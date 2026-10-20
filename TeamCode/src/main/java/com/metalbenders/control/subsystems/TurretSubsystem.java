@@ -15,6 +15,12 @@ import static com.qualcomm.robotcore.hardware.DcMotor.RunMode.RUN_USING_ENCODER;
 
 public class TurretSubsystem extends SubsystemBase {
 
+    public enum LaunchGateState {
+        OPEN,
+        CLOSED,
+        KICK
+    }
+
     private final Telemetry telemetry;
 //    private final DcMotorEx turretMotor;
     private final DcMotorEx launcher;
@@ -59,7 +65,8 @@ public class TurretSubsystem extends SubsystemBase {
     }
 
     public boolean atLaunchVelocity() {
-        return Math.abs(targetLaunchVelocity - actualLaunchVelocity) < 50;
+        return true;
+        //Math.abs(targetLaunchVelocity - actualLaunchVelocity) < 50;
     }
 
     public void closeLaunchGate() {
@@ -79,7 +86,7 @@ public class TurretSubsystem extends SubsystemBase {
     public void kickLaunchGate() {
         if (launchGateState == LaunchGateState.OPEN) {
             launchGateState = LaunchGateState.KICK;
-            launchGateServo.setPosition(0.8);
+            launchGateServo.setPosition(0.08);
         }
     }
 
@@ -147,9 +154,7 @@ public class TurretSubsystem extends SubsystemBase {
         telemetry.addLine();
     }
 
-    public enum LaunchGateState {
-        OPEN,
-        CLOSED,
-        KICK
+    public void teardown() {
+        closeLaunchGate();
     }
 }

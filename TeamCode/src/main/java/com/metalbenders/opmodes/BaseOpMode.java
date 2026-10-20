@@ -48,6 +48,7 @@ public abstract class BaseOpMode extends CommandOpMode {
         telemetry.addLine("--------------------------------");
         updateRuntime();
         telemetry.addData("Main Loop Time", "%d ms", System.currentTimeMillis() - startTime);
+        telemetry.addData("Alliance Color", getAllianceColor());
         telemetry.addLine();
         telemetry.update();
     }
@@ -59,5 +60,14 @@ public abstract class BaseOpMode extends CommandOpMode {
                 "%02.0f:%02.0f",
                 totalSeconds / 60,
                 totalSeconds % 60);
+    }
+
+    @Override
+    public void reset() {
+        intakeSubsystem.teardown();
+        limelightSubsystem.teardown();
+        turretSubsystem.teardown();
+        driveSubsystem.teardown(getOpModeType());
+        super.reset();
     }
 }

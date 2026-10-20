@@ -42,10 +42,12 @@ public abstract class BaseTeleop extends BaseOpMode {
                 .whenPressed(new ResetHeadingCommand(driveSubsystem));
 
         driverGamepad.getGamepadButton(GamepadKeys.Button.DPAD_UP)
-                .whenPressed(new SetFieldSideOverrideCommand(limelightSubsystem, Constants.FieldSide.SCORE_SIDE));
+                .whenPressed(new SetFieldSideOverrideCommand(
+                        limelightSubsystem, Constants.FieldSide.SCORE_SIDE));
 
         driverGamepad.getGamepadButton(GamepadKeys.Button.DPAD_DOWN)
-                .whenPressed(new SetFieldSideOverrideCommand(limelightSubsystem, Constants.FieldSide.AUDIENCE_SIDE));
+                .whenPressed(new SetFieldSideOverrideCommand(
+                        limelightSubsystem, Constants.FieldSide.AUDIENCE_SIDE));
 
         driverGamepad.getGamepadButton(GamepadKeys.Button.LEFT_BUMPER)
                 .whileHeld(new ReverseIntakeCommand(intakeSubsystem));

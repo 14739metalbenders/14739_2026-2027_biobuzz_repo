@@ -22,7 +22,9 @@ public class LimelightSubsystem extends SubsystemBase {
     private final Constants.AllianceColor allianceColor;
     private final Limelight3A limelight;
     private Constants.FieldSide activeHiveCellFieldSide;
-    private final TimedEntity<List<LLResultTypes.FiducialResult>> lastActiveSideDetections =
+    private TimedEntity<List<LLResultTypes.FiducialResult>> lastActiveSideDetections =
+            new TimedEntity<>(new ArrayList<>());
+    private TimedEntity<List<LLResultTypes.FiducialResult>> lastInactiveSideDetections =
             new TimedEntity<>(new ArrayList<>());
 
     public LimelightSubsystem(HardwareMap hardwareMap, Telemetry telemetry, Constants.AllianceColor allianceColor) {
@@ -31,11 +33,10 @@ public class LimelightSubsystem extends SubsystemBase {
         this.limelight = hardwareMap.get(Limelight3A.class, "limelight");
         this.limelight.pipelineSwitch(0);
         this.limelight.start();
-        if (allianceColor == Constants.AllianceColor.RED) {
-            this.activeHiveCellFieldSide = SCORE_SIDE;
-        } else {
-            this.activeHiveCellFieldSide = AUDIENCE_SIDE;
-        }
+        this.activeHiveCellFieldSide =
+                allianceColor == Constants.AllianceColor.RED
+                        ? SCORE_SIDE
+                        : AUDIENCE_SIDE;
     }
 
     private void processLLResult() {
@@ -46,44 +47,58 @@ public class LimelightSubsystem extends SubsystemBase {
                 || llResult.getFiducialResults().isEmpty()) {
             return;
         }
-        processFiducialResults(llResult.getFiducialResults());
-    }
-
-    private void processFiducialResults(List<LLResultTypes.FiducialResult> fiducialResults) {
         List<LLResultTypes.FiducialResult> scoreSideResults = new ArrayList<>();
         List<LLResultTypes.FiducialResult> audienceSideResults = new ArrayList<>();
-        //Group the results by cluster, ignoring results for the other alliance color.
-        for (LLResultTypes.FiducialResult fiducialResult : fiducialResults) {
+        for (LLResultTypes.FiducialResult fiducialResult : llResult.getFiducialResults()) {
             AprilTag aprilTag = AprilTag.getAprilTagById(fiducialResult.getFiducialId());
             if (aprilTag != null && aprilTag.getAllianceColor() == allianceColor) {
                 if (aprilTag.getFieldSide() == SCORE_SIDE) {
                     scoreSideResults.add(fiducialResult);
-                } else if (aprilTag.getFieldSide() == AUDIENCE_SIDE) {
+                } else {
                     audienceSideResults.add(fiducialResult);
                 }
             }
         }
-        updateActiveHiveCellFieldSide(scoreSideResults, audienceSideResults);
-        if (activeHiveCellFieldSide == SCORE_SIDE) {
-            TimedEntity.of(scoreSideResults);
-        } else {
-            TimedEntity.of(audienceSideResults);
+        setDetections(scoreSideResults, audienceSideResults);
+        updateActiveHiveCellFieldSide();
+    }
+
+    private void setDetections(
+            List<LLResultTypes.FiducialResult> scoreSideResults,
+            List<LLResultTypes.FiducialResult> audienceSideResults) {
+        if (scoreSideResults != null && !scoreSideResults.isEmpty()) {
+            if (activeHiveCellFieldSide == SCORE_SIDE) {
+                lastActiveSideDetections = TimedEntity.of(scoreSideResults);
+            } else {
+                lastInactiveSideDetections = TimedEntity.of(scoreSideResults);
+            }
+        }
+        if (audienceSideResults != null && !audienceSideResults.isEmpty()) {
+            if (activeHiveCellFieldSide == AUDIENCE_SIDE) {
+                lastActiveSideDetections = TimedEntity.of(audienceSideResults);
+            } else {
+                lastInactiveSideDetections = TimedEntity.of(audienceSideResults);
+            }
         }
     }
 
-    private void updateActiveHiveCellFieldSide(
-            List<LLResultTypes.FiducialResult> scoreSideResults,
-            List<LLResultTypes.FiducialResult> audienceSideResults) {
-        if (scoreSideResults.isEmpty() || audienceSideResults.isEmpty()) {
+    private void updateActiveHiveCellFieldSide() {
+        if (Math.abs(lastActiveSideDetections.getTime() - lastInactiveSideDetections.getTime()) > 100) {
             return;
         }
-        double averageTyScoreSide = calculateAverageTy(scoreSideResults);
-        double averageTyAudienceSide = calculateAverageTy(audienceSideResults);
-        if (averageTyScoreSide > averageTyAudienceSide) {
-            activeHiveCellFieldSide = SCORE_SIDE;
-        } else {
-            activeHiveCellFieldSide = AUDIENCE_SIDE;
+        double averageTyActiveSide = calculateAverageTy(lastActiveSideDetections.getEntity());
+        double averageTyInactiveSide = calculateAverageTy(lastInactiveSideDetections.getEntity());
+        //y-values above are negative, so the lower number is higher (i.e. less negative)
+        if (averageTyInactiveSide < averageTyActiveSide) {
+            switchActiveSide();
         }
+    }
+
+    private void switchActiveSide() {
+        activeHiveCellFieldSide = activeHiveCellFieldSide == SCORE_SIDE ? AUDIENCE_SIDE : SCORE_SIDE;
+        TimedEntity<List<LLResultTypes.FiducialResult>> swap = lastActiveSideDetections;
+        lastActiveSideDetections = lastInactiveSideDetections;
+        lastInactiveSideDetections = swap;
     }
 
     private double calculateAverageTy(List<LLResultTypes.FiducialResult> fiducialResults) {
@@ -112,10 +127,27 @@ public class LimelightSubsystem extends SubsystemBase {
         telemetry.addLine(this.getClass().getSimpleName());
         telemetry.addLine("--------------------------------");
         telemetry.addData("Active Hive Cell Field Side", getActiveHiveCellFieldSide());
-        telemetry.addLine("TAGS");
-        for (LLResultTypes.FiducialResult fiducialResult : lastActiveSideDetections.getEntity()) {
-            telemetry.addLine("\t" + fiducialResult.getFiducialId());
+
+        //ACTIVE
+        telemetry.addLine("ACTIVE Side Detections");
+        telemetry.addData("Time Since Last Detection",
+                System.currentTimeMillis() - lastActiveSideDetections.getTime() + " ms");
+        for (LLResultTypes.FiducialResult result : lastActiveSideDetections.getEntity()) {
+            telemetry.addLine("\t" + result.getFiducialId());
+        }
+
+        //INACTIVE
+        telemetry.addLine("INACTIVE Side Detections");
+        telemetry.addData("Time Since Last Detection",
+                System.currentTimeMillis() - lastInactiveSideDetections.getTime() + " ms");
+        telemetry.addLine("INACTIVE - Detected " + allianceColor + "Tags");
+        for (LLResultTypes.FiducialResult result : lastInactiveSideDetections.getEntity()) {
+            telemetry.addLine("\t" + result.getFiducialId());
         }
         telemetry.addLine();
+    }
+
+    public void teardown() {
+        limelight.stop();
     }
 }

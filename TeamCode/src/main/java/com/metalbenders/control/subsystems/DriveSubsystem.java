@@ -1,7 +1,10 @@
 package com.metalbenders.control.subsystems;
 
+import static com.metalbenders.constants.Constants.OpModeType.AUTO;
+
 import android.annotation.SuppressLint;
 import com.arcrobotics.ftclib.command.SubsystemBase;
+import com.metalbenders.util.AutonomousStorage;
 import com.metalbenders.util.RotatingBuffer;
 import com.pedropathing.follower.Follower;
 import com.pedropathing.follower.ManualDrive;
@@ -62,5 +65,11 @@ public class DriveSubsystem extends SubsystemBase {
                         follower.pose().x(), follower.pose().y(), follower.pose().heading()));
         telemetry.addData("Driving", follower.isBusy() ? "Yes" : "No");
         telemetry.addLine();
+    }
+
+    public void teardown(com.metalbenders.constants.Constants.OpModeType opModeType) {
+        if (opModeType == AUTO) {
+            AutonomousStorage.endPose = getCurrentPose();
+        }
     }
 }

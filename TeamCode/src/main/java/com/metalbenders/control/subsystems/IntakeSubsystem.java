@@ -51,4 +51,8 @@ public class IntakeSubsystem extends SubsystemBase {
         telemetry.addData("Intake State", intakeState);
         telemetry.addLine();
     }
+
+    public void teardown() {
+        stop();
+    }
 }
