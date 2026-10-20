@@ -96,7 +96,7 @@ public class LimelightSubsystem extends SubsystemBase {
     }
 
     private void updateActiveHiveCellFieldSide() {
-        if (Math.abs(lastActiveSideDetections.getTime() - lastInactiveSideDetections.getTime()) > 100) {
+        if (Math.abs(lastActiveSideDetections.getTime() - lastInactiveSideDetections.getTime()) > 500) {
             return;
         }
 

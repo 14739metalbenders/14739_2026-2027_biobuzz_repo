@@ -7,7 +7,10 @@ public enum FieldLocations {
     AUDIENCE_SIDE_START_POSE(
             new Pose(0, 0, Math.toRadians(0)),
             new Pose(0, 0, Math.toRadians(0))),
-    AUDIENCE_SIDE_FLOWER(
+    GARDEN_SIDE_FLOWER(
+            new Pose(0, 0, Math.toRadians(0)),
+            new Pose(0, 0, Math.toRadians(0))),
+    PARK_SIDE_FLOWER(
             new Pose(0, 0, Math.toRadians(0)),
             new Pose(0, 0, Math.toRadians(0))),
     AUDIENCE_SIDE_LAUNCH(
@@ -20,9 +23,6 @@ public enum FieldLocations {
             new Pose(0, 0, Math.toRadians(270)),
             new Pose(0, 0, Math.toRadians(270))),
     SCORE_SIDE_START_POSE(
-            new Pose(0, 0, Math.toRadians(0)),
-            new Pose(0, 0, Math.toRadians(0))),
-    SCORE_SIDE_FLOWER(
             new Pose(0, 0, Math.toRadians(0)),
             new Pose(0, 0, Math.toRadians(0))),
     SCORE_SIDE_LAUNCH(
