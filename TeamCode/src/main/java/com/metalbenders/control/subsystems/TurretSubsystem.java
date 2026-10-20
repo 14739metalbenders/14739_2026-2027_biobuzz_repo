@@ -179,7 +179,8 @@ public class TurretSubsystem extends SubsystemBase {
         actualLaunchVelocity = launcher.getVelocity();
         telemetry.addLine(this.getClass().getSimpleName());
         telemetry.addLine("--------------------------------");
-        telemetry.addData("Target Velocity", targetLaunchVelocity.name());
+        telemetry.addData("Target Velocity",
+                targetLaunchVelocity.name() + " (" + targetLaunchVelocity.getVelocity() + " rpm)");
         telemetry.addData("Actual Velocity", actualLaunchVelocity);
         telemetry.addData("Launch Gate State", launchGateState);
         telemetry.addData("Target Heading (degrees)", targetHeadingDegrees);
