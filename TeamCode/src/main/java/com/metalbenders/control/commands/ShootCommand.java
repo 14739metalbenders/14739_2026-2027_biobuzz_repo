@@ -17,7 +17,8 @@ public class ShootCommand extends CommandBase {
 
     @Override
     public void execute() {
-        if (turretSubsystem.atLaunchVelocity()) {
+        if (turretSubsystem.getLaunchGateState() == TurretSubsystem.LaunchGateState.CLOSED
+                && turretSubsystem.atLaunchVelocity()) {
             turretSubsystem.openLaunchGate();
             intakeSubsystem.intake();
         }

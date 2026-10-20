@@ -3,6 +3,7 @@ package com.metalbenders.control.subsystems;
 import com.arcrobotics.ftclib.command.SubsystemBase;
 import com.metalbenders.constants.Constants;
 import com.metalbenders.constants.FieldLocations;
+import com.metalbenders.constants.LaunchVelocity;
 import com.metalbenders.util.TimedEntity;
 import com.pedropathing.math.Pose;
 import com.qualcomm.hardware.limelightvision.LLResultTypes;
@@ -11,6 +12,8 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 import java.util.List;
 
+import static com.metalbenders.constants.LaunchVelocity.getLaunchVelocityByDistance;
+import static com.metalbenders.util.MathUtil.calculateAverageTx;
 import static com.qualcomm.robotcore.hardware.DcMotor.RunMode.RUN_USING_ENCODER;
 
 public class TurretSubsystem extends SubsystemBase {
@@ -25,9 +28,8 @@ public class TurretSubsystem extends SubsystemBase {
 //    private final DcMotorEx turretMotor;
     private final DcMotorEx launcher;
     private final Servo launchGateServo;
-    private double targetLaunchVelocity;
+    private LaunchVelocity targetLaunchVelocity = LaunchVelocity.DEFAULT;
     private double actualLaunchVelocity;
-    //TODO: Tune PID values for launcher velocity
     private LaunchGateState launchGateState;
     private double targetHeadingDegrees = 0.0;
     private double turretHeadingDegrees = 0.0;
@@ -40,11 +42,14 @@ public class TurretSubsystem extends SubsystemBase {
         this.telemetry = telemetry;
         this.allianceColor = allianceColor;
         this.launchGateServo = hardwareMap.get(Servo.class, "launchServo");
-        closeLaunchGate();
+        // Force a known startup position/state so first shot command can open the gate.
+        this.launchGateServo.setPosition(0.75);
+        this.launchGateState = LaunchGateState.CLOSED;
 
         //launcher motor setup
         this.launcher = hardwareMap.get(DcMotorEx.class, "launcher");
         this.launcher.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        this.launcher.setMode(RUN_USING_ENCODER);
         this.launcher.setPIDFCoefficients(RUN_USING_ENCODER, new PIDFCoefficients(
                 LAUNCHER_VELOCITY_PID.p, LAUNCHER_VELOCITY_PID.i, LAUNCHER_VELOCITY_PID.d, LAUNCHER_VELOCITY_PID.f));
 
@@ -53,44 +58,71 @@ public class TurretSubsystem extends SubsystemBase {
 //        this.turretMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 //        this.turretMotor.setPIDFCoefficients(RUN_USING_ENCODER, new PIDFCoefficients(
 //                TURRET_VELOCITY_PID.p, TURRET_VELOCITY_PID.i, TURRET_VELOCITY_PID.d, TURRET_VELOCITY_PID.f));
-
-        //TODO: This line will need to be removed and replaced with setting the velocity from the vision system.
-        closeLaunchGate();
-        setTargetLaunchVelocity(1300);
-    }
-
-    public void setTargetLaunchVelocity(double velocity) {
-        launcher.setVelocity(velocity);
-        this.targetLaunchVelocity = velocity;
     }
 
     public boolean atLaunchVelocity() {
-        return true;
-        //Math.abs(targetLaunchVelocity - actualLaunchVelocity) < 50;
+        return targetLaunchVelocity.getTolerance() == null
+                || Math.abs(targetLaunchVelocity.getVelocity() - actualLaunchVelocity) < targetLaunchVelocity.getTolerance();
     }
 
     public void closeLaunchGate() {
-        if (launchGateState == LaunchGateState.KICK || launchGateState == LaunchGateState.OPEN) {
+        if (launchGateState != LaunchGateState.CLOSED) {
             launchGateState = LaunchGateState.CLOSED;
             launchGateServo.setPosition(0.75);
         }
     }
 
     public void openLaunchGate() {
-        if (launchGateState == LaunchGateState.CLOSED) {
+        if (launchGateState != LaunchGateState.OPEN) {
             launchGateState = LaunchGateState.OPEN;
             launchGateServo.setPosition(0.52);
         }
     }
 
     public void kickLaunchGate() {
-        if (launchGateState == LaunchGateState.OPEN) {
+        if (launchGateState != LaunchGateState.KICK) {
             launchGateState = LaunchGateState.KICK;
             launchGateServo.setPosition(0.08);
         }
     }
 
-    public void determineTargetHeading(
+    public LaunchGateState getLaunchGateState() {
+        return launchGateState;
+    }
+
+    public void updateLauncher(
+            Constants.FieldSide activeHiveCellFieldSide,
+            Pose currentPose,
+            TimedEntity<List<LLResultTypes.FiducialResult>> lastActiveSideDetections) {
+        setTargetLaunchVelocity(activeHiveCellFieldSide, currentPose, lastActiveSideDetections);
+        setTargetHeadingDegrees(activeHiveCellFieldSide, currentPose, lastActiveSideDetections);
+    }
+
+    public void setTargetLaunchVelocity(
+            Constants.FieldSide activeHiveCellFieldSide,
+            Pose currentPose,
+            TimedEntity<List<LLResultTypes.FiducialResult>> lastActiveSideDetections) {
+
+        double distance;
+        if (areDetectionsValid(lastActiveSideDetections)) {
+            distance = calculateAverageTx(lastActiveSideDetections.getEntity());
+        } else {
+            distance = calculateDistanceFromOdometry(activeHiveCellFieldSide, currentPose);
+        }
+        this.targetLaunchVelocity = getLaunchVelocityByDistance(distance);
+    }
+
+    private double calculateDistanceFromOdometry(Constants.FieldSide activeHiveCellFieldSide, Pose currentPose) {
+        double targetX;
+        if (activeHiveCellFieldSide == Constants.FieldSide.SCORE_SIDE) {
+            targetX = FieldLocations.SCORE_SIDE_HIVE_CELL.getPose(allianceColor).x();
+        } else {
+            targetX = FieldLocations.AUDIENCE_SIDE_HIVE_CELL.getPose(allianceColor).x();
+        }
+        return Math.abs(targetX - currentPose.x());
+    }
+
+    private void setTargetHeadingDegrees(
             Constants.FieldSide activeHiveCellFieldSide,
             Pose currentPose,
             TimedEntity<List<LLResultTypes.FiducialResult>> lastActiveSideDetections) {
@@ -143,10 +175,11 @@ public class TurretSubsystem extends SubsystemBase {
 
     @Override
     public void periodic() {
+        launcher.setVelocity(targetLaunchVelocity.getVelocity());
         actualLaunchVelocity = launcher.getVelocity();
         telemetry.addLine(this.getClass().getSimpleName());
         telemetry.addLine("--------------------------------");
-        telemetry.addData("Target Velocity", targetLaunchVelocity);
+        telemetry.addData("Target Velocity", targetLaunchVelocity.name());
         telemetry.addData("Actual Velocity", actualLaunchVelocity);
         telemetry.addData("Launch Gate State", launchGateState);
         telemetry.addData("Target Heading (degrees)", targetHeadingDegrees);
