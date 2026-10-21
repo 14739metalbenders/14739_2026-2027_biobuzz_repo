@@ -1,6 +1,5 @@
 package com.metalbenders.control.subsystems;
 
-import com.arcrobotics.ftclib.command.SubsystemBase;
 import com.metalbenders.constants.Constants;
 import com.metalbenders.constants.FieldLocations;
 import com.metalbenders.constants.LaunchVelocity;
@@ -16,7 +15,7 @@ import static com.metalbenders.constants.LaunchVelocity.getLaunchVelocityByDista
 import static com.metalbenders.util.MathUtil.calculateAverageTx;
 import static com.qualcomm.robotcore.hardware.DcMotor.RunMode.RUN_USING_ENCODER;
 
-public class TurretSubsystem extends SubsystemBase {
+public class TurretSubsystem extends CloseableSubsystem {
 
     public enum LaunchGateState {
         OPEN,
@@ -189,7 +188,8 @@ public class TurretSubsystem extends SubsystemBase {
         telemetry.addLine();
     }
 
-    public void teardown() {
+    @Override
+    public void close(Constants.OpModeType opModeType) {
         closeLaunchGate();
     }
 }

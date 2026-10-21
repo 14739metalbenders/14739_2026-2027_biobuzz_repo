@@ -2,8 +2,6 @@ package com.metalbenders.control.subsystems;
 
 import static com.metalbenders.constants.Constants.OpModeType.AUTO;
 
-import android.annotation.SuppressLint;
-import com.arcrobotics.ftclib.command.SubsystemBase;
 import com.metalbenders.util.AutonomousStorage;
 import com.metalbenders.util.RotatingBuffer;
 import com.pedropathing.follower.Follower;
@@ -17,7 +15,7 @@ import org.firstinspires.ftc.teamcode.pedro.Constants;
 
 import java.util.Locale;
 
-public class DriveSubsystem extends SubsystemBase {
+public class DriveSubsystem extends CloseableSubsystem {
 
     private final Follower follower;
     private final RotatingBuffer<Pose> poseHistory = new RotatingBuffer<>(10);
@@ -67,7 +65,8 @@ public class DriveSubsystem extends SubsystemBase {
         telemetry.addLine();
     }
 
-    public void teardown(com.metalbenders.constants.Constants.OpModeType opModeType) {
+    @Override
+    public void close(com.metalbenders.constants.Constants.OpModeType opModeType) {
         if (opModeType == AUTO) {
             AutonomousStorage.endPose = getCurrentPose();
         }

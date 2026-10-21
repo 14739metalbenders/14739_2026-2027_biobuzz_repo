@@ -1,11 +1,11 @@
 package com.metalbenders.control.subsystems;
 
-import com.arcrobotics.ftclib.command.SubsystemBase;
+import com.metalbenders.constants.Constants;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
-public class IntakeSubsystem extends SubsystemBase {
+public class IntakeSubsystem extends CloseableSubsystem {
 
     private enum IntakeState {
         INTAKE,
@@ -52,7 +52,8 @@ public class IntakeSubsystem extends SubsystemBase {
         telemetry.addLine();
     }
 
-    public void teardown() {
+    @Override
+    public void close(Constants.OpModeType opModeType) {
         stop();
     }
 }

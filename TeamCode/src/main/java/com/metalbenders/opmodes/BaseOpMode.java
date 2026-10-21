@@ -5,10 +5,7 @@ import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.arcrobotics.ftclib.command.CommandOpMode;
 import com.metalbenders.constants.Constants;
 import com.metalbenders.constants.Constants.AllianceColor;
-import com.metalbenders.control.subsystems.DriveSubsystem;
-import com.metalbenders.control.subsystems.IntakeSubsystem;
-import com.metalbenders.control.subsystems.LimelightSubsystem;
-import com.metalbenders.control.subsystems.TurretSubsystem;
+import com.metalbenders.control.subsystems.*;
 import com.pedropathing.math.Pose;
 
 public abstract class BaseOpMode extends CommandOpMode {
@@ -17,18 +14,18 @@ public abstract class BaseOpMode extends CommandOpMode {
     public abstract Pose getInitialPose();
     public abstract Constants.OpModeType getOpModeType();
 
-    protected DriveSubsystem driveSubsystem;
-    protected IntakeSubsystem intakeSubsystem;
-    protected LimelightSubsystem limelightSubsystem;
-    protected TurretSubsystem turretSubsystem;
-
+    private SubsystemMap subsystemMap = new SubsystemMap();
     @Override
     public void initialize() {
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
-        driveSubsystem = new DriveSubsystem(hardwareMap, telemetry, getInitialPose());
-        intakeSubsystem = new IntakeSubsystem(hardwareMap, telemetry);
-        limelightSubsystem = new LimelightSubsystem(hardwareMap, telemetry, getAllianceColor());
-        turretSubsystem = new TurretSubsystem(hardwareMap, telemetry, getAllianceColor());
+        subsystemMap.register(DriveSubsystem.class, new DriveSubsystem(hardwareMap, telemetry, getInitialPose()));
+        subsystemMap.register(IntakeSubsystem.class, new IntakeSubsystem(hardwareMap, telemetry));
+        subsystemMap.register(LimelightSubsystem.class, new LimelightSubsystem(hardwareMap, telemetry, getAllianceColor()));
+        subsystemMap.register(TurretSubsystem.class, new TurretSubsystem(hardwareMap, telemetry, getAllianceColor()));
+        if (getOpModeType() == Constants.OpModeType.AUTO) {
+            subsystemMap.register(LidarSubsystem.class, new LidarSubsystem(hardwareMap, telemetry));
+            subsystemMap.register(HuskyLensSubsystem.class, new HuskyLensSubsystem(hardwareMap, telemetry, getAllianceColor()));
+        }
 
 //        turretSubsystem.setDefaultCommand(new UpdateLauncherCommand(
 //                turretSubsystem, limelightSubsystem, driveSubsystem));
@@ -62,10 +59,13 @@ public abstract class BaseOpMode extends CommandOpMode {
 
     @Override
     public void reset() {
-        intakeSubsystem.teardown();
-        limelightSubsystem.teardown();
-        turretSubsystem.teardown();
-        driveSubsystem.teardown(getOpModeType());
+        for(CloseableSubsystem subsystem : subsystemMap.getAllSubsystems()) {
+            subsystem.close(getOpModeType());
+        }
         super.reset();
+    }
+
+    public SubsystemMap getSubsystemMap() {
+        return subsystemMap;
     }
 }
