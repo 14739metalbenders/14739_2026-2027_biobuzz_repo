@@ -1,18 +1,14 @@
 package com.metalbenders.opmodes.auto.strategies;
 
-import com.arcrobotics.ftclib.command.CommandScheduler;
-import com.arcrobotics.ftclib.command.SequentialCommandGroup;
 import com.metalbenders.constants.Constants;
-import com.metalbenders.control.subsystems.SubsystemMap;
+import com.metalbenders.control.subsystems.SubsystemRegistry;
 import com.pedropathing.math.Pose;
 
 public class AudienceSideTestStrategy extends AutoStrategy {
 
     @Override
-    public void initialize(Constants.AllianceColor allianceColor, Pose parkPose, SubsystemMap subsystemMap) {
+    public void initialize(Constants.AllianceColor allianceColor, Pose parkPose, SubsystemRegistry subsystemRegistry) {
         // Initialize any necessary components or variables for the Audience Side Test Strategy
-        CommandScheduler.getInstance().schedule(new SequentialCommandGroup(
-        ));
     }
 
     @Override

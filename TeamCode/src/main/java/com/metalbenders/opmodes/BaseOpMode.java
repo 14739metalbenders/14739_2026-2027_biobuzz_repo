@@ -14,18 +14,12 @@ public abstract class BaseOpMode extends CommandOpMode {
     public abstract Pose getInitialPose();
     public abstract Constants.OpModeType getOpModeType();
 
-    private SubsystemMap subsystemMap = new SubsystemMap();
+    private SubsystemRegistry subsystemRegistry;
     @Override
     public void initialize() {
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
-        subsystemMap.register(DriveSubsystem.class, new DriveSubsystem(hardwareMap, telemetry, getInitialPose()));
-        subsystemMap.register(IntakeSubsystem.class, new IntakeSubsystem(hardwareMap, telemetry));
-        subsystemMap.register(LimelightSubsystem.class, new LimelightSubsystem(hardwareMap, telemetry, getAllianceColor()));
-        subsystemMap.register(TurretSubsystem.class, new TurretSubsystem(hardwareMap, telemetry, getAllianceColor()));
-        if (getOpModeType() == Constants.OpModeType.AUTO) {
-            subsystemMap.register(LidarSubsystem.class, new LidarSubsystem(hardwareMap, telemetry));
-            subsystemMap.register(HuskyLensSubsystem.class, new HuskyLensSubsystem(hardwareMap, telemetry, getAllianceColor()));
-        }
+        subsystemRegistry = new SubsystemRegistry(
+                hardwareMap, telemetry, getAllianceColor(), getInitialPose(), getOpModeType());
 
 //        turretSubsystem.setDefaultCommand(new UpdateLauncherCommand(
 //                turretSubsystem, limelightSubsystem, driveSubsystem));
@@ -59,13 +53,11 @@ public abstract class BaseOpMode extends CommandOpMode {
 
     @Override
     public void reset() {
-        for(CloseableSubsystem subsystem : subsystemMap.getAllSubsystems()) {
-            subsystem.close(getOpModeType());
-        }
+        subsystemRegistry.closeAllSubsystems(getOpModeType());
         super.reset();
     }
 
-    public SubsystemMap getSubsystemMap() {
-        return subsystemMap;
+    public SubsystemRegistry getSubsystemRegistry() {
+        return subsystemRegistry;
     }
 }

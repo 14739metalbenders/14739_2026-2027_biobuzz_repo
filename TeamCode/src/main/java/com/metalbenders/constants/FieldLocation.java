@@ -3,7 +3,7 @@ package com.metalbenders.constants;
 import com.metalbenders.constants.Constants.AllianceColor;
 import com.pedropathing.math.Pose;
 
-public enum FieldLocations {
+public enum FieldLocation {
     AUDIENCE_SIDE_START_POSE(
             new Pose(55.4, 7.2, Math.toRadians(90)),
             new Pose(82.7, 7.2, Math.toRadians(90))),
@@ -43,7 +43,7 @@ public enum FieldLocations {
     private final Pose redPose;
     private final Pose bluePose;
 
-    FieldLocations(Pose redPose, Pose bluePose) {
+    FieldLocation(Pose redPose, Pose bluePose) {
         this.redPose = redPose;
         this.bluePose = bluePose;
     }

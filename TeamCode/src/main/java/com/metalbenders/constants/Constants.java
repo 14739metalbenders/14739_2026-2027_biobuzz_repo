@@ -19,5 +19,10 @@ public class Constants {
         AUDIENCE_SIDE
     }
 
+    public enum ArtifactType {
+        POLLEN,
+        NECTAR
+    }
+
     public static final Pose DEFAULT_POSE = new Pose(0, 0, Math.toRadians(90));
 }

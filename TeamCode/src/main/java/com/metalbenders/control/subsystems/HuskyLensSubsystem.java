@@ -35,16 +35,18 @@ public class HuskyLensSubsystem extends CloseableSubsystem {
         return huskyLens.blocks();
     }
 
-    public HuskyLens.Block[] getNectarBlocks() {
-        if(allianceColor == Constants.AllianceColor.RED) {
-            return huskyLens.blocks(RED_NECTAR_BLOCK_ID);
-        } else {
-            return huskyLens.blocks(BLUE_NECTAR_BLOCK_ID);
+    public HuskyLens.Block[] getBlocksOfType(Constants.ArtifactType artifactType) {
+        switch (artifactType) {
+            case POLLEN:
+                return huskyLens.blocks(POLLEN_BLOCK_ID);
+            case NECTAR:
+                if(allianceColor == Constants.AllianceColor.RED) {
+                    return huskyLens.blocks(RED_NECTAR_BLOCK_ID);
+                } else {
+                    return huskyLens.blocks(BLUE_NECTAR_BLOCK_ID);
+                }
         }
-    }
-
-    public HuskyLens.Block[] getPollenBlocks() {
-        return huskyLens.blocks(POLLEN_BLOCK_ID);
+        return null;
     }
 
     @Override
@@ -58,6 +60,5 @@ public class HuskyLensSubsystem extends CloseableSubsystem {
     @Override
     public void close(Constants.OpModeType opModeType) {
         // No specific teardown needed for HuskyLens
-
     }
 }

@@ -35,8 +35,8 @@ public abstract class BaseTeleop extends BaseOpMode {
 
         driverGamepad = new GamepadEx(gamepad1);
 
-        getSubsystemMap().get(DriveSubsystem.class).setDefaultCommand(new DriveCommand(
-                getSubsystemMap().get(DriveSubsystem.class),
+        getSubsystemRegistry().get(DriveSubsystem.class).setDefaultCommand(new DriveCommand(
+                getSubsystemRegistry().get(DriveSubsystem.class),
                 () -> driverGamepad.getLeftX(),
                 () -> driverGamepad.getLeftY(),
                 () -> -driverGamepad.getRightX()
@@ -45,37 +45,37 @@ public abstract class BaseTeleop extends BaseOpMode {
         driverGamepad.getGamepadButton(GamepadKeys.Button.DPAD_RIGHT)
                 .whenPressed(
                         new ResetHeadingCommand(
-                                getSubsystemMap().get(DriveSubsystem.class)));
+                                getSubsystemRegistry().get(DriveSubsystem.class)));
 
         driverGamepad.getGamepadButton(GamepadKeys.Button.DPAD_UP)
                 .whenPressed(
                         new SetFieldSideOverrideCommand(
-                                getSubsystemMap().get(LimelightSubsystem.class),
+                                getSubsystemRegistry().get(LimelightSubsystem.class),
                                 Constants.FieldSide.SCORE_SIDE));
 
         driverGamepad.getGamepadButton(GamepadKeys.Button.DPAD_DOWN)
                 .whenPressed(
                         new SetFieldSideOverrideCommand(
-                                getSubsystemMap().get(LimelightSubsystem.class),
+                                getSubsystemRegistry().get(LimelightSubsystem.class),
                                 Constants.FieldSide.AUDIENCE_SIDE));
 
         driverGamepad.getGamepadButton(GamepadKeys.Button.LEFT_BUMPER)
                 .whileHeld(
                         new ReverseIntakeCommand(
-                                getSubsystemMap().get(IntakeSubsystem.class)));
+                                getSubsystemRegistry().get(IntakeSubsystem.class)));
 
         Trigger leftTrigger = new Trigger(() ->
                 driverGamepad.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER) > 0.2);
         leftTrigger.whileActiveContinuous(
                 new IntakeCommand(
-                        getSubsystemMap().get(IntakeSubsystem.class),
-                        getSubsystemMap().get(TurretSubsystem.class)));
+                        getSubsystemRegistry().get(IntakeSubsystem.class),
+                        getSubsystemRegistry().get(TurretSubsystem.class)));
 
         Trigger rightTrigger = new Trigger(() ->
                 driverGamepad.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER) > 0.2);
         rightTrigger.whileActiveContinuous(
                 new ShootCommand(
-                        getSubsystemMap().get(TurretSubsystem.class),
-                        getSubsystemMap().get(IntakeSubsystem.class)));
+                        getSubsystemRegistry().get(TurretSubsystem.class),
+                        getSubsystemRegistry().get(IntakeSubsystem.class)));
     }
 }

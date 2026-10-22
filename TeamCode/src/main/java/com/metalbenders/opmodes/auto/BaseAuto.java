@@ -1,12 +1,13 @@
 package com.metalbenders.opmodes.auto;
 
+import com.metalbenders.constants.AutoFieldBoundary;
 import com.metalbenders.constants.Constants;
 import com.metalbenders.opmodes.BaseOpMode;
 import com.metalbenders.opmodes.auto.strategies.AudienceSideTestStrategy;
 import com.metalbenders.opmodes.auto.strategies.AutoStrategy;
 import com.pedropathing.math.Pose;
 
-import static com.metalbenders.constants.FieldLocations.*;
+import static com.metalbenders.constants.FieldLocation.*;
 
 public abstract class BaseAuto extends BaseOpMode {
 
@@ -30,9 +31,13 @@ public abstract class BaseAuto extends BaseOpMode {
         return PARK.getPose(getAllianceColor());
     }
 
+    public AutoFieldBoundary getAutoFieldRange() {
+        return AutoFieldBoundary.getByAllianceColor(getAllianceColor());
+    }
+
     @Override
     public void initialize() {
         super.initialize();
-        getAutoStrategy().initialize(getAllianceColor(), getParkPose(), getSubsystemMap());
+        getAutoStrategy().initialize(getAllianceColor(), getParkPose(), getSubsystemRegistry());
     }
 }

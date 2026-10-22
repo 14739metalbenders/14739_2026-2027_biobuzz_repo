@@ -1,7 +1,7 @@
 package com.metalbenders.control.subsystems;
 
 import com.metalbenders.constants.Constants;
-import com.metalbenders.constants.FieldLocations;
+import com.metalbenders.constants.FieldLocation;
 import com.metalbenders.constants.LaunchVelocity;
 import com.metalbenders.util.TimedEntity;
 import com.pedropathing.math.Pose;
@@ -115,9 +115,9 @@ public class TurretSubsystem extends CloseableSubsystem {
     private double calculateDistanceFromOdometry(Constants.FieldSide activeHiveCellFieldSide, Pose currentPose) {
         double targetX;
         if (activeHiveCellFieldSide == Constants.FieldSide.SCORE_SIDE) {
-            targetX = FieldLocations.SCORE_SIDE_HIVE_CELL.getPose(allianceColor).x();
+            targetX = FieldLocation.SCORE_SIDE_HIVE_CELL.getPose(allianceColor).x();
         } else {
-            targetX = FieldLocations.AUDIENCE_SIDE_HIVE_CELL.getPose(allianceColor).x();
+            targetX = FieldLocation.AUDIENCE_SIDE_HIVE_CELL.getPose(allianceColor).x();
         }
         return Math.abs(targetX - currentPose.x());
     }
@@ -145,12 +145,12 @@ public class TurretSubsystem extends CloseableSubsystem {
         double targetHeading;
         if (activeHiveCellFieldSide == Constants.FieldSide.SCORE_SIDE) {
             targetHeading = Math.toDegrees(Math.atan2(
-                    FieldLocations.SCORE_SIDE_HIVE_CELL.getPose(allianceColor).y() - currentPose.y(),
-                    FieldLocations.SCORE_SIDE_HIVE_CELL.getPose(allianceColor).x() - currentPose.x()));
+                    FieldLocation.SCORE_SIDE_HIVE_CELL.getPose(allianceColor).y() - currentPose.y(),
+                    FieldLocation.SCORE_SIDE_HIVE_CELL.getPose(allianceColor).x() - currentPose.x()));
         } else {
             targetHeading = Math.toDegrees(Math.atan2(
-                    FieldLocations.AUDIENCE_SIDE_HIVE_CELL.getPose(allianceColor).y() - currentPose.y(),
-                    FieldLocations.AUDIENCE_SIDE_HIVE_CELL.getPose(allianceColor).x() - currentPose.x()));
+                    FieldLocation.AUDIENCE_SIDE_HIVE_CELL.getPose(allianceColor).y() - currentPose.y(),
+                    FieldLocation.AUDIENCE_SIDE_HIVE_CELL.getPose(allianceColor).x() - currentPose.x()));
         }
         return targetHeading;
     }
