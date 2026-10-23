@@ -1,13 +1,13 @@
 package com.metalbenders.control.subsystems;
 
-import com.metalbenders.constants.Constants;
+import com.arcrobotics.ftclib.command.Subsystem;
 import com.metalbenders.hardware.StudicaLidar;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 import java.util.Arrays;
 
-public class LidarSubsystem extends CloseableSubsystem {
+public class LidarSubsystem implements Subsystem {
 
     private enum LidarState {
         CONNECTED,
@@ -45,8 +45,7 @@ public class LidarSubsystem extends CloseableSubsystem {
         telemetry.addLine();
     }
 
-    @Override
-    public void close(Constants.OpModeType opModeType) {
+    public void teardown() {
         studicaLidar.stop();
     }
 }

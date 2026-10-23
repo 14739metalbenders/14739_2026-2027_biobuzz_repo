@@ -24,5 +24,8 @@ public class Constants {
         NECTAR
     }
 
+    public static final double NECTAR_DIAMETER = 3.6; //inches
+    public static final double POLLEN_DIAMETER = 2.8; //inches
+
     public static final Pose DEFAULT_POSE = new Pose(0, 0, Math.toRadians(90));
 }

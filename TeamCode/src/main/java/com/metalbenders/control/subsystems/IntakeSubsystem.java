@@ -1,11 +1,11 @@
 package com.metalbenders.control.subsystems;
 
-import com.metalbenders.constants.Constants;
+import com.arcrobotics.ftclib.command.SubsystemBase;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
-public class IntakeSubsystem extends CloseableSubsystem {
+public class IntakeSubsystem extends SubsystemBase {
 
     private enum IntakeState {
         INTAKE,
@@ -25,21 +25,21 @@ public class IntakeSubsystem extends CloseableSubsystem {
 
     public void intake() {
         if ( intakeState != IntakeState.INTAKE) {
-            intakeMotor.setPower(1);
+            intakeMotor.setVelocity(2300);
             intakeState = IntakeState.INTAKE;
         }
     }
 
     public void reverseIntake() {
         if (intakeState != IntakeState.REVERSE_INTAKE) {
-            intakeMotor.setPower(-1);
+            intakeMotor.setVelocity(-2300);
             intakeState = IntakeState.REVERSE_INTAKE;
         }
     }
 
     public void stop() {
         if (intakeState != IntakeState.STOPPED) {
-            intakeMotor.setPower(0);
+            intakeMotor.setVelocity(0);
             intakeState = IntakeState.STOPPED;
         }
     }
@@ -52,8 +52,7 @@ public class IntakeSubsystem extends CloseableSubsystem {
         telemetry.addLine();
     }
 
-    @Override
-    public void close(Constants.OpModeType opModeType) {
+    public void teardown() {
         stop();
     }
 }

@@ -1,11 +1,12 @@
 package com.metalbenders.control.subsystems;
 
+import com.arcrobotics.ftclib.command.Subsystem;
 import com.metalbenders.constants.Constants;
 import com.qualcomm.hardware.dfrobot.HuskyLens;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
-public class HuskyLensSubsystem extends CloseableSubsystem {
+public class HuskyLensSubsystem implements Subsystem {
 
     private enum HuskyLensState {
         READY,
@@ -31,10 +32,6 @@ public class HuskyLensSubsystem extends CloseableSubsystem {
         }
     }
 
-    public HuskyLens.Block[] getAllBlocks() {
-        return huskyLens.blocks();
-    }
-
     public HuskyLens.Block[] getBlocksOfType(Constants.ArtifactType artifactType) {
         switch (artifactType) {
             case POLLEN:
@@ -55,10 +52,5 @@ public class HuskyLensSubsystem extends CloseableSubsystem {
         telemetry.addLine("--------------------------------");
         telemetry.addData("HuskyLens State", state);
         telemetry.addLine();
-    }
-
-    @Override
-    public void close(Constants.OpModeType opModeType) {
-        // No specific teardown needed for HuskyLens
     }
 }

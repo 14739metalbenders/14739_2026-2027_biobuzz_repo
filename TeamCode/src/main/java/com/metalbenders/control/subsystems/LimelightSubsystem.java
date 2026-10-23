@@ -1,5 +1,6 @@
 package com.metalbenders.control.subsystems;
 
+import com.arcrobotics.ftclib.command.SubsystemBase;
 import com.metalbenders.constants.AprilTag;
 import com.metalbenders.constants.Constants;
 import com.metalbenders.util.TimedEntity;
@@ -16,7 +17,7 @@ import static com.metalbenders.constants.Constants.FieldSide.AUDIENCE_SIDE;
 import static com.metalbenders.constants.Constants.FieldSide.SCORE_SIDE;
 import static com.metalbenders.util.MathUtil.calculateAverageTy;
 
-public class LimelightSubsystem extends CloseableSubsystem {
+public class LimelightSubsystem extends SubsystemBase {
 
     private final Telemetry telemetry;
     private final Constants.AllianceColor allianceColor;
@@ -154,8 +155,7 @@ public class LimelightSubsystem extends CloseableSubsystem {
         }
     }
 
-    @Override
-    public void close(Constants.OpModeType opModeType) {
+    public void teardown() {
         limelight.stop();
     }
 }

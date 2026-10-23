@@ -1,5 +1,6 @@
 package com.metalbenders.control.subsystems;
 
+import com.arcrobotics.ftclib.command.SubsystemBase;
 import com.metalbenders.constants.Constants;
 import com.metalbenders.constants.FieldLocation;
 import com.metalbenders.constants.LaunchVelocity;
@@ -15,7 +16,7 @@ import static com.metalbenders.constants.LaunchVelocity.getLaunchVelocityByDista
 import static com.metalbenders.util.MathUtil.calculateAverageTx;
 import static com.qualcomm.robotcore.hardware.DcMotor.RunMode.RUN_USING_ENCODER;
 
-public class TurretSubsystem extends CloseableSubsystem {
+public class TurretSubsystem extends SubsystemBase {
 
     public enum LaunchGateState {
         OPEN,
@@ -27,14 +28,14 @@ public class TurretSubsystem extends CloseableSubsystem {
     private final DcMotorEx turretMotor;
     private final DcMotorEx launcher;
     private final Servo launchGateServo;
-    private LaunchVelocity targetLaunchVelocity = LaunchVelocity.DEFAULT;
+    private LaunchVelocity targetLaunchVelocity = LaunchVelocity.IDLE;
     private double actualLaunchVelocity;
     private LaunchGateState launchGateState;
     private double targetHeadingDegrees = 0.0;
     private double turretHeadingDegrees = 0.0;
     private final Constants.AllianceColor allianceColor;
     private static final double MAX_TURRET_ROTATION_DEGREES = 120.0;
-    private static final PIDFCoefficients LAUNCHER_VELOCITY_PID = new PIDFCoefficients(150, 0, 0, 3);
+    private static final PIDFCoefficients LAUNCHER_VELOCITY_PID = new PIDFCoefficients(150, 0, 0, 15);
     private static final PIDFCoefficients TURRET_VELOCITY_PID = new PIDFCoefficients(23.25, 0.0, 0.8, 7.5);
 
     public TurretSubsystem(HardwareMap hardwareMap, Telemetry telemetry, Constants.AllianceColor allianceColor) {
@@ -61,8 +62,7 @@ public class TurretSubsystem extends CloseableSubsystem {
     }
 
     public boolean atLaunchVelocity() {
-        return targetLaunchVelocity.getTolerance() == null
-                || Math.abs(targetLaunchVelocity.getVelocity() - actualLaunchVelocity) < targetLaunchVelocity.getTolerance();
+        return true;//targetLaunchVelocity.getTolerance() == null || Math.abs(targetLaunchVelocity.getVelocity() - actualLaunchVelocity) < targetLaunchVelocity.getTolerance();
     }
 
     public void closeLaunchGate() {
@@ -188,8 +188,7 @@ public class TurretSubsystem extends CloseableSubsystem {
         telemetry.addLine();
     }
 
-    @Override
-    public void close(Constants.OpModeType opModeType) {
+    public void teardown() {
         closeLaunchGate();
     }
 }

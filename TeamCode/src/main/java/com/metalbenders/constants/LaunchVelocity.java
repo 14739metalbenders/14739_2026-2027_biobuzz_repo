@@ -1,7 +1,13 @@
 package com.metalbenders.constants;
 
 public enum LaunchVelocity {
-    DEFAULT(1300.0, null, null, 100.0);
+    IDLE(1180.0, 0.0, 26.0, 100.0),
+    VELOCITY_26_30(0.0, 26.0, 30.0, 100.0),
+    VELOCITY_30_34(0.0, 30.0, 34.0, 100.0),
+    VELOCITY_34_38(0.0, 34.0, 38.0, 100.0),
+    VELOCITY_38_42(0.0, 38.0, 42.0, 100.0),
+    MAX(0.0, 26.0, 30.0, 100.0);
+
 
     private final Double velocity;
     private final Double minDistance;
@@ -32,6 +38,9 @@ public enum LaunchVelocity {
     }
 
     public static LaunchVelocity getLaunchVelocityByDistance(double distance) {
+        if (distance > MAX.minDistance) {
+            return MAX;
+        }
         for (LaunchVelocity launchVelocity : LaunchVelocity.values()) {
             if (launchVelocity.getMinDistance() != null && launchVelocity.getMaxDistance() != null) {
                 if (distance >= launchVelocity.getMinDistance() && distance <= launchVelocity.getMaxDistance()) {
@@ -39,6 +48,6 @@ public enum LaunchVelocity {
                 }
             }
         }
-        return DEFAULT;
+        return IDLE;
     }
 }

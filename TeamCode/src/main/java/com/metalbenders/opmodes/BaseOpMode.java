@@ -14,13 +14,25 @@ public abstract class BaseOpMode extends CommandOpMode {
     public abstract Pose getInitialPose();
     public abstract Constants.OpModeType getOpModeType();
 
-    private SubsystemRegistry subsystemRegistry;
+    protected DriveSubsystem driveSubsystem;
+    protected IntakeSubsystem intakeSubsystem;
+    protected LimelightSubsystem limelightSubsystem;
+    protected TurretSubsystem turretSubsystem;
+    protected LidarSubsystem lidarSubsystem;
+    protected HuskyLensSubsystem huskyLensSubsystem;
+
     @Override
     public void initialize() {
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
-        subsystemRegistry = new SubsystemRegistry(
-                hardwareMap, telemetry, getAllianceColor(), getInitialPose(), getOpModeType());
+        driveSubsystem = new DriveSubsystem(hardwareMap, telemetry, getInitialPose());
+        intakeSubsystem = new IntakeSubsystem(hardwareMap, telemetry);
+        limelightSubsystem = new LimelightSubsystem(hardwareMap, telemetry, getAllianceColor());
+        turretSubsystem = new TurretSubsystem(hardwareMap, telemetry, getAllianceColor());
+        if (getOpModeType() == Constants.OpModeType.AUTO) {
+            lidarSubsystem = new LidarSubsystem(hardwareMap, telemetry);
+            huskyLensSubsystem = new HuskyLensSubsystem(hardwareMap, telemetry, getAllianceColor());
 
+        }
 //        turretSubsystem.setDefaultCommand(new UpdateLauncherCommand(
 //                turretSubsystem, limelightSubsystem, driveSubsystem));
     }
@@ -53,11 +65,13 @@ public abstract class BaseOpMode extends CommandOpMode {
 
     @Override
     public void reset() {
-        subsystemRegistry.closeAllSubsystems(getOpModeType());
+        intakeSubsystem.teardown();
+        limelightSubsystem.teardown();
+        turretSubsystem.teardown();
+        driveSubsystem.teardown(getOpModeType());
+        if (getOpModeType() == Constants.OpModeType.AUTO) {
+            lidarSubsystem.teardown();
+        }
         super.reset();
-    }
-
-    public SubsystemRegistry getSubsystemRegistry() {
-        return subsystemRegistry;
     }
 }
