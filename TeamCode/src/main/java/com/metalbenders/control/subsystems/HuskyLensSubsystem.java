@@ -6,29 +6,25 @@ import com.qualcomm.hardware.dfrobot.HuskyLens;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
+import static com.metalbenders.constants.Constants.*;
+
 public class HuskyLensSubsystem implements Subsystem {
 
-    private enum HuskyLensState {
-        READY,
-        FAILED
-    }
+
 
     private final HuskyLens huskyLens;
     private final Telemetry telemetry;
     private final Constants.AllianceColor allianceColor;
-    private final HuskyLensState state;
-    private static final int POLLEN_BLOCK_ID = 1;
-    private static final int BLUE_NECTAR_BLOCK_ID = 2;
-    private static final int RED_NECTAR_BLOCK_ID = 3;
+    private final Constants.HuskyLensState state;
 
     public HuskyLensSubsystem(HardwareMap hardwareMap, Telemetry telemetry, Constants.AllianceColor allianceColor) {
         this.huskyLens = hardwareMap.get(HuskyLens.class, "huskylens");
         this.telemetry = telemetry;
         this.allianceColor = allianceColor;
         if (!huskyLens.knock()) {
-            state = HuskyLensState.FAILED;
+            state = Constants.HuskyLensState.FAILED;
         } else {
-            state = HuskyLensState.READY;
+            state = Constants.HuskyLensState.READY;
         }
     }
 

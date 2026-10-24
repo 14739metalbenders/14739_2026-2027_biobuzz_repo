@@ -20,7 +20,7 @@ public abstract class BaseOpMode extends CommandOpMode {
     protected TurretSubsystem turretSubsystem;
     protected LidarSubsystem lidarSubsystem;
     protected HuskyLensSubsystem huskyLensSubsystem;
-
+    protected LaunchSubsystem launchSubsystem;
     @Override
     public void initialize() {
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
@@ -28,11 +28,15 @@ public abstract class BaseOpMode extends CommandOpMode {
         intakeSubsystem = new IntakeSubsystem(hardwareMap, telemetry);
         limelightSubsystem = new LimelightSubsystem(hardwareMap, telemetry, getAllianceColor());
         turretSubsystem = new TurretSubsystem(hardwareMap, telemetry, getAllianceColor());
+        launchSubsystem = new LaunchSubsystem(hardwareMap, telemetry, getAllianceColor());
         if (getOpModeType() == Constants.OpModeType.AUTO) {
             lidarSubsystem = new LidarSubsystem(hardwareMap, telemetry);
             huskyLensSubsystem = new HuskyLensSubsystem(hardwareMap, telemetry, getAllianceColor());
 
         }
+//        turretSubsystem.setDefaultCommand(new UpdateLauncherCommand(
+//                turretSubsystem, limelightSubsystem, driveSubsystem));
+
 //        turretSubsystem.setDefaultCommand(new UpdateLauncherCommand(
 //                turretSubsystem, limelightSubsystem, driveSubsystem));
     }
@@ -68,6 +72,7 @@ public abstract class BaseOpMode extends CommandOpMode {
         intakeSubsystem.teardown();
         limelightSubsystem.teardown();
         turretSubsystem.teardown();
+        launchSubsystem.teardown();
         driveSubsystem.teardown(getOpModeType());
         if (getOpModeType() == Constants.OpModeType.AUTO) {
             lidarSubsystem.teardown();

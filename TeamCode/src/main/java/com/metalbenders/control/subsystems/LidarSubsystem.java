@@ -1,6 +1,7 @@
 package com.metalbenders.control.subsystems;
 
 import com.arcrobotics.ftclib.command.Subsystem;
+import com.metalbenders.constants.Constants;
 import com.metalbenders.hardware.StudicaLidar;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
@@ -9,23 +10,18 @@ import java.util.Arrays;
 
 public class LidarSubsystem implements Subsystem {
 
-    private enum LidarState {
-        CONNECTED,
-        FAILED
-    }
-
     private final StudicaLidar studicaLidar;
     private final Telemetry telemetry;
-    private final LidarState state;
+    private final Constants.LidarState state;
     public LidarSubsystem(HardwareMap hardwareMap, Telemetry telemetry) {
         this.studicaLidar = new StudicaLidar();
         this.telemetry = telemetry;
         studicaLidar.init(hardwareMap);
         studicaLidar.start();
         if (!studicaLidar.isConnected()) {
-            state = LidarState.FAILED;
+            state = Constants.LidarState.FAILED;
         } else {
-            state = LidarState.CONNECTED;
+            state = Constants.LidarState.CONNECTED;
         }
     }
 

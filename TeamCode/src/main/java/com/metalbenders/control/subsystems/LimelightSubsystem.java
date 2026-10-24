@@ -22,9 +22,7 @@ public class LimelightSubsystem extends SubsystemBase {
     private final Telemetry telemetry;
     private final Constants.AllianceColor allianceColor;
     private final Limelight3A limelight;
-
     private Constants.FieldSide activeHiveCellFieldSide;
-
     private TimedEntity<List<LLResultTypes.FiducialResult>> lastActiveSideDetections =
             new TimedEntity<>(new ArrayList<>());
     private TimedEntity<List<LLResultTypes.FiducialResult>> lastInactiveSideDetections =

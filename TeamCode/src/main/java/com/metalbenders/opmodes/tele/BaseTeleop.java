@@ -1,7 +1,9 @@
 package com.metalbenders.opmodes.tele;
 
 import static com.metalbenders.constants.Constants.DEFAULT_POSE;
+import static com.metalbenders.constants.Constants.IntakeState.STOP;
 
+import com.arcrobotics.ftclib.command.SequentialCommandGroup;
 import com.arcrobotics.ftclib.command.button.Trigger;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
 import com.arcrobotics.ftclib.gamepad.GamepadKeys;
@@ -31,33 +33,41 @@ public abstract class BaseTeleop extends BaseOpMode {
 
         driverGamepad = new GamepadEx(gamepad1);
 
-        driveSubsystem.setDefaultCommand(new DriveCommand(
-                driveSubsystem,
-                () -> driverGamepad.getLeftX(),
-                () -> driverGamepad.getLeftY(),
-                () -> -driverGamepad.getRightX()
+        //DRIVE
+        driveSubsystem.setDefaultCommand(
+                new DriveCommand(
+                        driveSubsystem,
+                        () -> driverGamepad.getLeftX(),
+                        () -> driverGamepad.getLeftY(),
+                        () -> -driverGamepad.getRightX()
         ));
 
-        driverGamepad.getGamepadButton(GamepadKeys.Button.DPAD_RIGHT)
-                .whenPressed(new ResetHeadingCommand(driveSubsystem));
-
+        //SET ACTIVE FIELD SIDE TO SCORE SIDE
         driverGamepad.getGamepadButton(GamepadKeys.Button.DPAD_UP)
-                .whenPressed(new SetFieldSideOverrideCommand(
-                        limelightSubsystem, Constants.FieldSide.SCORE_SIDE));
+                .whenPressed(new SetFieldSideOverrideCommand(limelightSubsystem, Constants.FieldSide.SCORE_SIDE));
 
+        //SET ACTIVE FIELD SIDE TO AUDIENCE SIDE
         driverGamepad.getGamepadButton(GamepadKeys.Button.DPAD_DOWN)
-                .whenPressed(new SetFieldSideOverrideCommand(
-                        limelightSubsystem, Constants.FieldSide.AUDIENCE_SIDE));
+                .whenPressed(new SetFieldSideOverrideCommand(limelightSubsystem, Constants.FieldSide.AUDIENCE_SIDE));
 
+        //REVERSE INTAKE
         driverGamepad.getGamepadButton(GamepadKeys.Button.LEFT_BUMPER)
-                .whileHeld(new ReverseIntakeCommand(intakeSubsystem));
+                .whileActiveOnce(new SetIntakeStateCommand(intakeSubsystem, Constants.IntakeState.REVERSE_INTAKE));
 
-        Trigger leftTrigger = new Trigger(() ->
-                driverGamepad.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER) > 0.2);
-        leftTrigger.whileActiveContinuous(new IntakeCommand(intakeSubsystem, turretSubsystem));
+        //INTAKE
+        Trigger leftTrigger = new Trigger(() -> driverGamepad.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER) > 0.2);
+        leftTrigger.whileActiveOnce(new SequentialCommandGroup(
+                new SetLaunchGateStateCommand(launchSubsystem, Constants.LaunchGateState.CLOSED),
+                new SetIntakeStateCommand(intakeSubsystem, Constants.IntakeState.INTAKE)));
 
-        Trigger rightTrigger = new Trigger(() ->
-                driverGamepad.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER) > 0.2);
-        rightTrigger.whileActiveContinuous(new ShootCommand(turretSubsystem, intakeSubsystem));
+        //SHOOT
+        Trigger rightTrigger = new Trigger(() -> driverGamepad.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER) > 0.2);
+        rightTrigger.whileActiveOnce(new SequentialCommandGroup(
+                new SetLaunchGateStateCommand(launchSubsystem, Constants.LaunchGateState.OPEN),
+                new SetIntakeStateCommand(intakeSubsystem, Constants.IntakeState.INTAKE)));
+        rightTrigger.whenInactive(new SequentialCommandGroup(
+                new SetIntakeStateCommand(intakeSubsystem, Constants.IntakeState.STOP),
+                new SetLaunchGateStateCommand(launchSubsystem, Constants.LaunchGateState.KICK),
+                new SetLaunchGateStateCommand(launchSubsystem, Constants.LaunchGateState.CLOSED)));
     }
 }

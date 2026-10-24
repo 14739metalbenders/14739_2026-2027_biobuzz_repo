@@ -1,21 +1,16 @@
 package com.metalbenders.control.subsystems;
 
 import com.arcrobotics.ftclib.command.SubsystemBase;
+import com.metalbenders.constants.Constants;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 public class IntakeSubsystem extends SubsystemBase {
 
-    private enum IntakeState {
-        INTAKE,
-        REVERSE_INTAKE,
-        STOPPED
-    }
-
     private final DcMotorEx intakeMotor;
     private final Telemetry telemetry;
-    private IntakeState intakeState = IntakeState.STOPPED;
+    private Constants.IntakeState intakeState = Constants.IntakeState.STOP;
 
     public IntakeSubsystem(HardwareMap hardwareMap, Telemetry telemetry) {
         this.telemetry = telemetry;
@@ -23,24 +18,10 @@ public class IntakeSubsystem extends SubsystemBase {
         this.intakeMotor.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
     }
 
-    public void intake() {
-        if ( intakeState != IntakeState.INTAKE) {
-            intakeMotor.setVelocity(2300);
-            intakeState = IntakeState.INTAKE;
-        }
-    }
-
-    public void reverseIntake() {
-        if (intakeState != IntakeState.REVERSE_INTAKE) {
-            intakeMotor.setVelocity(-2300);
-            intakeState = IntakeState.REVERSE_INTAKE;
-        }
-    }
-
-    public void stop() {
-        if (intakeState != IntakeState.STOPPED) {
-            intakeMotor.setVelocity(0);
-            intakeState = IntakeState.STOPPED;
+    public void setIntakeState(Constants.IntakeState intakeState) {
+        if (this.intakeState != intakeState) {
+            this.intakeState = intakeState;
+            intakeMotor.setVelocity(this.intakeState.getTargetVelocity());
         }
     }
 
@@ -53,6 +34,6 @@ public class IntakeSubsystem extends SubsystemBase {
     }
 
     public void teardown() {
-        stop();
+        setIntakeState(Constants.IntakeState.STOP);
     }
 }
