@@ -1,7 +1,6 @@
 package com.metalbenders.opmodes.tele;
 
 import static com.metalbenders.constants.Constants.DEFAULT_POSE;
-import static com.metalbenders.constants.Constants.IntakeState.STOP;
 
 import com.arcrobotics.ftclib.command.SequentialCommandGroup;
 import com.arcrobotics.ftclib.command.button.Trigger;

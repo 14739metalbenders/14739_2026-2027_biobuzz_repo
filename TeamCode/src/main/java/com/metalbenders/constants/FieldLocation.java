@@ -5,8 +5,8 @@ import com.pedropathing.math.Pose;
 
 public enum FieldLocation {
     AUDIENCE_SIDE_START_POSE(
-            new Pose(55.4, 7.2, Math.toRadians(90)),
-            new Pose(82.7, 7.2, Math.toRadians(90))),
+            new Pose(57.75, 7, Math.toRadians(90)),
+            new Pose(82.7, 7, Math.toRadians(90))),
     GARDEN_SIDE_FLOWER(
             new Pose(47.4, 129.9, Math.toRadians(90)),
             new Pose(94.4, 10.7, Math.toRadians(270))),
@@ -14,8 +14,8 @@ public enum FieldLocation {
             new Pose(9.6, 46.8, Math.toRadians(180)),
             new Pose(129.9, 93.2, Math.toRadians(0))),
     AUDIENCE_SIDE_LAUNCH(
-            new Pose(57.7, 21.6, Math.toRadians(180)),
-            new Pose(85.5, 21.6, Math.toRadians(180))),
+            new Pose(57.75, 21.6, Math.toRadians(90)),
+            new Pose(85.5, 21.6, Math.toRadians(90))),
     AUDIENCE_SIDE_WAYPOINT(
             new Pose(38, 37.7, Math.toRadians(90)),
             new Pose(105.8, 36.5, Math.toRadians(90))),

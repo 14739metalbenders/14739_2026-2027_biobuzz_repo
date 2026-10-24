@@ -8,8 +8,8 @@ import com.metalbenders.util.RotatingBuffer;
 import com.pedropathing.follower.Follower;
 import com.pedropathing.follower.ManualDrive;
 import com.pedropathing.math.Pose;
-import com.pedropathing.paths.Path;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import static com.pedropathing.api.Paths.*;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.pedro.Constants;
@@ -37,8 +37,8 @@ public class DriveSubsystem extends SubsystemBase {
         }
     }
 
-    public void followPath(Path path) {
-        follower.follow(path);
+    public void driveToPosition(Pose pose) {
+        follower.follow(line(follower.pose(), pose).constant(pose.heading()));
     }
 
     public void resetHeading() {
@@ -61,7 +61,7 @@ public class DriveSubsystem extends SubsystemBase {
         telemetry.addLine("--------------------------------");
         telemetry.addData("Pose",
                 String.format(Locale.ENGLISH, "x: %.2f, y: %.2f, heading: %.2f",
-                        follower.pose().x(), follower.pose().y(), follower.pose().heading()));
+                        follower.pose().x(), follower.pose().y(), Math.toDegrees(follower.pose().heading())));
         telemetry.addData("Driving", follower.isBusy() ? "Yes" : "No");
         telemetry.addLine();
     }

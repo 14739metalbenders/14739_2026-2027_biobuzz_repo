@@ -32,7 +32,6 @@ public abstract class BaseOpMode extends CommandOpMode {
         if (getOpModeType() == Constants.OpModeType.AUTO) {
             lidarSubsystem = new LidarSubsystem(hardwareMap, telemetry);
             huskyLensSubsystem = new HuskyLensSubsystem(hardwareMap, telemetry, getAllianceColor());
-
         }
 //        turretSubsystem.setDefaultCommand(new UpdateLauncherCommand(
 //                turretSubsystem, limelightSubsystem, driveSubsystem));

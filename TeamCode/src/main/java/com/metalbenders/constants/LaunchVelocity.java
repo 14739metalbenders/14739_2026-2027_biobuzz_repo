@@ -1,5 +1,8 @@
 package com.metalbenders.constants;
 
+import com.acmerobotics.dashboard.config.Config;
+
+@Config
 public enum LaunchVelocity {
     IDLE(1180.0, 0.0, 26.0, 100.0),
     VELOCITY_26_30(0.0, 26.0, 30.0, 100.0),
@@ -9,7 +12,7 @@ public enum LaunchVelocity {
     MAX(0.0, 26.0, 30.0, 100.0);
 
 
-    private final Double velocity;
+    public Double velocity;
     private final Double minDistance;
     private final Double maxDistance;
     private final Double tolerance;

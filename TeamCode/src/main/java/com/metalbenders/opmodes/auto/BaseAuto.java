@@ -38,6 +38,15 @@ public abstract class BaseAuto extends BaseOpMode {
     @Override
     public void initialize() {
         super.initialize();
-//        getAutoStrategy().initialize(getAllianceColor(), getParkPose());
+        getAutoStrategy().initialize(
+                getAllianceColor(),
+                getParkPose(),
+                driveSubsystem,
+                intakeSubsystem,
+                launchSubsystem,
+                turretSubsystem,
+                huskyLensSubsystem,
+                limelightSubsystem,
+                lidarSubsystem);
     }
 }

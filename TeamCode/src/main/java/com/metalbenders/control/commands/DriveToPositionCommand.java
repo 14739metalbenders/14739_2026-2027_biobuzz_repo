@@ -2,22 +2,23 @@ package com.metalbenders.control.commands;
 
 import com.arcrobotics.ftclib.command.CommandBase;
 import com.metalbenders.control.subsystems.DriveSubsystem;
-import com.pedropathing.paths.Path;
+import com.pedropathing.math.Pose;
 
-public class FollowPathCommand extends CommandBase {
+public class DriveToPositionCommand extends CommandBase {
+
     private final DriveSubsystem driveSubsystem;
-    private final Path path;
+    private final Pose pose;
 
-    public FollowPathCommand(DriveSubsystem driveSubsystem, Path path) {
+    public DriveToPositionCommand(DriveSubsystem driveSubsystem, Pose pose) {
         this.driveSubsystem = driveSubsystem;
-        this.path = path;
+        this.pose = pose;
         addRequirements(driveSubsystem);
     }
 
     @Override
     public void initialize() {
         // Start the path via Pedro Follower exposed method
-        driveSubsystem.followPath(path);
+        driveSubsystem.driveToPosition(pose);
     }
 
     @Override
