@@ -28,8 +28,7 @@ public class DriveCommand extends CommandBase {
         driveSubsystem.drive(
                 forwardSupplier.getAsDouble(),
                 strafeSupplier.getAsDouble(),
-                headingSupplier.getAsDouble(),
-                true // true = Field Centric; false = Robot Centric
+                headingSupplier.getAsDouble()
         );
     }
 }

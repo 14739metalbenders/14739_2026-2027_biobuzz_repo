@@ -1,36 +1,18 @@
-package com.metalbenders.opmodes.tele;
-
-import static com.metalbenders.constants.Constants.DEFAULT_POSE;
+package com.metalbenders.opmodes;
 
 import com.arcrobotics.ftclib.command.SequentialCommandGroup;
 import com.arcrobotics.ftclib.command.button.Trigger;
-import com.arcrobotics.ftclib.gamepad.GamepadEx;
 import com.arcrobotics.ftclib.gamepad.GamepadKeys;
 import com.metalbenders.constants.Constants;
 import com.metalbenders.control.commands.*;
-import com.metalbenders.opmodes.BaseOpMode;
-import com.metalbenders.util.AutonomousStorage;
-import com.pedropathing.math.Pose;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
-public abstract class BaseTeleop extends BaseOpMode {
-
-    private GamepadEx driverGamepad;
-
-    @Override
-    public Constants.OpModeType getOpModeType() {
-        return Constants.OpModeType.TELEOP;
-    }
-
-    @Override
-    public Pose getInitialPose() {
-        return AutonomousStorage.endPose == null ? DEFAULT_POSE : AutonomousStorage.endPose;
-    }
+@TeleOp(name = "Teleop", group = "Teleop")
+public abstract class TeleopMode extends BaseOpMode {
 
     @Override
     public void initialize() {
         super.initialize();
-
-        driverGamepad = new GamepadEx(gamepad1);
 
         //DRIVE
         driveSubsystem.setDefaultCommand(

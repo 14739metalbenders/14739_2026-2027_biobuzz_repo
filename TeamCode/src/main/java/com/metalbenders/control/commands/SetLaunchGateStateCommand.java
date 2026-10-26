@@ -1,35 +1,20 @@
 package com.metalbenders.control.commands;
 
-import com.arcrobotics.ftclib.command.CommandBase;
+import static com.metalbenders.constants.Constants.LAUNCH_GATE_POSITION_DELAY_MILLI;
+
+import com.arcrobotics.ftclib.command.InstantCommand;
+import com.arcrobotics.ftclib.command.SequentialCommandGroup;
+import com.arcrobotics.ftclib.command.WaitCommand;
 import com.metalbenders.constants.Constants;
 import com.metalbenders.control.subsystems.LaunchSubsystem;
 
-import static com.metalbenders.constants.Constants.LAUNCH_GATE_POSITION_DELAY_MILLI;
-
-public class SetLaunchGateStateCommand extends CommandBase {
-
-    private final LaunchSubsystem launchSubsystem;
-    private final Constants.LaunchGateState launchGateState;
-    private long startTime;
+public class SetLaunchGateStateCommand extends SequentialCommandGroup {
 
     public SetLaunchGateStateCommand(LaunchSubsystem launchSubsystem, Constants.LaunchGateState launchGateState) {
-        this.launchSubsystem = launchSubsystem;
-        this.launchGateState = launchGateState;
-        addRequirements(launchSubsystem);
-    }
-
-    @Override
-    public void initialize() {
-        startTime = System.currentTimeMillis();
-    }
-
-    @Override
-    public void execute() {
-        launchSubsystem.setLaunchGateState(launchGateState);
-    }
-
-    @Override
-    public boolean isFinished() {
-        return (System.currentTimeMillis() - startTime) >= LAUNCH_GATE_POSITION_DELAY_MILLI;
+        super(
+                new InstantCommand(
+                        () -> launchSubsystem.setLaunchGateState(launchGateState),
+                        launchSubsystem),
+                new WaitCommand(LAUNCH_GATE_POSITION_DELAY_MILLI));
     }
 }

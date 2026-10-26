@@ -72,7 +72,7 @@ public class Constants {
     public static final Pose DEFAULT_POSE = new Pose(0, 0, Math.toRadians(90));
 
     /*LAUNCHER CONSTANTS*/
-    public static final double LAUNCH_GATE_POSITION_DELAY_MILLI = 125.0;
+    public static final long LAUNCH_GATE_POSITION_DELAY_MILLI = 125;
     public static final double MAX_TURRET_ROTATION_DEGREES = 120.0;
     public static final PIDFCoefficients LAUNCHER_VELOCITY_PID = new PIDFCoefficients(150, 0, 0, 15);
     public static final PIDFCoefficients TURRET_VELOCITY_PID = new PIDFCoefficients(23.25, 0.0, 0.8, 7.5);
@@ -83,5 +83,6 @@ public class Constants {
     public static final int RED_NECTAR_BLOCK_ID = 3;
 
     /*AUTO CONSTANTS*/
-    public static final long MILLIS_TO_WAIT_DURING_AUTO_SHOOT = 750l;
+    public static final long MILLIS_TO_WAIT_DURING_AUTO_SHOOT = 750;
+    public static final long MILLIS_TO_WAIT_FOR_HIVE_SWITCH = 5000;
 }

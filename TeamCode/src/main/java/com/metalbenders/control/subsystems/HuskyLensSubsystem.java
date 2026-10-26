@@ -33,7 +33,7 @@ public class HuskyLensSubsystem implements Subsystem {
             case POLLEN:
                 return huskyLens.blocks(POLLEN_BLOCK_ID);
             case NECTAR:
-                if(allianceColor == Constants.AllianceColor.RED) {
+                if (allianceColor == Constants.AllianceColor.RED) {
                     return huskyLens.blocks(RED_NECTAR_BLOCK_ID);
                 } else {
                     return huskyLens.blocks(BLUE_NECTAR_BLOCK_ID);
@@ -48,5 +48,9 @@ public class HuskyLensSubsystem implements Subsystem {
         telemetry.addLine("--------------------------------");
         telemetry.addData("HuskyLens State", state);
         telemetry.addLine();
+    }
+
+    public void teardown() {
+        //no teardown needed for HuskyLens
     }
 }

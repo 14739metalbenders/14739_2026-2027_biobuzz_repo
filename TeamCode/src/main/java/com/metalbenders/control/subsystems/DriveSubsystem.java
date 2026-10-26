@@ -28,13 +28,9 @@ public class DriveSubsystem extends SubsystemBase {
         this.follower.setPose(initialPose);
     }
 
-    public void drive(double forward, double strafe, double heading, boolean fieldCentric) {
-        if (fieldCentric) {
-            ManualDrive.driveOrHold(follower,
-                    ManualDrive.fieldCentric(forward, strafe, heading, follower.pose().heading()));
-        } else {
-            ManualDrive.driveOrHold(follower, forward, strafe, heading);
-        }
+    public void drive(double forward, double strafe, double heading) {
+        ManualDrive.driveOrHold(follower,
+                ManualDrive.fieldCentric(forward, strafe, heading, follower.pose().heading()));
     }
 
     public void driveToPosition(Pose pose) {
@@ -68,8 +64,5 @@ public class DriveSubsystem extends SubsystemBase {
 
     public void teardown(com.metalbenders.constants.Constants.OpModeType opModeType) {
         follower.stop();
-        if (opModeType == AUTO) {
-            AutonomousStorage.endPose = getCurrentPose();
-        }
     }
 }

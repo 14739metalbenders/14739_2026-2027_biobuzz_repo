@@ -3,8 +3,8 @@ package com.metalbenders.constants;
 public enum AutoFieldBoundary {
 
     //These ranges may need to be tweaked so that we aren't going over the middle of the field with any part of the bot
-    RED_FIELD_SIDE(Constants.AllianceColor.RED, 0, 72, 0, 144),
-    BLUE_FIELD_SIDE(Constants.AllianceColor.BLUE, 72, 144, 0, 144);
+    RED_FIELD_BOUNDARY(Constants.AllianceColor.RED, 0, 72, 0, 144),
+    BLUE_FIELD_BOUNDARY(Constants.AllianceColor.BLUE, 72, 144, 0, 144);
 
     private final Constants.AllianceColor allianceColor;
     private final double minX;
