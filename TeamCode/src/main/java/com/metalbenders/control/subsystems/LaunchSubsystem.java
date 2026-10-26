@@ -51,22 +51,24 @@ public class LaunchSubsystem extends SubsystemBase {
     public void updateLauncherVelocity(
             FieldSide activeHiveCellFieldSide,
             Pose currentPose,
-            TimedEntity<List<LLResultTypes.FiducialResult>> lastActiveSideDetections) {
-        setTargetLaunchVelocity(activeHiveCellFieldSide, currentPose, lastActiveSideDetections);
+            TimedEntity<List<LLResultTypes.FiducialResult>> lastActiveSideDetections,
+            double distance) {
+        setTargetLaunchVelocity(activeHiveCellFieldSide, currentPose, lastActiveSideDetections, distance);
     }
 
     public void setTargetLaunchVelocity(
             FieldSide activeHiveCellFieldSide,
             Pose currentPose,
-            TimedEntity<List<LLResultTypes.FiducialResult>> lastActiveSideDetections) {
+            TimedEntity<List<LLResultTypes.FiducialResult>> lastActiveSideDetections,
+            double distance) {
 
-        double distance;
-        if (areDetectionsValid(lastActiveSideDetections)) {
-            distance = calculateAverageTx(lastActiveSideDetections.getEntity());
-        } else {
-            distance = calculateDistanceFromOdometry(activeHiveCellFieldSide, currentPose);
-        }
-        this.targetLaunchVelocity = getLaunchVelocityByDistance(distance);
+        //double distance;
+        //if (areDetectionsValid(lastActiveSideDetections)) {
+        //    distance = calculateAverageTx(lastActiveSideDetections.getEntity());
+        //} else {
+        //    distance = calculateDistanceFromOdometry(activeHiveCellFieldSide, currentPose);
+        //}
+        this.targetLaunchVelocity = getLaunchVelocityByDistance(distance * 39.3701);
     }
 
     private double calculateDistanceFromOdometry(FieldSide activeHiveCellFieldSide, Pose currentPose) {

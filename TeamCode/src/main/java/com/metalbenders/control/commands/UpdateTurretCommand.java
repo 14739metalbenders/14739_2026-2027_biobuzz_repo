@@ -17,7 +17,7 @@ public class UpdateTurretCommand extends CommandBase {
         this.turretSubsystem = turretSubsystem;
         this.limelightSubsystem = limelightSubsystem;
         this.driveSubsystem = driveSubsystem;
-        addRequirements(turretSubsystem, limelightSubsystem, driveSubsystem);
+        addRequirements(turretSubsystem);
     }
 
     @Override
@@ -25,6 +25,8 @@ public class UpdateTurretCommand extends CommandBase {
         turretSubsystem.updateTurretPosition(
                 limelightSubsystem.getActiveHiveCellFieldSide(),
                 driveSubsystem.getCurrentPose(),
-                limelightSubsystem.getLastActiveSideDetections());
+                driveSubsystem.getCurrentTwist(),
+                limelightSubsystem.getLastActiveSideDetections(),
+                limelightSubsystem.getAimError());
     }
 }

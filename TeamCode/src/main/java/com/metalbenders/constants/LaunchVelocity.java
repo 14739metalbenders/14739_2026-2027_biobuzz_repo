@@ -2,17 +2,16 @@ package com.metalbenders.constants;
 
 import com.acmerobotics.dashboard.config.Config;
 
-@Config
 public enum LaunchVelocity {
-    IDLE(1180.0, 0.0, 26.0, 100.0),
-    VELOCITY_26_30(0.0, 26.0, 30.0, 100.0),
-    VELOCITY_30_34(0.0, 30.0, 34.0, 100.0),
-    VELOCITY_34_38(0.0, 34.0, 38.0, 100.0),
-    VELOCITY_38_42(0.0, 38.0, 42.0, 100.0),
-    MAX(0.0, 26.0, 30.0, 100.0);
+    IDLE(1100.0, 0.0, 26.0, 100.0),
+    VELOCITY_26_30(1100.0, 26.0, 30.0, 100.0),
+    VELOCITY_30_34(1110.0, 30.0, 34.0, 100.0),
+    VELOCITY_34_38(1160.0, 34.0, 38.0, 100.0),
+    VELOCITY_38_42(1120.0, 38.0, 42.0, 100.0),
+    MAX(1240.0, 42.0, 60.0, 100.0);
 
 
-    public Double velocity;
+    private Double velocity;
     private final Double minDistance;
     private final Double maxDistance;
     private final Double tolerance;
@@ -46,7 +45,7 @@ public enum LaunchVelocity {
         }
         for (LaunchVelocity launchVelocity : LaunchVelocity.values()) {
             if (launchVelocity.getMinDistance() != null && launchVelocity.getMaxDistance() != null) {
-                if (distance >= launchVelocity.getMinDistance() && distance <= launchVelocity.getMaxDistance()) {
+                if (distance >= launchVelocity.getMinDistance() && distance < launchVelocity.getMaxDistance()) {
                     return launchVelocity;
                 }
             }

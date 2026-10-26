@@ -3,24 +3,38 @@ package com.metalbenders.control.subsystems;
 import com.arcrobotics.ftclib.command.SubsystemBase;
 import com.metalbenders.constants.Constants;
 import com.metalbenders.constants.FieldLocation;
+import com.metalbenders.hardware.AS5600;
 import com.metalbenders.util.TimedEntity;
 import com.pedropathing.math.Pose;
+import com.pedropathing.math.Twist;
 import com.qualcomm.hardware.limelightvision.LLResultTypes;
 import com.qualcomm.robotcore.hardware.*;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+
+import com.metalbenders.util.TurretController.TurretRotateCalc;
+import static com.metalbenders.util.TurretController.calculateTurretLead;
 
 import java.util.List;
 
 import static com.metalbenders.constants.Constants.*;
-import static com.qualcomm.robotcore.hardware.DcMotor.RunMode.RUN_USING_ENCODER;
 
 public class TurretSubsystem extends SubsystemBase {
 
     private final Telemetry telemetry;
     private final DcMotorEx turretMotor;
+    private final AS5600 turretEncoder;
     private double targetHeadingDegrees = 0.0;
     private double turretHeadingDegrees = 0.0;
     private final Constants.AllianceColor allianceColor;
+    private double turretMotorEncoderZero = 0;
+    public double TURRET_TICKS_PER_DEGREE = ( 1425.1 / 360 ) * 1.872340426;
+
+    private double shotLeadAngle = 0;
+    private double shotTimeOfFLight = 0;
+    private double targetBearing = 0;
+    private double turretPower = 0;
+    private double turretAngle = 0;
 
     public TurretSubsystem(HardwareMap hardwareMap, Telemetry telemetry, Constants.AllianceColor allianceColor) {
         this.telemetry = telemetry;
@@ -28,17 +42,24 @@ public class TurretSubsystem extends SubsystemBase {
 
         //turret motor setup
         this.turretMotor = hardwareMap.get(DcMotorEx.class, "turretMotor");
-        this.turretMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        this.turretMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        this.turretMotor.setPIDFCoefficients(RUN_USING_ENCODER, new PIDFCoefficients(
-                TURRET_VELOCITY_PID.p, TURRET_VELOCITY_PID.i, TURRET_VELOCITY_PID.d, TURRET_VELOCITY_PID.f));
+        this.turretMotor.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
+        this.turretMotor.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
+        this.turretMotor.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
+        this.turretMotor.setDirection(DcMotorSimple.Direction.FORWARD);
+        //this.turretMotor.setPIDFCoefficients(RUN_USING_ENCODER, new PIDFCoefficients(
+        //        TURRET_VELOCITY_PID.p, TURRET_VELOCITY_PID.i, TURRET_VELOCITY_PID.d, TURRET_VELOCITY_PID.f));
+        this.turretEncoder = hardwareMap.get(AS5600.class, "turretEncoder");
+        setTurretEncoderToMotorEncoderOffset();
     }
 
     public void updateTurretPosition(
             Constants.FieldSide activeHiveCellFieldSide,
             Pose currentPose,
-            TimedEntity<List<LLResultTypes.FiducialResult>> lastActiveSideDetections) {
+            Twist currentTwist,
+            TimedEntity<List<LLResultTypes.FiducialResult>> lastActiveSideDetections,
+            double aimError) {
         setTargetHeadingDegrees(activeHiveCellFieldSide, currentPose, lastActiveSideDetections);
+        turretPower(currentTwist, aimError);
     }
 
     private void setTargetHeadingDegrees(
@@ -92,12 +113,54 @@ public class TurretSubsystem extends SubsystemBase {
                 && !lastActiveSideDetections.getEntity().isEmpty();
     }
 
+    private double getTurretEncoderFixed() {
+        return ((turretEncoder.getAngleDeg(true) * 2) - 196.8);
+    }
+
+    private void setTurretEncoderToMotorEncoderOffset() {
+        long currentTurretMotorEncoderValue = turretMotor.getCurrentPosition();
+        turretMotorEncoderZero = currentTurretMotorEncoderValue - (long)(getTurretAngleFromEncoder() * TURRET_TICKS_PER_DEGREE);
+    }
+
+    private double getTurretAngleFromMotor() {
+        long currentTurretMotorEncoderValue = turretMotor.getCurrentPosition();
+        turretAngle = AngleUnit.normalizeDegrees((currentTurretMotorEncoderValue - turretMotorEncoderZero) / TURRET_TICKS_PER_DEGREE);
+        return turretAngle;
+    }
+
+    private double getTurretAngleFromEncoder() {
+        return AngleUnit.normalizeDegrees((getTurretEncoderFixed() / 1.872340426));
+    }
+
+    private void turretPower(Twist currentTwist, double aimError) {
+        TurretRotateCalc calculateTurretLead = calculateTurretLead(currentTwist, aimError, getTurretAngleFromMotor(), 5, 15);
+        shotLeadAngle = calculateTurretLead.getShotLeadAngle();
+        shotTimeOfFLight = calculateTurretLead.getTimeOfFlight();
+        targetBearing = calculateTurretLead.getTargetBearing();
+        turretPower = calculateTurretLead.getTurretPower();
+        //if (turretPower > -0.05 && turretPower < 0.05) { turretPower = 0; }
+        setTurretPower(calculateTurretLead.getTurretPower());
+    }
+
+    private void setTurretPower(double turretPower) {
+        //if ((turretAngle > -30 && turretPower < 0) || (turretAngle < 30 && turretPower > 0)) {
+            this.turretMotor.setPower(turretPower);
+        //} else {
+        //    this.turretMotor.setPower(0);
+        //}
+    }
+
     @Override
     public void periodic() {
         telemetry.addLine(this.getClass().getSimpleName());
         telemetry.addLine("--------------------------------");
-        telemetry.addData("Target Heading (degrees)", targetHeadingDegrees);
-        telemetry.addData("Turret Heading (degrees)", turretHeadingDegrees);
+        //telemetry.addData("Target Heading (degrees)", targetHeadingDegrees);
+        //telemetry.addData("Turret Heading (degrees)", turretHeadingDegrees);
+        telemetry.addData("Turret Power", turretPower);
+        telemetry.addData("Turret Angle (deg)", turretAngle);
+        telemetry.addData("Target Lead (deg)", shotLeadAngle);
+        telemetry.addData("Target Bearing (deg)", targetBearing);
+        telemetry.addData("Shot ToF (s)", shotTimeOfFLight);
         telemetry.addLine();
     }
 

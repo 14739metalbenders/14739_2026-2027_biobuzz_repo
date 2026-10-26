@@ -5,6 +5,8 @@ import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.arcrobotics.ftclib.command.CommandOpMode;
 import com.metalbenders.constants.Constants;
 import com.metalbenders.constants.Constants.AllianceColor;
+import com.metalbenders.control.commands.UpdateLauncherCommand;
+import com.metalbenders.control.commands.UpdateTurretCommand;
 import com.metalbenders.control.subsystems.*;
 import com.pedropathing.math.Pose;
 
@@ -33,8 +35,10 @@ public abstract class BaseOpMode extends CommandOpMode {
             lidarSubsystem = new LidarSubsystem(hardwareMap, telemetry);
             huskyLensSubsystem = new HuskyLensSubsystem(hardwareMap, telemetry, getAllianceColor());
         }
-//        turretSubsystem.setDefaultCommand(new UpdateLauncherCommand(
-//                turretSubsystem, limelightSubsystem, driveSubsystem));
+        turretSubsystem.setDefaultCommand(new UpdateTurretCommand(
+                turretSubsystem, limelightSubsystem, driveSubsystem));
+        launchSubsystem.setDefaultCommand(new UpdateLauncherCommand(
+                launchSubsystem, limelightSubsystem, driveSubsystem));
 
 //        turretSubsystem.setDefaultCommand(new UpdateLauncherCommand(
 //                turretSubsystem, limelightSubsystem, driveSubsystem));

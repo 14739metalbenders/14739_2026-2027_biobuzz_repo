@@ -17,7 +17,7 @@ public class UpdateLauncherCommand extends CommandBase {
         this.launcherSubsystem = launcherSubsystem;
         this.limelightSubsystem = limelightSubsystem;
         this.driveSubsystem = driveSubsystem;
-        addRequirements(launcherSubsystem, limelightSubsystem, driveSubsystem);
+        addRequirements(launcherSubsystem);
     }
 
     @Override
@@ -25,6 +25,7 @@ public class UpdateLauncherCommand extends CommandBase {
         launcherSubsystem.updateLauncherVelocity(
                 limelightSubsystem.getActiveHiveCellFieldSide(),
                 driveSubsystem.getCurrentPose(),
-                limelightSubsystem.getLastActiveSideDetections());
+                limelightSubsystem.getLastActiveSideDetections(),
+                limelightSubsystem.getTargetDistance());
     }
 }
