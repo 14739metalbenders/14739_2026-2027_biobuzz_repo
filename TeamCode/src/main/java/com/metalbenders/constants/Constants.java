@@ -81,4 +81,7 @@ public class Constants {
     public static final int POLLEN_BLOCK_ID = 1;
     public static final int BLUE_NECTAR_BLOCK_ID = 2;
     public static final int RED_NECTAR_BLOCK_ID = 3;
+
+    /*AUTO CONSTANTS*/
+    public static final long MILLIS_TO_WAIT_DURING_AUTO_SHOOT = 750l;
 }

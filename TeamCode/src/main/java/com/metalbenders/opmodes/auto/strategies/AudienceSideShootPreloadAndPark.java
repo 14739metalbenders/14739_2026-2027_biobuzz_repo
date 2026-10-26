@@ -3,13 +3,14 @@ package com.metalbenders.opmodes.auto.strategies;
 import com.arcrobotics.ftclib.command.CommandScheduler;
 import com.arcrobotics.ftclib.command.SequentialCommandGroup;
 import com.metalbenders.constants.Constants;
+import com.metalbenders.control.commands.AutoShoot;
 import com.metalbenders.control.commands.DriveToPositionCommand;
 import com.metalbenders.control.subsystems.*;
 import com.pedropathing.math.Pose;
 
 import static com.metalbenders.constants.FieldLocation.AUDIENCE_SIDE_LAUNCH;
 
-public class AudienceSideTestStrategy extends AutoStrategy {
+public class AudienceSideShootPreloadAndPark extends AutoStrategy {
 
     @Override
     public void initialize(
@@ -26,7 +27,9 @@ public class AudienceSideTestStrategy extends AutoStrategy {
         // Initialize any necessary components or variables for the Audience Side Test Strategy
         CommandScheduler.getInstance().schedule(
                 new SequentialCommandGroup(
-                    new DriveToPositionCommand(driveSubsystem, AUDIENCE_SIDE_LAUNCH.getPose(allianceColor)))
+                        new DriveToPositionCommand(driveSubsystem, AUDIENCE_SIDE_LAUNCH.getPose(allianceColor)),
+                        new AutoShoot(intakeSubsystem, launchSubsystem),
+                        new DriveToPositionCommand(driveSubsystem, ))
         );
     }
 

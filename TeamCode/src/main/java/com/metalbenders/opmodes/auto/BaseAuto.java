@@ -3,7 +3,7 @@ package com.metalbenders.opmodes.auto;
 import com.metalbenders.constants.AutoFieldBoundary;
 import com.metalbenders.constants.Constants;
 import com.metalbenders.opmodes.BaseOpMode;
-import com.metalbenders.opmodes.auto.strategies.AudienceSideTestStrategy;
+import com.metalbenders.opmodes.auto.strategies.AudienceSideShootPreloadAndPark;
 import com.metalbenders.opmodes.auto.strategies.AutoStrategy;
 import com.pedropathing.math.Pose;
 
@@ -17,7 +17,7 @@ public abstract class BaseAuto extends BaseOpMode {
     }
 
     public AutoStrategy getAutoStrategy() {
-        return new AudienceSideTestStrategy();
+        return new AudienceSideShootPreloadAndPark();
     }
 
     @Override
