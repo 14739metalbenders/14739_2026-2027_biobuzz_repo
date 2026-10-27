@@ -1,4 +1,4 @@
-package com.metalbenders.autostrategies;
+package com.metalbenders.strategies;
 
 import com.metalbenders.constants.Constants;
 import com.metalbenders.control.subsystems.*;

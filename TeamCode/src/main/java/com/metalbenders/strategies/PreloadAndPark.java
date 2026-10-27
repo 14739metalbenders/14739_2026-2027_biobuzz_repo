@@ -1,4 +1,4 @@
-package com.metalbenders.autostrategies;
+package com.metalbenders.strategies;
 
 import com.arcrobotics.ftclib.command.CommandScheduler;
 import com.arcrobotics.ftclib.command.SequentialCommandGroup;
@@ -12,7 +12,7 @@ import com.metalbenders.control.subsystems.*;
 import static com.metalbenders.constants.Constants.MILLIS_TO_WAIT_FOR_HIVE_SWITCH;
 import static com.metalbenders.constants.FieldLocation.*;
 
-public class ShootPreloadAndPark extends AutoStrategy {
+public class PreloadAndPark extends AutoStrategy {
 
     @Override
     protected void initializeAuto(
@@ -34,6 +34,7 @@ public class ShootPreloadAndPark extends AutoStrategy {
             boolean waitBeforeStarting) {
         boolean scoreSide = startingFieldSide == Constants.FieldSide.SCORE_SIDE;
         FieldLocation launchLocation = scoreSide ? SCORE_SIDE_LAUNCH : AUDIENCE_SIDE_LAUNCH;
+        FieldLocation wayPoint = scoreSide ? SCORE_SIDE_WAYPOINT : AUDIENCE_SIDE_WAYPOINT;
         FieldLocation parkLocation = scoreSide ? SCORE_SIDE_PARK : AUDIENCE_SIDE_PARK;
 
         SequentialCommandGroup commands = new SequentialCommandGroup();
@@ -43,6 +44,7 @@ public class ShootPreloadAndPark extends AutoStrategy {
         }
         commands.addCommands(
                 new AutoShoot(intakeSubsystem, launchSubsystem),
+                new DriveToPositionCommand(driveSubsystem, wayPoint.getPose(allianceColor)),
                 new DriveToPositionCommand(driveSubsystem, parkLocation.getPose(allianceColor)));
         CommandScheduler.getInstance().schedule(commands);
     }

@@ -1,4 +1,4 @@
-package com.metalbenders.autostrategies;
+package com.metalbenders.strategies;
 
 import com.arcrobotics.ftclib.command.CommandScheduler;
 import com.metalbenders.constants.Constants;

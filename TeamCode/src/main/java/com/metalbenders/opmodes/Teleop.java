@@ -8,7 +8,7 @@ import com.metalbenders.control.commands.*;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 @TeleOp(name = "Teleop", group = "Teleop")
-public class TeleopMode extends BaseOpMode {
+public class Teleop extends Base {
 
     @Override
     public void initialize() {

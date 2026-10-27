@@ -4,12 +4,13 @@ import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.arcrobotics.ftclib.command.CommandOpMode;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
-import com.arcrobotics.ftclib.gamepad.GamepadKeys;
-import com.metalbenders.autostrategies.AutoStrategyType;
 import com.metalbenders.constants.Constants;
 import com.metalbenders.constants.Constants.AllianceColor;
+import com.metalbenders.control.commands.UpdateLauncherCommand;
+import com.metalbenders.control.commands.UpdateTurretCommand;
 import com.metalbenders.control.subsystems.*;
 import com.metalbenders.util.AutonomousStorage;
+import com.metalbenders.util.ConfigFileUtil;
 import com.pedropathing.math.Pose;
 
 import static com.metalbenders.constants.Constants.DEFAULT_POSE;
@@ -17,7 +18,7 @@ import static com.metalbenders.constants.Constants.OpModeType.AUTO;
 import static com.metalbenders.constants.FieldLocation.AUDIENCE_SIDE_START_POSE;
 import static com.metalbenders.constants.FieldLocation.SCORE_SIDE_START_POSE;
 
-public abstract class BaseOpMode extends CommandOpMode {
+public abstract class Base extends CommandOpMode {
 
     protected GamepadEx driverGamepad;
     protected DriveSubsystem driveSubsystem;
@@ -35,15 +36,8 @@ public abstract class BaseOpMode extends CommandOpMode {
         driverGamepad = new GamepadEx(gamepad1);
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
 
-        if (getOpModeType() == Constants.OpModeType.AUTO) {
-            AutoMode autoMode = (AutoMode) this;
-            autoMode.startingFieldSide = promptForStartingFieldSide();
-            autoMode.autoStrategyType = promptForAutoStrategy();
-        } else {
-            // For teleop, set the alliance color based on the stored value from autonomous
-            allianceColor = AutonomousStorage.allianceColor;
-            allianceColor = promptForAllianceColor();
-        }
+        // Initialize configurations
+        initializeConfigurations();
 
         // Initialize subsystems
         driveSubsystem = new DriveSubsystem(hardwareMap, telemetry, getStartingPose());
@@ -55,11 +49,11 @@ public abstract class BaseOpMode extends CommandOpMode {
             lidarSubsystem = new LidarSubsystem(hardwareMap, telemetry);
 //            huskyLensSubsystem = new HuskyLensSubsystem(hardwareMap, telemetry, allianceColor);
         }
-//        turretSubsystem.setDefaultCommand(new UpdateLauncherCommand(
-//                turretSubsystem, limelightSubsystem, driveSubsystem));
+        turretSubsystem.setDefaultCommand(new UpdateTurretCommand(
+                turretSubsystem, limelightSubsystem, driveSubsystem));
 
-//        turretSubsystem.setDefaultCommand(new UpdateLauncherCommand(
-//                turretSubsystem, limelightSubsystem, driveSubsystem));
+        launchSubsystem.setDefaultCommand(new UpdateLauncherCommand(
+                launchSubsystem, limelightSubsystem, driveSubsystem));
     }
 
     @Override
@@ -76,15 +70,16 @@ public abstract class BaseOpMode extends CommandOpMode {
         telemetry.addData("Main Loop Time", "%d ms", System.currentTimeMillis() - startTime);
         telemetry.addData("Alliance Color", allianceColor);
         if (getOpModeType() == Constants.OpModeType.AUTO) {
-            AutoMode autoMode = (AutoMode) this;
-            telemetry.addData("Starting Field Side", autoMode.startingFieldSide);
-            telemetry.addData("Auto Strategy", autoMode.autoStrategyType);
+            Auto auto = (Auto) this;
+            telemetry.addData("Starting Field Side", auto.startingFieldSide);
+            telemetry.addData("Auto Strategy", auto.autoStrategyType);
         }
         telemetry.addLine();
         telemetry.update();
     }
 
     public void updateRuntime() {
+        // Update the runtime telemetry in MM:SS format
         double totalSeconds = getRuntime();
         telemetry.addData(
                 "Runtime",
@@ -98,7 +93,6 @@ public abstract class BaseOpMode extends CommandOpMode {
         if (getOpModeType() == AUTO) {
             //Store the end pose and alliance color for use in teleop
             AutonomousStorage.endPose = driveSubsystem.getCurrentPose();
-            AutonomousStorage.allianceColor = allianceColor;
 
             //teardown subsystems that are only used in autonomous
             lidarSubsystem.teardown();
@@ -113,52 +107,8 @@ public abstract class BaseOpMode extends CommandOpMode {
         super.reset();
     }
 
-    private Constants.AllianceColor promptForAllianceColor() {
-        return promptForSelection(
-                Constants.AllianceColor.values(),
-                "Select Alliance Color",
-                "Current Alliance Color");
-    }
-
-    private Constants.FieldSide promptForStartingFieldSide() {
-        return promptForSelection(
-                Constants.FieldSide.values(),
-                "Select Starting Field Side",
-                "Current Starting Field Side");
-    }
-
-    private AutoStrategyType promptForAutoStrategy() {
-        return promptForSelection(
-                AutoStrategyType.values(),
-                "Select Auto Strategy",
-                "Current Strategy");
-    }
-
-    private <T extends Enum<T>> T promptForSelection(
-            T[] options,
-            String promptText,
-            String currentLabel) {
-        T currentSelection = options[0];
-        while (!isStopRequested()) {
-            // wasJustPressed only works if button state is refreshed every loop
-            driverGamepad.readButtons();
-            telemetry.addData(promptText, "Press DPAD_UP/DPAD_DOWN to select, X to confirm");
-            telemetry.addData(currentLabel, currentSelection);
-            telemetry.update();
-            if (driverGamepad.wasJustPressed(GamepadKeys.Button.DPAD_UP)) {
-                currentSelection = options[(currentSelection.ordinal() + 1) % options.length];
-            } else if (driverGamepad.wasJustPressed(GamepadKeys.Button.DPAD_DOWN)) {
-                currentSelection = options[(currentSelection.ordinal() - 1 + options.length) % options.length];
-            } else if (driverGamepad.wasJustPressed(GamepadKeys.Button.X)) {
-                return currentSelection;
-            }
-            sleep(20);
-        }
-        return currentSelection;
-    }
-
     public Constants.OpModeType getOpModeType() {
-        if (this instanceof AutoMode) {
+        if (this instanceof Auto) {
             return Constants.OpModeType.AUTO;
         }
         return Constants.OpModeType.TELEOP;
@@ -166,12 +116,22 @@ public abstract class BaseOpMode extends CommandOpMode {
 
     public Pose getStartingPose() {
         if (getOpModeType() == Constants.OpModeType.AUTO) {
-            AutoMode autoMode = (AutoMode) this;
-            return autoMode.startingFieldSide == Constants.FieldSide.AUDIENCE_SIDE
+            Auto auto = (Auto) this;
+            return auto.startingFieldSide == Constants.FieldSide.AUDIENCE_SIDE
                     ? AUDIENCE_SIDE_START_POSE.getPose(allianceColor)
                     : SCORE_SIDE_START_POSE.getPose(allianceColor);
         } else {
             return AutonomousStorage.endPose == null ? DEFAULT_POSE : AutonomousStorage.endPose;
+        }
+    }
+
+    private void initializeConfigurations() {
+        ConfigFileUtil.ConfigFile configFile = ConfigFileUtil.readConfigFile(telemetry);
+        allianceColor = configFile.getAllianceColor();
+        if (getOpModeType() == Constants.OpModeType.AUTO) {
+            Auto auto = (Auto) this;
+            auto.startingFieldSide = configFile.getStartingFieldSide();
+            auto.autoStrategyType = configFile.getAutoStrategyType();
         }
     }
 }

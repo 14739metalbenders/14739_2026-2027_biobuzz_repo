@@ -17,7 +17,7 @@ public class UpdateLauncherCommand extends CommandBase {
         this.launcherSubsystem = launcherSubsystem;
         this.limelightSubsystem = limelightSubsystem;
         this.driveSubsystem = driveSubsystem;
-        addRequirements(launcherSubsystem, limelightSubsystem, driveSubsystem);
+        addRequirements(launcherSubsystem);
     }
 
     @Override

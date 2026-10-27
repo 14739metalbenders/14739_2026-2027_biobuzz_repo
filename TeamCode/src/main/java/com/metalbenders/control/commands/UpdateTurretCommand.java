@@ -17,7 +17,7 @@ public class UpdateTurretCommand extends CommandBase {
         this.turretSubsystem = turretSubsystem;
         this.limelightSubsystem = limelightSubsystem;
         this.driveSubsystem = driveSubsystem;
-        addRequirements(turretSubsystem, limelightSubsystem, driveSubsystem);
+        addRequirements(turretSubsystem);
     }
 
     @Override

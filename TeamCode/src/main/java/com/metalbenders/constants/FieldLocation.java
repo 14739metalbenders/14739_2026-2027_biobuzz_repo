@@ -34,9 +34,12 @@ public enum FieldLocation {
     SCORE_SIDE_HIVE_CELL(
             new Pose(58.6, 82.3, Math.toRadians(90)),
             new Pose(84.4, 82.3, Math.toRadians(90))),
-    GARDEN(
-            new Pose(23.4, 6.6, Math.toRadians(180)),
-            new Pose(119.3, 134.9, Math.toRadians(0))),
+    GARDEN_START(
+            new Pose(23.4, 6.5, Math.toRadians(180)),
+            new Pose(120.6, 137.5, Math.toRadians(0))),
+    GARDEN_END(
+            new Pose(7.0, 6.5, Math.toRadians(180)),
+            new Pose(119.3, 137.5, Math.toRadians(0))),
     AUDIENCE_SIDE_PARK(
             new Pose(12.8, 92.9, Math.toRadians(90)),
             new Pose(128.2, 50.6, Math.toRadians(270))),
