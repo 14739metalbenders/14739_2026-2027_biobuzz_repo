@@ -11,18 +11,18 @@ public class TurretController {
         private static final double GRAVITY = 9.81; // in m/s2
 
         // PID controller parameters
-        public static double AIM_Kp = 0.02;
+        public static double AIM_Kp = 0.025;
         public static double AIM_Ki = 0;
-        public static double AIM_Kd = 0.003;
-        public static double AIM_Ks = 0.06;
+        public static double AIM_Kd = 0.03;
+        public static double AIM_Ks = 0.02;
         public static double AIM_DEADBAND = 2.0;
         private static double aimIntegral = 0;
         private static double aimLastError = 0;
         private static final ElapsedTime aimTimer = new ElapsedTime();
         private static double previousPower; // Previous power output value for rate limiting
-        public static double maxRateChange = 0.01; // Maximum allowed change in output per iteration
-        private static double powerLimit = 0.7; // Maximum motor power
-        private static double turretAngleLimit = 30; // Maximum angle limit for turret movement
+        public static double maxRateChange = 0.15; // Maximum allowed change in output per iteration
+        public static double powerLimit = 1.0; // Maximum motor power
+        public static double turretAngleLimit = 45; // Maximum angle limit for turret movement
         private static double integral;
         private static double previousError;
         private static final double INCHES_TO_METERS = 0.0254;
