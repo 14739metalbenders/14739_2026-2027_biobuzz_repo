@@ -6,7 +6,7 @@ import com.metalbenders.constants.Constants;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
 @Autonomous(name = "Auto", group = "Auto", preselectTeleOp = "TeleOp")
-public abstract class AutoMode extends BaseOpMode {
+public class AutoMode extends BaseOpMode {
 
     protected Constants.FieldSide startingFieldSide;
     protected AutoStrategyType autoStrategyType;

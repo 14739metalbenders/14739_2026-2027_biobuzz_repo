@@ -25,7 +25,7 @@ public abstract class BaseOpMode extends CommandOpMode {
     protected LimelightSubsystem limelightSubsystem;
     protected TurretSubsystem turretSubsystem;
     protected LidarSubsystem lidarSubsystem;
-//    protected HuskyLensSubsystem huskyLensSubsystem;
+    protected HuskyLensSubsystem huskyLensSubsystem;
     protected LaunchSubsystem launchSubsystem;
     protected AllianceColor allianceColor;
 
@@ -74,7 +74,7 @@ public abstract class BaseOpMode extends CommandOpMode {
         telemetry.addLine("--------------------------------");
         updateRuntime();
         telemetry.addData("Main Loop Time", "%d ms", System.currentTimeMillis() - startTime);
-        telemetry.addData("Alliance Color", getFormattedAllianceColor(allianceColor));
+        telemetry.addData("Alliance Color", allianceColor);
         if (getOpModeType() == Constants.OpModeType.AUTO) {
             AutoMode autoMode = (AutoMode) this;
             telemetry.addData("Starting Field Side", autoMode.startingFieldSide);
@@ -117,35 +117,33 @@ public abstract class BaseOpMode extends CommandOpMode {
         return promptForSelection(
                 Constants.AllianceColor.values(),
                 "Select Alliance Color",
-                "Current Alliance Color",
-                this::getFormattedAllianceColor);
+                "Current Alliance Color");
     }
 
     private Constants.FieldSide promptForStartingFieldSide() {
         return promptForSelection(
                 Constants.FieldSide.values(),
                 "Select Starting Field Side",
-                "Current Starting Field Side",
-                value -> value);
+                "Current Starting Field Side");
     }
 
     private AutoStrategyType promptForAutoStrategy() {
         return promptForSelection(
                 AutoStrategyType.values(),
                 "Select Auto Strategy",
-                "Current Strategy",
-                value -> value);
+                "Current Strategy");
     }
 
     private <T extends Enum<T>> T promptForSelection(
             T[] options,
             String promptText,
-            String currentLabel,
-            java.util.function.Function<T, Object> displayValue) {
+            String currentLabel) {
         T currentSelection = options[0];
-        while (true) {
+        while (!isStopRequested()) {
+            // wasJustPressed only works if button state is refreshed every loop
+            driverGamepad.readButtons();
             telemetry.addData(promptText, "Press DPAD_UP/DPAD_DOWN to select, X to confirm");
-            telemetry.addData(currentLabel, displayValue.apply(currentSelection));
+            telemetry.addData(currentLabel, currentSelection);
             telemetry.update();
             if (driverGamepad.wasJustPressed(GamepadKeys.Button.DPAD_UP)) {
                 currentSelection = options[(currentSelection.ordinal() + 1) % options.length];
@@ -154,11 +152,9 @@ public abstract class BaseOpMode extends CommandOpMode {
             } else if (driverGamepad.wasJustPressed(GamepadKeys.Button.X)) {
                 return currentSelection;
             }
+            sleep(20);
         }
-    }
-
-    private String getFormattedAllianceColor(Constants.AllianceColor allianceColor) {
-        return "<font color='" + allianceColor + "'>" + allianceColor + "</font>";
+        return currentSelection;
     }
 
     public Constants.OpModeType getOpModeType() {
