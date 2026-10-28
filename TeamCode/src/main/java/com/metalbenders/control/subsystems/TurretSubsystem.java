@@ -61,17 +61,11 @@ public class TurretSubsystem extends SubsystemBase {
     }
 
     private double getHeadingDegreesFromOdometry(Constants.FieldSide activeHiveCellFieldSide, Pose currentPose) {
-        double targetHeading;
-        if (activeHiveCellFieldSide == Constants.FieldSide.SCORE_SIDE) {
-            targetHeading = Math.toDegrees(Math.atan2(
-                    FieldLocation.SCORE_SIDE_HIVE_CELL.getPose(allianceColor).y() - currentPose.y(),
-                    FieldLocation.SCORE_SIDE_HIVE_CELL.getPose(allianceColor).x() - currentPose.x()));
-        } else {
-            targetHeading = Math.toDegrees(Math.atan2(
-                    FieldLocation.AUDIENCE_SIDE_HIVE_CELL.getPose(allianceColor).y() - currentPose.y(),
-                    FieldLocation.AUDIENCE_SIDE_HIVE_CELL.getPose(allianceColor).x() - currentPose.x()));
-        }
-        return targetHeading;
+        FieldLocation hiveLocation = FieldLocation.getHiveCellLocation(activeHiveCellFieldSide);
+        return Math.toDegrees(
+                Math.atan2(
+                        hiveLocation.getPose(allianceColor).y() - currentPose.y(),
+                        hiveLocation.getPose(allianceColor).x() - currentPose.x()));
     }
 
     private void setHeadingDegrees(double targetHeadingDegrees, Pose currentPose) {

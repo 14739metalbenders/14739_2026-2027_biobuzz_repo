@@ -19,7 +19,6 @@ import java.util.function.Function;
 public class Config extends LinearOpMode {
 
     protected GamepadEx driverGamepad;
-    private boolean backRequested;
 
     @Override
     public void runOpMode() {
@@ -31,45 +30,63 @@ public class Config extends LinearOpMode {
         waitForStart();
         ConfigFileUtil.ConfigFile configFile = ConfigFileUtil.readConfigFile(telemetry);
 
-        List<Runnable> steps = Arrays.asList(
-                () -> configFile.setAllianceColor(promptForAllianceColor(configFile.getAllianceColor())),
-                () -> configFile.setStartingFieldSide(promptForStartingFieldSide(configFile.getStartingFieldSide())),
-                () -> configFile.setAutoStrategyType(promptForAutoStrategy(configFile.getAutoStrategyType())),
-                () -> promptForConfirmation(configFile));
-        int step = 0;
-        while (step < steps.size() && !isStopRequested()) {
-            backRequested = false;
-            steps.get(step).run();
-            step = backRequested ? Math.max(0, step - 1) : step + 1;
-        }
+        promptForConfiguration(configFile);
         if (isStopRequested()) {
             return;
         }
 
-        // Only reached once X was pressed on the confirmation step
+        // Only reached once Save configuration was selected
         try {
             ConfigFileUtil.writeConfigFile(configFile);
             telemetry.addLine("Configuration saved Successfully!");
+            telemetry.addLine("-----------Saved Configurations------------");
+            telemetry.addData("Alliance Color", configFile.getAllianceColor());
+            telemetry.addData("Starting Field Side", configFile.getStartingFieldSide());
+            telemetry.addData("Auto Strategy", configFile.getAutoStrategyType());
         } catch (IOException e) {
             telemetry.addData("Error saving configuration", e.getMessage());
         }
         telemetry.update();
-        sleep(2000);
+        while (!isStopRequested()) {
+            sleep(20);
+        }
     }
 
-    private void promptForConfirmation(ConfigFileUtil.ConfigFile configFile) {
+    private void promptForConfiguration(ConfigFileUtil.ConfigFile configFile) {
+        List<Runnable> editors = Arrays.asList(
+                () -> configFile.setAllianceColor(promptForAllianceColor(configFile.getAllianceColor())),
+                () -> configFile.setStartingFieldSide(promptForStartingFieldSide(configFile.getStartingFieldSide())),
+                () -> configFile.setAutoStrategyType(promptForAutoStrategy(configFile.getAutoStrategyType())));
+        String[] labels = {"Alliance Color", "Starting Field Side", "Auto Strategy", "Save configuration"};
+        int selected = 0;
         while (!isStopRequested()) {
             driverGamepad.readButtons();
-            telemetry.addLine("Confirm configuration: X to save and exit, B to go back");
-            telemetry.addData("Alliance Color", configFile.getAllianceColor());
-            telemetry.addData("Starting Field Side", configFile.getStartingFieldSide());
-            telemetry.addData("Auto Strategy", configFile.getAutoStrategyType());
+            telemetry.addLine("DPAD_UP/DPAD_DOWN to select, X to edit or save");
+            telemetry.addLine("Changes are not saved until you select Save configuration");
+            telemetry.addLine("-----------Current Configuration-----------");
+            Object[] values = {
+                    configFile.getAllianceColor(),
+                    configFile.getStartingFieldSide(),
+                    configFile.getAutoStrategyType()
+            };
+            for (int i = 0; i < labels.length; i++) {
+                String label = (selected == i ? "> " : "  ") + labels[i];
+                if (i < values.length) {
+                    telemetry.addData(label, values[i]);
+                } else {
+                    telemetry.addLine(label);
+                }
+            }
             telemetry.update();
-            if (driverGamepad.wasJustPressed(GamepadKeys.Button.X)) {
-                return;
-            } else if (driverGamepad.wasJustPressed(GamepadKeys.Button.B)) {
-                backRequested = true;
-                return;
+            if (driverGamepad.wasJustPressed(GamepadKeys.Button.DPAD_UP)) {
+                selected = (selected - 1 + labels.length) % labels.length;
+            } else if (driverGamepad.wasJustPressed(GamepadKeys.Button.DPAD_DOWN)) {
+                selected = (selected + 1) % labels.length;
+            } else if (driverGamepad.wasJustPressed(GamepadKeys.Button.X)) {
+                if (selected == editors.size()) {
+                    return;
+                }
+                editors.get(selected).run();
             }
             sleep(20);
         }
@@ -117,7 +134,7 @@ public class Config extends LinearOpMode {
         T currentSelection = initialSelection != null ? initialSelection : options[0];
         while (!isStopRequested()) {
             driverGamepad.readButtons();
-            telemetry.addData(promptText, "Press DPAD_UP/DPAD_DOWN to select, X to confirm, B to go back");
+            telemetry.addData(promptText, "Press DPAD_UP/DPAD_DOWN to select, X to confirm, B to cancel");
             telemetry.addData(currentLabel, currentSelection);
             if (describer != null) {
                 telemetry.addData("Description", describer.apply(currentSelection));
@@ -130,8 +147,7 @@ public class Config extends LinearOpMode {
             } else if (driverGamepad.wasJustPressed(GamepadKeys.Button.X)) {
                 return currentSelection;
             } else if (driverGamepad.wasJustPressed(GamepadKeys.Button.B)) {
-                backRequested = true;
-                return currentSelection;
+                return initialSelection;
             }
             sleep(20);
         }

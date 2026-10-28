@@ -6,6 +6,7 @@ import com.metalbenders.control.subsystems.*;
 public abstract class AutoStrategy {
 
     protected Constants.FieldSide startingFieldSide;
+    protected Constants.FieldSide oppositeFieldSide;
     protected Constants.AllianceColor allianceColor;
 
     public void initialize(
@@ -19,6 +20,7 @@ public abstract class AutoStrategy {
             LimelightSubsystem limelightSubsystem,
             LidarSubsystem lidarSubsystem) {
         this.startingFieldSide = startingFieldSide;
+        this.oppositeFieldSide = Constants.FieldSide.getOppositeSide(startingFieldSide);
         this.allianceColor = allianceColor;
 
         initializeAuto(

@@ -32,20 +32,15 @@ public class PreloadAndPark extends AutoStrategy {
             IntakeSubsystem intakeSubsystem,
             LaunchSubsystem launchSubsystem,
             boolean waitBeforeStarting) {
-        boolean scoreSide = startingFieldSide == Constants.FieldSide.SCORE_SIDE;
-        FieldLocation launchLocation = scoreSide ? SCORE_SIDE_LAUNCH : AUDIENCE_SIDE_LAUNCH;
-        FieldLocation wayPoint = scoreSide ? SCORE_SIDE_WAYPOINT : AUDIENCE_SIDE_WAYPOINT;
-        FieldLocation parkLocation = scoreSide ? SCORE_SIDE_PARK : AUDIENCE_SIDE_PARK;
-
         SequentialCommandGroup commands = new SequentialCommandGroup();
-        commands.addCommands(new DriveToPositionCommand(driveSubsystem, launchLocation.getPose(allianceColor)));
+        commands.addCommands(new DriveToPositionCommand(driveSubsystem, FieldLocation.getLaunchLocation(startingFieldSide).getPose(allianceColor)));
         if (waitBeforeStarting) {
             commands.addCommands(new WaitCommand(MILLIS_TO_WAIT_FOR_HIVE_SWITCH));
         }
         commands.addCommands(
                 new AutoShoot(intakeSubsystem, launchSubsystem),
-                new DriveToPositionCommand(driveSubsystem, wayPoint.getPose(allianceColor)),
-                new DriveToPositionCommand(driveSubsystem, parkLocation.getPose(allianceColor)));
+                new DriveToPositionCommand(driveSubsystem, FieldLocation.getWaypointLocation(startingFieldSide).getPose(allianceColor)),
+                new DriveToPositionCommand(driveSubsystem, FieldLocation.getParkLocation(startingFieldSide).getPose(allianceColor)));
         CommandScheduler.getInstance().schedule(commands);
     }
 }

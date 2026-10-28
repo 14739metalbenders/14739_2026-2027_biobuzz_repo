@@ -20,9 +20,9 @@ public class ParkOnly extends AutoStrategy {
             LimelightSubsystem limelightSubsystem,
             LidarSubsystem lidarSubsystem,
             boolean startingOnActiveSide) {
-        boolean scoreSide = startingFieldSide == Constants.FieldSide.SCORE_SIDE;
-        FieldLocation parkLocation = scoreSide ? SCORE_SIDE_PARK : AUDIENCE_SIDE_PARK;
         CommandScheduler.getInstance().schedule(
-                new DriveToPositionCommand(driveSubsystem, parkLocation.getPose(allianceColor)));
+                new DriveToPositionCommand(
+                        driveSubsystem,
+                        FieldLocation.getParkLocation(startingFieldSide).getPose(allianceColor)));
     }
 }

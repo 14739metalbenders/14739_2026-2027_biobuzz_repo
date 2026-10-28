@@ -1,9 +1,7 @@
 package com.metalbenders.control.subsystems;
 
-import static com.metalbenders.constants.Constants.OpModeType.AUTO;
 
 import com.arcrobotics.ftclib.command.SubsystemBase;
-import com.metalbenders.util.AutonomousStorage;
 import com.metalbenders.util.RotatingBuffer;
 import com.pedropathing.follower.Follower;
 import com.pedropathing.follower.ManualDrive;
@@ -37,10 +35,6 @@ public class DriveSubsystem extends SubsystemBase {
         follower.follow(line(follower.pose(), pose).constant(pose.heading()));
     }
 
-    public void resetHeading() {
-        this.follower.setHeading(Math.toRadians(180));
-    }
-
     public Pose getCurrentPose() {
         return follower.pose();
     }
@@ -62,7 +56,7 @@ public class DriveSubsystem extends SubsystemBase {
         telemetry.addLine();
     }
 
-    public void teardown(com.metalbenders.constants.Constants.OpModeType opModeType) {
+    public void teardown() {
         follower.stop();
     }
 }

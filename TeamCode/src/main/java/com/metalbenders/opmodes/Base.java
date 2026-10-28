@@ -6,6 +6,7 @@ import com.arcrobotics.ftclib.command.CommandOpMode;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
 import com.metalbenders.constants.Constants;
 import com.metalbenders.constants.Constants.AllianceColor;
+import com.metalbenders.constants.FieldLocation;
 import com.metalbenders.control.commands.UpdateLauncherCommand;
 import com.metalbenders.control.commands.UpdateTurretCommand;
 import com.metalbenders.control.subsystems.*;
@@ -15,8 +16,6 @@ import com.pedropathing.math.Pose;
 
 import static com.metalbenders.constants.Constants.DEFAULT_POSE;
 import static com.metalbenders.constants.Constants.OpModeType.AUTO;
-import static com.metalbenders.constants.FieldLocation.AUDIENCE_SIDE_START_POSE;
-import static com.metalbenders.constants.FieldLocation.SCORE_SIDE_START_POSE;
 
 public abstract class Base extends CommandOpMode {
 
@@ -103,7 +102,7 @@ public abstract class Base extends CommandOpMode {
         limelightSubsystem.teardown();
         turretSubsystem.teardown();
         launchSubsystem.teardown();
-        driveSubsystem.teardown(getOpModeType());
+        driveSubsystem.teardown();
         super.reset();
     }
 
@@ -117,9 +116,7 @@ public abstract class Base extends CommandOpMode {
     public Pose getStartingPose() {
         if (getOpModeType() == Constants.OpModeType.AUTO) {
             Auto auto = (Auto) this;
-            return auto.startingFieldSide == Constants.FieldSide.AUDIENCE_SIDE
-                    ? AUDIENCE_SIDE_START_POSE.getPose(allianceColor)
-                    : SCORE_SIDE_START_POSE.getPose(allianceColor);
+            return FieldLocation.getStartLocation(auto.startingFieldSide).getPose(allianceColor);
         } else {
             return AutonomousStorage.endPose == null ? DEFAULT_POSE : AutonomousStorage.endPose;
         }

@@ -12,7 +12,7 @@ public class AutoShoot extends SequentialCommandGroup {
     public AutoShoot(IntakeSubsystem intakeSubsystem, LaunchSubsystem launchSubsystem) {
         super(
                 new SetLaunchGateStateCommand(launchSubsystem, Constants.LaunchGateState.OPEN),
-                new SetIntakeStateCommand(intakeSubsystem, Constants.IntakeState.INTAKE)
+                new SetIntakeStateCommand(intakeSubsystem, Constants.IntakeState.SHOOT)
                         .withTimeout(MILLIS_TO_WAIT_DURING_AUTO_SHOOT),
                 new SetIntakeStateCommand(intakeSubsystem, Constants.IntakeState.STOP),
                 new SetLaunchGateStateCommand(launchSubsystem, Constants.LaunchGateState.KICK),

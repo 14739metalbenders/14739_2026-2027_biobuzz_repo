@@ -17,7 +17,11 @@ public class Constants {
 
     public enum FieldSide {
         SCORE_SIDE,
-        AUDIENCE_SIDE
+        AUDIENCE_SIDE;
+
+        public static FieldSide getOppositeSide(FieldSide fieldSide) {
+            return fieldSide == SCORE_SIDE ? AUDIENCE_SIDE : SCORE_SIDE;
+        }
     }
 
     public enum ArtifactType {
@@ -26,6 +30,7 @@ public class Constants {
     }
 
     public enum IntakeState {
+        SHOOT(1800),
         INTAKE(2300),
         REVERSE_INTAKE(-2300),
         STOP(0);
@@ -65,9 +70,6 @@ public class Constants {
         CONNECTED,
         FAILED
     }
-
-    public static final double NECTAR_DIAMETER = 3.6; //inches
-    public static final double POLLEN_DIAMETER = 2.8; //inches
 
     public static final Pose DEFAULT_POSE = new Pose(0, 0, Math.toRadians(90));
 

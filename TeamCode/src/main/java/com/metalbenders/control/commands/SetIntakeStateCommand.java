@@ -3,7 +3,6 @@ package com.metalbenders.control.commands;
 import com.arcrobotics.ftclib.command.CommandBase;
 import com.metalbenders.constants.Constants;
 import com.metalbenders.control.subsystems.IntakeSubsystem;
-import com.metalbenders.control.subsystems.TurretSubsystem;
 
 public class SetIntakeStateCommand extends CommandBase {
     private final IntakeSubsystem intakeSubsystem;
@@ -28,8 +27,6 @@ public class SetIntakeStateCommand extends CommandBase {
 
     @Override
     public void end(boolean interrupted) {
-        if (intakeState == Constants.IntakeState.REVERSE_INTAKE || intakeState == Constants.IntakeState.INTAKE) {
-            intakeSubsystem.setIntakeState(Constants.IntakeState.STOP);
-        }
+        intakeSubsystem.setIntakeState(Constants.IntakeState.STOP);
     }
 }
