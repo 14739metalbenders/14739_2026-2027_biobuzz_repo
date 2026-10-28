@@ -145,7 +145,7 @@ public class LimelightSubsystem extends SubsystemBase {
         telemetry.addLine(this.getClass().getSimpleName());
         telemetry.addLine("--------------------------------");
         //telemetry.addData("Active Hive Cell Field Side", getActiveHiveCellFieldSide());
-        telemetry.addData("Target Distance (m)", tagDistance);
+        telemetry.addData("Target Distance (in)", tagDistance * 39.3701);
         telemetry.addData("Aim Error (deg)", aimError);
         //addDetectionTelemetry("ACTIVE Side Detections", lastActiveSideDetections);
         //addDetectionTelemetry("INACTIVE Side Detections", lastInactiveSideDetections);
@@ -211,25 +211,30 @@ public class LimelightSubsystem extends SubsystemBase {
             double dist = Double.NaN; // create dist
             double dist3D = Double.NaN; // create dist
 
+            double midHeight = (1.261 + 0.905) / 2.0; // Up cell = 1.261m, Down Cell = 0.905m, Midpoint between 2 positions is 1.083m
+
             // If 3D pose get X/Z components and calculate distance
             if (pose != null) {
                 Position p = offsetPose.getPosition().toUnit(DistanceUnit.METER);
                 if (p.z > 0.05) {
                     double fwd = p.z * Math.cos(pitch) + p.y * Math.sin(pitch);
                     double up = p.z * Math.sin(pitch) - p.y * Math.cos(pitch);
+                    double height = 0.300 + up;
                     //dist3D = Math.hypot(p.z, p.x);
-                    sumHeight[cell] += 0.300 + up; // Camera height on robot 0.300m
-                    dist = Math.hypot(p.x, fwd);
-                    count3d[cell]++;
+                    if (height > midHeight) {
+                        sumHeight[cell] += height; // Camera height on robot 0.300m
+                        dist = Math.hypot(p.x, fwd);
+                        count3d[cell]++;
+                    }
                 }
             }
 
-            if (Double.isNaN(dist)) { // no 3D pose: assume this cluster is on the upward CELL
-                if (camRayUp <= 0.01) {
-                    continue;
-                }
-                dist = (1.261 - 0.300) * camRayHoriz / camRayUp; // Up cell = 1.261m, Camera height on robot 0.300m
-            }
+            //if (Double.isNaN(dist)) { // no 3D pose: assume this cluster is on the upward CELL
+            //    if (camRayUp <= 0.01) {
+            //        continue;
+            //    }
+            //    dist = (1.261 - 0.300) * camRayHoriz / camRayUp; // Up cell = 1.261m, Camera height on robot 0.300m
+            //}
 
             sumDist[cell] += dist;
             sumTx[cell] += bearing;
@@ -238,7 +243,7 @@ public class LimelightSubsystem extends SubsystemBase {
         }
 
         // Find up cell based on the higher tag cluster (measured height when 3D is available, else larger ty)
-        double midHeight = (1.261 + 0.905) / 2.0; // Up cell = 1.261m, Down Cell = 0.905m, Midpoint between 2 positions is 1.083m
+
         int best = -1;
         double bestScore = Double.NEGATIVE_INFINITY;
 
@@ -250,9 +255,7 @@ public class LimelightSubsystem extends SubsystemBase {
             if (count3d[c] > 0) {
                 // If 3D pose available score for biggest height from 3D data
                 double height = sumHeight[c] / count3d[c];
-                if (height < midHeight) {
-                    continue; // this cell is below the mid-point between up/down cells and is not a valid target
-                }
+
                 score = 1000 + height;
             } else {
                 // If 3D pose not available score for biggest Ty

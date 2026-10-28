@@ -11,17 +11,17 @@ public class TurretController {
         private static final double GRAVITY = 9.81; // in m/s2
 
         // PID controller parameters
-        public static double AIM_Kp = 0.025;
+        public static double AIM_Kp = 0.035;
         public static double AIM_Ki = 0;
-        public static double AIM_Kd = 0.03;
-        public static double AIM_Ks = 0.02;
+        public static double AIM_Kd = 0.001;
+        public static double AIM_Ks = 0.022;
         public static double AIM_DEADBAND = 2.0;
         private static double aimIntegral = 0;
         private static double aimLastError = 0;
         private static final ElapsedTime aimTimer = new ElapsedTime();
         private static double previousPower; // Previous power output value for rate limiting
-        public static double maxRateChange = 0.15; // Maximum allowed change in output per iteration
-        public static double powerLimit = 1.0; // Maximum motor power
+        public static double maxRateChange = 1.0; // Maximum allowed change in output per iteration
+        public static double powerLimit = 0.9; // Maximum motor power
         public static double turretAngleLimit = 45; // Maximum angle limit for turret movement
         private static double integral;
         private static double previousError;
@@ -41,10 +41,11 @@ public class TurretController {
         double turretPower = 0;
 
         // Calculate time of flight
-        double timeOfFlight = calculateTimeOfFlight(ballLaunchVelocity, ballLaunchAngle);
+        //double timeOfFlight = calculateTimeOfFlight(ballLaunchVelocity, ballLaunchAngle);
+        double timeOfFlight = 1;
 
         // Calculate shot lead angle
-        double shotLeadAngle = calculateShotLead(vx_mps, vy_mps, twist.omega, timeOfFlight, turretAngle, ballLaunchVelocity);
+        double shotLeadAngle = -calculateShotLead(vx_mps, vy_mps, twist.omega, timeOfFlight, turretAngle, ballLaunchVelocity);
 
         if (Math.abs(targetBearing) > 0) {
             // Desired turret angle is the current bearing plus the shot lead angle
