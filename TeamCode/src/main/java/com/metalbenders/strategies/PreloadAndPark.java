@@ -3,14 +3,12 @@ package com.metalbenders.strategies;
 import com.arcrobotics.ftclib.command.CommandScheduler;
 import com.arcrobotics.ftclib.command.SequentialCommandGroup;
 import com.arcrobotics.ftclib.command.WaitCommand;
-import com.metalbenders.constants.Constants;
 import com.metalbenders.constants.FieldLocation;
 import com.metalbenders.control.commands.AutoShoot;
 import com.metalbenders.control.commands.DriveToPositionCommand;
 import com.metalbenders.control.subsystems.*;
 
 import static com.metalbenders.constants.Constants.MILLIS_TO_WAIT_FOR_HIVE_SWITCH;
-import static com.metalbenders.constants.FieldLocation.*;
 
 public class PreloadAndPark extends AutoStrategy {
 
@@ -39,7 +37,7 @@ public class PreloadAndPark extends AutoStrategy {
         }
         commands.addCommands(
                 new AutoShoot(intakeSubsystem, launchSubsystem),
-                new DriveToPositionCommand(driveSubsystem, FieldLocation.getWaypointLocation(startingFieldSide).getPose(allianceColor)),
+                new DriveToPositionCommand(driveSubsystem, FieldLocation.getOuterWaypointLocation(startingFieldSide).getPose(allianceColor)),
                 new DriveToPositionCommand(driveSubsystem, FieldLocation.getParkLocation(startingFieldSide).getPose(allianceColor)));
         CommandScheduler.getInstance().schedule(commands);
     }

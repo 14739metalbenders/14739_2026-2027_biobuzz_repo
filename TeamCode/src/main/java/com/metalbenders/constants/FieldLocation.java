@@ -11,8 +11,11 @@ public enum FieldLocation {
     AUDIENCE_SIDE_LAUNCH(
             new Pose(57.75, 21.6, Math.toRadians(90)),
             new Pose(85.5, 21.6, Math.toRadians(90))),
-    AUDIENCE_SIDE_WAYPOINT(
+    AUDIENCE_SIDE_OUTER_WAYPOINT(
             new Pose(38, 37.7, Math.toRadians(90)),
+            new Pose(105.8, 36.5, Math.toRadians(90))),
+    AUDIENCE_SIDE_INNER_WAYPOINT(
+            new Pose(61, 37.7, Math.toRadians(90)),
             new Pose(105.8, 36.5, Math.toRadians(90))),
     AUDIENCE_SIDE_HIVE_CELL(
             new Pose(57.7, 57.7, Math.toRadians(270)),
@@ -27,7 +30,10 @@ public enum FieldLocation {
     SCORE_SIDE_LAUNCH(
             new Pose(58.3, 118.7, Math.toRadians(270)),
             new Pose(82.7, 118.4, Math.toRadians(270))),
-    SCORE_SIDE_WAYPOINT(
+    SCORE_SIDE_OUTER_WAYPOINT(
+            new Pose(36.3, 103.2, Math.toRadians(270)),
+            new Pose(102.6, 102.3, Math.toRadians(270))),
+    SCORE_SIDE_INNER_WAYPOINT(
             new Pose(36.3, 103.2, Math.toRadians(270)),
             new Pose(102.6, 102.3, Math.toRadians(270))),
     SCORE_SIDE_HIVE_CELL(
@@ -66,8 +72,12 @@ public enum FieldLocation {
         return selectByFieldSide(fieldSide, SCORE_SIDE_LAUNCH, AUDIENCE_SIDE_LAUNCH);
     }
 
-    public static FieldLocation getWaypointLocation(Constants.FieldSide fieldSide) {
-        return selectByFieldSide(fieldSide, SCORE_SIDE_WAYPOINT, AUDIENCE_SIDE_WAYPOINT);
+    public static FieldLocation getOuterWaypointLocation(Constants.FieldSide fieldSide) {
+        return selectByFieldSide(fieldSide, SCORE_SIDE_OUTER_WAYPOINT, AUDIENCE_SIDE_OUTER_WAYPOINT);
+    }
+
+    public static FieldLocation getInnerWaypointLocation(Constants.FieldSide fieldSide) {
+        return selectByFieldSide(fieldSide, SCORE_SIDE_INNER_WAYPOINT, AUDIENCE_SIDE_INNER_WAYPOINT);
     }
 
     public static FieldLocation getParkLocation(Constants.FieldSide fieldSide) {

@@ -45,10 +45,10 @@ public class PreloadGardenAndPark extends AutoStrategy {
                 new ParallelDeadlineGroup(
                         new DriveToPositionCommand(driveSubsystem, GARDEN_END.getPose(allianceColor)),
                         new SetIntakeStateCommand(intakeSubsystem, Constants.IntakeState.INTAKE)),
-                new DriveToPositionCommand(driveSubsystem, FieldLocation.getLaunchLocation(startingFieldSide).getPose(allianceColor)),
+                new DriveToPositionCommand(driveSubsystem, FieldLocation.getInnerWaypointLocation(startingFieldSide).getPose(allianceColor)),
                 new DriveToPositionCommand(driveSubsystem, FieldLocation.getLaunchLocation(oppositeFieldSide).getPose(allianceColor)),
                 new AutoShoot(intakeSubsystem, launchSubsystem),
-                new DriveToPositionCommand(driveSubsystem, FieldLocation.getWaypointLocation(oppositeFieldSide).getPose(allianceColor)),
+                new DriveToPositionCommand(driveSubsystem, FieldLocation.getOuterWaypointLocation(oppositeFieldSide).getPose(allianceColor)),
                 new DriveToPositionCommand(driveSubsystem, FieldLocation.getParkLocation(startingFieldSide).getPose(allianceColor)));
         CommandScheduler.getInstance().schedule(commands);
     }

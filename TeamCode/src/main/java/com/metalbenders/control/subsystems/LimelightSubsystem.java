@@ -19,9 +19,15 @@ import static com.metalbenders.util.MathUtil.calculateAverageTy;
 
 public class LimelightSubsystem extends SubsystemBase {
 
+    private enum LimelightState {
+        READY,
+        FAILED
+    }
+
     private final Telemetry telemetry;
     private final Constants.AllianceColor allianceColor;
     private final Limelight3A limelight;
+    private final LimelightState limelightState;
     private Constants.FieldSide activeHiveCellFieldSide;
     private TimedEntity<List<LLResultTypes.FiducialResult>> lastActiveSideDetections =
             new TimedEntity<>(new ArrayList<>());
@@ -35,6 +41,11 @@ public class LimelightSubsystem extends SubsystemBase {
 
         limelight.pipelineSwitch(0);
         limelight.start();
+        if (limelight.isConnected() && limelight.isRunning()) {
+            limelightState = LimelightState.READY;
+        } else {
+            limelightState = LimelightState.FAILED;
+        }
 
         activeHiveCellFieldSide = (allianceColor == Constants.AllianceColor.RED) ? SCORE_SIDE : AUDIENCE_SIDE;
     }
@@ -133,6 +144,7 @@ public class LimelightSubsystem extends SubsystemBase {
 
         telemetry.addLine(this.getClass().getSimpleName());
         telemetry.addLine("--------------------------------");
+        telemetry.addData("Limelight State", limelightState);
         telemetry.addData("Active Hive Cell Field Side", getActiveHiveCellFieldSide());
 
         addDetectionTelemetry("ACTIVE Side Detections", lastActiveSideDetections);
