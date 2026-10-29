@@ -54,7 +54,7 @@ public enum FieldLocation {
             new Pose(23.4, 6.5, Math.toRadians(180)),
             new Pose(120.6, 137.5, Math.toRadians(0))),
     GARDEN_END(
-            new Pose(7.0, 6.5, Math.toRadians(180)),
+            new Pose(8.0, 6.5, Math.toRadians(180)),
             new Pose(119.3, 137.5, Math.toRadians(0)));
     private final Pose redPose;
     private final Pose bluePose;
