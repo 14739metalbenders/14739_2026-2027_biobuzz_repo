@@ -30,25 +30,24 @@ public class Config extends LinearOpMode {
         waitForStart();
         ConfigFileUtil.ConfigFile configFile = ConfigFileUtil.readConfigFile(telemetry);
 
-        promptForConfiguration(configFile);
-        if (isStopRequested()) {
-            return;
-        }
-
-        // Only reached once Save configuration was selected
-        try {
-            ConfigFileUtil.writeConfigFile(configFile);
-            telemetry.addLine("Configuration saved Successfully!");
-            telemetry.addLine("-----------Saved Configurations------------");
-            telemetry.addData("Alliance Color", configFile.getAllianceColor());
-            telemetry.addData("Starting Field Side", configFile.getStartingFieldSide());
-            telemetry.addData("Auto Strategy", configFile.getAutoStrategyType());
-        } catch (IOException e) {
-            telemetry.addData("Error saving configuration", e.getMessage());
-        }
-        telemetry.update();
         while (!isStopRequested()) {
-            sleep(20);
+            promptForConfiguration(configFile);
+            if (isStopRequested()) {
+                return;
+            }
+
+            try {
+                ConfigFileUtil.writeConfigFile(configFile);
+                telemetry.addLine("Configuration saved successfully!");
+                telemetry.addLine("-----------Saved Configurations------------");
+                telemetry.addData("Alliance Color", configFile.getAllianceColor());
+                telemetry.addData("Starting Field Side", configFile.getStartingFieldSide());
+                telemetry.addData("Auto Strategy", configFile.getAutoStrategyType());
+            } catch (IOException e) {
+                telemetry.addData("Error saving configuration", e.getMessage());
+            }
+            telemetry.update();
+            sleep(2000);
         }
     }
 

@@ -26,4 +26,12 @@ public class DriveToPositionCommand extends CommandBase {
         // This command ends automatically when the robot arrives at the target
         return !driveSubsystem.isBusy();
     }
+
+    @Override
+    public void end(boolean interrupted) {
+        // Stop the drive subsystem when the command ends
+        if (interrupted) {
+            driveSubsystem.stop();
+        }
+    }
 }

@@ -87,4 +87,5 @@ public class Constants {
     /*AUTO CONSTANTS*/
     public static final long MILLIS_TO_WAIT_DURING_AUTO_SHOOT = 750;
     public static final long MILLIS_TO_WAIT_FOR_HIVE_SWITCH = 5000;
+    public static final long MILLIS_TO_WAIT_FOR_GARDEN_TRAVEL = 1000;
 }

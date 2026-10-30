@@ -43,6 +43,10 @@ public class DriveSubsystem extends SubsystemBase {
         return follower.isBusy();
     }
 
+    public void stop() {
+        follower.stop();
+    }
+
     @Override
     public void periodic() {
         poseHistory.put(follower.pose());
@@ -57,6 +61,6 @@ public class DriveSubsystem extends SubsystemBase {
     }
 
     public void teardown() {
-        follower.stop();
+        stop();
     }
 }

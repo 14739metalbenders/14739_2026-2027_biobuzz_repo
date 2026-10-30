@@ -34,7 +34,7 @@ public enum FieldLocation {
             new Pose(36.3, 103.2, Math.toRadians(270)),
             new Pose(102.6, 102.3, Math.toRadians(270))),
     SCORE_SIDE_INNER_WAYPOINT(
-            new Pose(36.3, 103.2, Math.toRadians(270)),
+            new Pose(61, 106.3, Math.toRadians(270)),
             new Pose(102.6, 102.3, Math.toRadians(270))),
     SCORE_SIDE_HIVE_CELL(
             new Pose(58.6, 82.3, Math.toRadians(90)),
