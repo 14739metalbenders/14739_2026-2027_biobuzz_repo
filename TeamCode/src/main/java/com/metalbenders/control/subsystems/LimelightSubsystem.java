@@ -166,6 +166,14 @@ public class LimelightSubsystem extends SubsystemBase {
         }
     }
 
+    /**
+     * Calculate hive cell targeting information from limelight.
+     * Uses Pose3D from limelight to calculate chich cell is up and uses apriltags to locate the cell center.
+     * Provides distance and bearing information to upper alliance hive.
+     *
+     * @param currentGoal Limelight llresult
+     * @param allianceColor which alliance is active
+     */
     private void updateHiveTargeting(LLResult currentGoal, Constants.AllianceColor allianceColor) {
 
         int hiveTagCount;               // how many of cell tags were used
@@ -203,13 +211,10 @@ public class LimelightSubsystem extends SubsystemBase {
             double tanTx = Math.tan(Math.toRadians(offsetTx));
             double tanTy = Math.tan(Math.toRadians(offsetTy));
             double camRayFwd = Math.cos(pitch) - tanTy * Math.sin(pitch);
-            double camRayUp = Math.sin(pitch) + tanTy * Math.cos(pitch);
-            double camRayHoriz = Math.hypot(tanTx, camRayFwd);
 
             // Rotate Tag location from camera reference frame to robot reference frame ----------------------
             double bearing = -Math.toDegrees(Math.atan2(tanTx, camRayFwd));  // Bearing from camera to tag center
             double dist = Double.NaN; // create dist
-            double dist3D = Double.NaN; // create dist
 
             double midHeight = (1.261 + 0.905) / 2.0; // Up cell = 1.261m, Down Cell = 0.905m, Midpoint between 2 positions is 1.083m
 
@@ -229,20 +234,13 @@ public class LimelightSubsystem extends SubsystemBase {
                 }
             }
 
-            //if (Double.isNaN(dist)) { // no 3D pose: assume this cluster is on the upward CELL
-            //    if (camRayUp <= 0.01) {
-            //        continue;
-            //    }
-            //    dist = (1.261 - 0.300) * camRayHoriz / camRayUp; // Up cell = 1.261m, Camera height on robot 0.300m
-            //}
-
             sumDist[cell] += dist;
             sumTx[cell] += bearing;
             sumTy[cell] += tag.getTargetYDegrees();
             count[cell]++;
         }
 
-        // Find up cell based on the higher tag cluster (measured height when 3D is available, else larger ty)
+        // Find up cell based on the higher tag cluster (measured height when 3D is available)
 
         int best = -1;
         double bestScore = Double.NEGATIVE_INFINITY;
@@ -280,11 +278,11 @@ public class LimelightSubsystem extends SubsystemBase {
     }
 
     /**
-     * Transforms the known static cell-center offset into Camera Space without using .compose()
+     * Transforms the known static cell-center offset into Camera Space
      *
      * @param tagId The visible AprilTag ID
      * @param tagInCameraSpace The Limelight fiducial target object
-     * @return A Pose3D representing the exact position and orientation of the cell center relative to the camera lens
+     * @return Pose3D representing the exact position and orientation of the cell center relative to the camera lens
      */
     private Pose3D computeCenterWithPoseOffset(int tagId, Pose3D tagInCameraSpace) {
 

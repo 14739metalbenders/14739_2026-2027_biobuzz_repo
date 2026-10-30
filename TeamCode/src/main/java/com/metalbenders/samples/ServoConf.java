@@ -17,15 +17,15 @@ public class ServoConf extends LinearOpMode {
         initialize();
         waitForStart();
 
-        double positionGate = 0.73;
-        double positionLaunch = 0.52;
-        double positionFinish = 0.08;
+        double positionGate = 0.85;
+        double positionLaunch = 0.25;
+        //double positionFinish = 0.6;
 
         while (opModeIsActive()) {
             if (gamepad1.a) {
                 angleServo.setPosition(positionLaunch);
-            } else if (gamepad1.b) {
-                angleServo.setPosition(positionFinish);
+            //} else if (gamepad1.b) {
+            //    angleServo.setPosition(positionFinish);
             } else {
                 angleServo.setPosition(positionGate);
             }
@@ -33,6 +33,6 @@ public class ServoConf extends LinearOpMode {
     }
 
     private void initialize() {
-        this.angleServo = hardwareMap.get(Servo.class, "launchServo");
+        this.angleServo = hardwareMap.get(Servo.class, "flowerServo");
     }
 }

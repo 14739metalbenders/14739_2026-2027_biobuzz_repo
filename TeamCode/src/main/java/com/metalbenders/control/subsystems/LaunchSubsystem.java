@@ -88,6 +88,11 @@ public class LaunchSubsystem extends SubsystemBase {
                 && !lastActiveSideDetections.getEntity().isEmpty();
     }
 
+    public double getLauncherRPM() {
+        // (Velocity from motor * 60 sec) / 1425.1 (PPR For goBilda 117 RPM Motor)
+        return (launcher.getVelocity() * 60) / 1425.1;
+    }
+
     @Override
     public void periodic() {
         launcher.setVelocity(targetLaunchVelocity.getVelocity());

@@ -57,9 +57,10 @@ public class TurretSubsystem extends SubsystemBase {
             Pose currentPose,
             Twist currentTwist,
             TimedEntity<List<LLResultTypes.FiducialResult>> lastActiveSideDetections,
-            double aimError) {
+            double aimError,
+            double launcherRPM) {
         setTargetHeadingDegrees(activeHiveCellFieldSide, currentPose, lastActiveSideDetections);
-        turretPower(currentTwist, aimError);
+        turretPower(currentTwist, aimError, launcherRPM);
     }
 
     private void setTargetHeadingDegrees(
@@ -132,22 +133,17 @@ public class TurretSubsystem extends SubsystemBase {
         return AngleUnit.normalizeDegrees((getTurretEncoderFixed() / 1.872340426));
     }
 
-    private void turretPower(Twist currentTwist, double aimError) {
-        TurretRotateCalc calculateTurretLead = calculateTurretLead(currentTwist, aimError, getTurretAngleFromMotor(), 5, 15);
+    private void turretPower(Twist currentTwist, double aimError, double launcherRPM) {
+        TurretRotateCalc calculateTurretLead = calculateTurretLead(currentTwist, aimError, getTurretAngleFromMotor(), launcherRPM, 15);
         shotLeadAngle = calculateTurretLead.getShotLeadAngle();
         shotTimeOfFLight = calculateTurretLead.getTimeOfFlight();
         targetBearing = calculateTurretLead.getTargetBearing();
         turretPower = calculateTurretLead.getTurretPower();
-        //if (turretPower > -0.05 && turretPower < 0.05) { turretPower = 0; }
         setTurretPower(calculateTurretLead.getTurretPower());
     }
 
     private void setTurretPower(double turretPower) {
-        //if ((turretAngle > -30 && turretPower < 0) || (turretAngle < 30 && turretPower > 0)) {
-            this.turretMotor.setPower(turretPower);
-        //} else {
-        //    this.turretMotor.setPower(0);
-        //}
+        this.turretMotor.setPower(turretPower);
     }
 
     @Override

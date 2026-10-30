@@ -36,7 +36,7 @@ public abstract class BaseOpMode extends CommandOpMode {
             huskyLensSubsystem = new HuskyLensSubsystem(hardwareMap, telemetry, getAllianceColor());
         }
         turretSubsystem.setDefaultCommand(new UpdateTurretCommand(
-                turretSubsystem, limelightSubsystem, driveSubsystem));
+                turretSubsystem, limelightSubsystem, driveSubsystem, launchSubsystem));
         launchSubsystem.setDefaultCommand(new UpdateLauncherCommand(
                 launchSubsystem, limelightSubsystem, driveSubsystem));
 

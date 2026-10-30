@@ -66,6 +66,9 @@ public class DriveSubsystem extends SubsystemBase {
                 String.format(Locale.ENGLISH, "x: %.2f, y: %.2f, heading: %.2f",
                         follower.pose().x(), follower.pose().y(), Math.toDegrees(follower.pose().heading())));
         telemetry.addData("Driving", follower.isBusy() ? "Yes" : "No");
+        //telemetry.addData("Xvector", follower.twist().vx);
+        //telemetry.addData("Yvector", follower.twist().vy);
+        //telemetry.addData("Omega", follower.twist().omega);
         telemetry.addLine();
     }
 
