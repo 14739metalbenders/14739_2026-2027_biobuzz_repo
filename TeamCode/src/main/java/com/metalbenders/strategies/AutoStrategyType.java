@@ -12,9 +12,13 @@ public enum AutoStrategyType {
     PARK_ONLY(
             ParkOnly::new,
             "Go directly to park"),
-    PRELOAD_GARDEN_AND_PARK(
-            PreloadGardenAndPark::new,
-            "Shoot preload, collect and shoot garden, then park"
+    PRELOAD_GARDEN_AND_PARK_INSIDE(
+            () -> new PreloadGardenAndPark(true),
+            "Shoot preload, collect and shoot garden, then park. Uses inside waypoints when crossing field."
+    ),
+    PRELOAD_GARDEN_AND_PARK_OUTSIDE(
+            () -> new PreloadGardenAndPark(false),
+            "Shoot preload, collect and shoot garden, then park. Uses outside waypoints when crossing field."
     );
 
     private final Supplier<AutoStrategy> strategySupplier;

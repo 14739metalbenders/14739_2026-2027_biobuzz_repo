@@ -6,62 +6,59 @@ import com.pedropathing.math.Pose;
 public enum FieldLocation {
     //AUDIENCE_SIDE specific locations
     AUDIENCE_SIDE_START_POSE(
-            new Pose(57.75, 7, Math.toRadians(90)),
-            new Pose(82.7, 7, Math.toRadians(90))),
+            new Pose(57.75, 7, Math.toRadians(90)), Symmetry.MIRROR_X),
     AUDIENCE_SIDE_LAUNCH(
-            new Pose(57.75, 21.6, Math.toRadians(90)),
-            new Pose(85.5, 21.6, Math.toRadians(90))),
+            new Pose(57.75, 20, Math.toRadians(90)), Symmetry.MIRROR_X),
     AUDIENCE_SIDE_OUTER_WAYPOINT(
-            new Pose(38, 37.7, Math.toRadians(90)),
-            new Pose(105.8, 36.5, Math.toRadians(90))),
+            new Pose(30, 34, Math.toRadians(90)), Symmetry.MIRROR_X),
     AUDIENCE_SIDE_INNER_WAYPOINT(
-            new Pose(61, 37.7, Math.toRadians(90)),
-            new Pose(105.8, 36.5, Math.toRadians(90))),
+            new Pose(60, 34, Math.toRadians(90)), Symmetry.MIRROR_X),
     AUDIENCE_SIDE_HIVE_CELL(
-            new Pose(57.7, 57.7, Math.toRadians(270)),
-            new Pose(83.8, 57.7, Math.toRadians(270))),
+            new Pose(57.75, 57, Math.toRadians(270)), Symmetry.MIRROR_X),
     AUDIENCE_SIDE_PARK(
-            new Pose(12.8, 92.9, Math.toRadians(90)),
-            new Pose(128.2, 50.6, Math.toRadians(270))),
+            new Pose(9.8, 95.5, Math.toRadians(90)), Symmetry.ROTATE_180),
     //SCORE_SIDE specific locations
     SCORE_SIDE_START_POSE(
-            new Pose(58.6, 134, Math.toRadians(270)),
-            new Pose(82.4, 134, Math.toRadians(0))),
+            new Pose(57.75, 137, Math.toRadians(270)), Symmetry.MIRROR_X),
     SCORE_SIDE_LAUNCH(
-            new Pose(58.3, 118.7, Math.toRadians(270)),
-            new Pose(82.7, 118.4, Math.toRadians(270))),
+            new Pose(57.75, 124, Math.toRadians(270)), Symmetry.MIRROR_X),
     SCORE_SIDE_OUTER_WAYPOINT(
-            new Pose(36.3, 103.2, Math.toRadians(270)),
-            new Pose(102.6, 102.3, Math.toRadians(270))),
+            new Pose(30, 110, Math.toRadians(270)), Symmetry.MIRROR_X),
     SCORE_SIDE_INNER_WAYPOINT(
-            new Pose(61, 106.3, Math.toRadians(270)),
-            new Pose(102.6, 102.3, Math.toRadians(270))),
+            new Pose(60, 110, Math.toRadians(270)), Symmetry.MIRROR_X),
     SCORE_SIDE_HIVE_CELL(
-            new Pose(58.6, 82.3, Math.toRadians(90)),
-            new Pose(84.4, 82.3, Math.toRadians(90))),
+            new Pose(57.75, 87, Math.toRadians(90)), Symmetry.MIRROR_X),
     SCORE_SIDE_PARK(
-            new Pose(12.8, 92.9, Math.toRadians(90)),
-            new Pose(128.2, 50.6, Math.toRadians(270))),
+            new Pose(14.5, 91, Math.toRadians(90)), Symmetry.ROTATE_180),
     //Flower Locations
-    GARDEN_SIDE_FLOWER(
-            new Pose(47.4, 129.9, Math.toRadians(90)),
-            new Pose(94.4, 10.7, Math.toRadians(270))),
+    OTHER_FLOWER(
+            new Pose(48, 136, Math.toRadians(90)), Symmetry.ROTATE_180),
     PARK_SIDE_FLOWER(
-            new Pose(9.6, 46.8, Math.toRadians(180)),
-            new Pose(129.9, 93.2, Math.toRadians(0))),
+            new Pose(8, 48, Math.toRadians(180)), Symmetry.ROTATE_180),
     //Garden Locations
     GARDEN_START(
-            new Pose(23.4, 6.5, Math.toRadians(180)),
-            new Pose(120.6, 137.5, Math.toRadians(0))),
+            new Pose(20, 7, Math.toRadians(180)), Symmetry.ROTATE_180),
     GARDEN_END(
-            new Pose(8.0, 6.5, Math.toRadians(180)),
-            new Pose(119.3, 137.5, Math.toRadians(0)));
+            new Pose(7.0, 7, Math.toRadians(180)), Symmetry.ROTATE_180);
+
+    private enum Symmetry {
+        MIRROR_X,
+        ROTATE_180;
+
+        private Pose apply(Pose pose) {
+            double heading = this == MIRROR_X ? Math.PI - pose.heading() : pose.heading() + Math.PI;
+            double fullTurn = 2 * Math.PI;
+            heading = ((heading % fullTurn) + fullTurn) % fullTurn;
+            return new Pose(144 - pose.x(), this == MIRROR_X ? pose.y() : 144 - pose.y(), heading);
+        }
+    }
+
     private final Pose redPose;
     private final Pose bluePose;
 
-    FieldLocation(Pose redPose, Pose bluePose) {
+    FieldLocation(Pose redPose, Symmetry symmetry) {
         this.redPose = redPose;
-        this.bluePose = bluePose;
+        this.bluePose = symmetry.apply(redPose);
     }
 
     public Pose getPose(AllianceColor alliance) {

@@ -26,8 +26,10 @@ public abstract class Base extends CommandOpMode {
     protected TurretSubsystem turretSubsystem;
     protected LidarSubsystem lidarSubsystem;
     protected HuskyLensSubsystem huskyLensSubsystem;
+    protected FlowerToolSubsystem flowerToolSubsystem;
     protected LaunchSubsystem launchSubsystem;
     protected AllianceColor allianceColor;
+    protected TurretSubsystem.TurretState turretState;
 
     @Override
     public void initialize() {
@@ -42,12 +44,15 @@ public abstract class Base extends CommandOpMode {
         driveSubsystem = new DriveSubsystem(hardwareMap, telemetry, getStartingPose());
         intakeSubsystem = new IntakeSubsystem(hardwareMap, telemetry);
         limelightSubsystem = new LimelightSubsystem(hardwareMap, telemetry, allianceColor);
-        turretSubsystem = new TurretSubsystem(hardwareMap, telemetry, allianceColor);
+        turretSubsystem = new TurretSubsystem(hardwareMap, telemetry, allianceColor, turretState);
         launchSubsystem = new LaunchSubsystem(hardwareMap, telemetry, allianceColor);
+        flowerToolSubsystem = new FlowerToolSubsystem(hardwareMap, telemetry);
+
         if (getOpModeType() == Constants.OpModeType.AUTO) {
             lidarSubsystem = new LidarSubsystem(hardwareMap, telemetry);
 //            huskyLensSubsystem = new HuskyLensSubsystem(hardwareMap, telemetry, allianceColor);
         }
+
         turretSubsystem.setDefaultCommand(new UpdateTurretCommand(
                 turretSubsystem, limelightSubsystem, driveSubsystem));
 
@@ -103,6 +108,7 @@ public abstract class Base extends CommandOpMode {
         turretSubsystem.teardown();
         launchSubsystem.teardown();
         driveSubsystem.teardown();
+        flowerToolSubsystem.teardown();
         super.reset();
     }
 
@@ -125,6 +131,7 @@ public abstract class Base extends CommandOpMode {
     private void initializeConfigurations() {
         ConfigFileUtil.ConfigFile configFile = ConfigFileUtil.readConfigFile(telemetry);
         allianceColor = configFile.getAllianceColor();
+        turretState = configFile.getTurretState();
         if (getOpModeType() == Constants.OpModeType.AUTO) {
             Auto auto = (Auto) this;
             auto.startingFieldSide = configFile.getStartingFieldSide();

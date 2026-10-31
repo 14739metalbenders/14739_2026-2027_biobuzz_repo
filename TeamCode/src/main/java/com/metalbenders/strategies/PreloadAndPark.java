@@ -22,17 +22,17 @@ public class PreloadAndPark extends AutoStrategy {
             LimelightSubsystem limelightSubsystem,
             LidarSubsystem lidarSubsystem,
             boolean startingOnActiveSide) {
-        scheduleAuto(driveSubsystem, intakeSubsystem, launchSubsystem, !startingOnActiveSide);
+        scheduleAuto(driveSubsystem, intakeSubsystem, launchSubsystem, startingOnActiveSide);
     }
 
     private void scheduleAuto(
             DriveSubsystem driveSubsystem,
             IntakeSubsystem intakeSubsystem,
             LaunchSubsystem launchSubsystem,
-            boolean waitBeforeStarting) {
+            boolean startingOnActiveSide) {
         SequentialCommandGroup commands = new SequentialCommandGroup();
         commands.addCommands(new DriveToPositionCommand(driveSubsystem, FieldLocation.getLaunchLocation(startingFieldSide).getPose(allianceColor)));
-        if (waitBeforeStarting) {
+        if (!startingOnActiveSide) {
             commands.addCommands(new WaitCommand(MILLIS_TO_WAIT_FOR_HIVE_SWITCH));
         }
         commands.addCommands(

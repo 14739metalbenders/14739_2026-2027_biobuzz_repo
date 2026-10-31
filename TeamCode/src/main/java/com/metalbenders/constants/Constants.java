@@ -61,6 +61,21 @@ public class Constants {
         }
     }
 
+    public enum FlowerToolState {
+        UP(0.85),
+        DOWN(0.25);
+
+        private final double position;
+
+        FlowerToolState(double position) {
+            this.position = position;
+        }
+
+        public double getPosition() {
+            return position;
+        }
+    }
+
     public enum HuskyLensState {
         READY,
         FAILED

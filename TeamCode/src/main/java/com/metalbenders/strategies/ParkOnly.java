@@ -21,8 +21,7 @@ public class ParkOnly extends AutoStrategy {
             LidarSubsystem lidarSubsystem,
             boolean startingOnActiveSide) {
         CommandScheduler.getInstance().schedule(
-                new DriveToPositionCommand(
-                        driveSubsystem,
-                        FieldLocation.getParkLocation(startingFieldSide).getPose(allianceColor)));
+                new DriveToPositionCommand(driveSubsystem, FieldLocation.getOuterWaypointLocation(startingFieldSide).getPose(allianceColor)),
+                new DriveToPositionCommand(driveSubsystem, FieldLocation.getParkLocation(startingFieldSide).getPose(allianceColor)));
     }
 }

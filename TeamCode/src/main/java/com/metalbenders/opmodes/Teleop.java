@@ -35,20 +35,30 @@ public class Teleop extends Base {
         driverGamepad.getGamepadButton(GamepadKeys.Button.LEFT_BUMPER)
                 .whileActiveOnce(new SetIntakeStateCommand(intakeSubsystem, Constants.IntakeState.REVERSE_INTAKE));
 
+        driverGamepad.getGamepadButton(GamepadKeys.Button.A)
+                .whileActiveOnce(new SetFlowerToolState(flowerToolSubsystem, Constants.FlowerToolState.DOWN))
+                .whenInactive(new SetFlowerToolState(flowerToolSubsystem, Constants.FlowerToolState.DOWN));
+
+
         //INTAKE
         Trigger leftTrigger = new Trigger(() -> driverGamepad.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER) > 0.2);
-        leftTrigger.whileActiveOnce(new SequentialCommandGroup(
-                new SetLaunchGateStateCommand(launchSubsystem, Constants.LaunchGateState.CLOSED),
-                new SetIntakeStateCommand(intakeSubsystem, Constants.IntakeState.INTAKE)));
+        leftTrigger
+                .whileActiveOnce(
+                        new SequentialCommandGroup(
+                            new SetLaunchGateStateCommand(launchSubsystem, Constants.LaunchGateState.CLOSED),
+                            new SetIntakeStateCommand(intakeSubsystem, Constants.IntakeState.INTAKE)))
+                .whenInactive(
+                        new SetIntakeStateCommand(intakeSubsystem, Constants.IntakeState.STOP));
 
         //SHOOT
         Trigger rightTrigger = new Trigger(() -> driverGamepad.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER) > 0.2);
-        rightTrigger.whileActiveOnce(new SequentialCommandGroup(
-                new SetLaunchGateStateCommand(launchSubsystem, Constants.LaunchGateState.OPEN),
-                new SetIntakeStateCommand(intakeSubsystem, Constants.IntakeState.SHOOT)));
-        rightTrigger.whenInactive(new SequentialCommandGroup(
-                new SetIntakeStateCommand(intakeSubsystem, Constants.IntakeState.STOP),
-                new SetLaunchGateStateCommand(launchSubsystem, Constants.LaunchGateState.KICK),
-                new SetLaunchGateStateCommand(launchSubsystem, Constants.LaunchGateState.CLOSED)));
+        rightTrigger
+                .whileActiveOnce(new SequentialCommandGroup(
+                    new SetLaunchGateStateCommand(launchSubsystem, Constants.LaunchGateState.OPEN),
+                    new SetIntakeStateCommand(intakeSubsystem, Constants.IntakeState.SHOOT)))
+                .whenInactive(new SequentialCommandGroup(
+                    new SetIntakeStateCommand(intakeSubsystem, Constants.IntakeState.STOP),
+                    new SetLaunchGateStateCommand(launchSubsystem, Constants.LaunchGateState.KICK),
+                    new SetLaunchGateStateCommand(launchSubsystem, Constants.LaunchGateState.CLOSED)));
     }
 }

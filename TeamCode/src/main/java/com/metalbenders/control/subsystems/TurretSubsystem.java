@@ -16,15 +16,23 @@ import static com.qualcomm.robotcore.hardware.DcMotor.RunMode.RUN_USING_ENCODER;
 
 public class TurretSubsystem extends SubsystemBase {
 
+    public enum TurretState {
+        AUTO,
+        MANUAL
+    }
+
     private final Telemetry telemetry;
     private final DcMotorEx turretMotor;
     private double targetHeadingDegrees = 0.0;
     private double turretHeadingDegrees = 0.0;
     private final Constants.AllianceColor allianceColor;
+    private final TurretState turretState;
 
-    public TurretSubsystem(HardwareMap hardwareMap, Telemetry telemetry, Constants.AllianceColor allianceColor) {
+
+    public TurretSubsystem(HardwareMap hardwareMap, Telemetry telemetry, Constants.AllianceColor allianceColor, TurretState turretState) {
         this.telemetry = telemetry;
         this.allianceColor = allianceColor;
+        this.turretState = turretState;
 
         //turret motor setup
         this.turretMotor = hardwareMap.get(DcMotorEx.class, "turretMotor");
@@ -92,6 +100,7 @@ public class TurretSubsystem extends SubsystemBase {
         telemetry.addLine("--------------------------------");
         telemetry.addData("Target Heading (degrees)", targetHeadingDegrees);
         telemetry.addData("Turret Heading (degrees)", turretHeadingDegrees);
+        telemetry.addData("Turret State", turretState);
         telemetry.addLine();
     }
 
