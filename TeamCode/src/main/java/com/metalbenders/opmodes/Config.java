@@ -63,7 +63,7 @@ public class Config extends LinearOpMode {
         int selected = 0;
         while (!isStopRequested()) {
             driverGamepad.readButtons();
-            telemetry.addLine("DPAD_UP/DPAD_DOWN to select, X to edit or save");
+            telemetry.addLine("DPAD_UP/DPAD_DOWN to select, A to edit or save");
             telemetry.addLine("Changes are not saved until you select Save configuration");
             telemetry.addLine("-----------Current Configuration-----------");
             Object[] values = {
@@ -80,17 +80,18 @@ public class Config extends LinearOpMode {
                     telemetry.addLine(label);
                 }
             }
-            telemetry.update();
+
             if (driverGamepad.wasJustPressed(GamepadKeys.Button.DPAD_UP)) {
                 selected = (selected - 1 + labels.length) % labels.length;
             } else if (driverGamepad.wasJustPressed(GamepadKeys.Button.DPAD_DOWN)) {
                 selected = (selected + 1) % labels.length;
-            } else if (driverGamepad.wasJustPressed(GamepadKeys.Button.X)) {
+            } else if (driverGamepad.wasJustPressed(GamepadKeys.Button.A)) {
                 if (selected == editors.size()) {
                     return;
                 }
                 editors.get(selected).run();
             }
+            telemetry.update();
             sleep(20);
         }
     }
@@ -146,7 +147,7 @@ public class Config extends LinearOpMode {
         T currentSelection = initialSelection != null ? initialSelection : options[0];
         while (!isStopRequested()) {
             driverGamepad.readButtons();
-            telemetry.addData(promptText, "Press DPAD_UP/DPAD_DOWN to select, X to confirm, B to cancel");
+            telemetry.addData(promptText, "Press DPAD_UP/DPAD_DOWN to select, A to confirm, B to cancel");
             telemetry.addData(currentLabel, currentSelection);
             if (describer != null) {
                 telemetry.addData("Description", describer.apply(currentSelection));
@@ -156,7 +157,7 @@ public class Config extends LinearOpMode {
                 currentSelection = options[(currentSelection.ordinal() + 1) % options.length];
             } else if (driverGamepad.wasJustPressed(GamepadKeys.Button.DPAD_DOWN)) {
                 currentSelection = options[(currentSelection.ordinal() - 1 + options.length) % options.length];
-            } else if (driverGamepad.wasJustPressed(GamepadKeys.Button.X)) {
+            } else if (driverGamepad.wasJustPressed(GamepadKeys.Button.A)) {
                 return currentSelection;
             } else if (driverGamepad.wasJustPressed(GamepadKeys.Button.B)) {
                 return initialSelection;
