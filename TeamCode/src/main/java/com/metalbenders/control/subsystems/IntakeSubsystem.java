@@ -9,20 +9,25 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 public class IntakeSubsystem extends SubsystemBase {
 
     private final DcMotorEx intakeMotor;
+    private final DcMotorEx intakeMotor2;
     private final Telemetry telemetry;
     private Constants.IntakeState intakeState = Constants.IntakeState.STOP;
 
     public IntakeSubsystem(HardwareMap hardwareMap, Telemetry telemetry) {
         this.telemetry = telemetry;
         this.intakeMotor = hardwareMap.get(DcMotorEx.class, "intakeMotor");
+        this.intakeMotor2 = hardwareMap.get(DcMotorEx.class, "intakeMotor2");
         this.intakeMotor.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
         this.intakeMotor.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
+        this.intakeMotor2.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
+        this.intakeMotor2.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
     }
 
     public void setIntakeState(Constants.IntakeState intakeState) {
         if (this.intakeState != intakeState) {
             this.intakeState = intakeState;
             intakeMotor.setVelocity(this.intakeState.getTargetVelocity());
+            intakeMotor2.setVelocity(this.intakeState.getTargetVelocity());
         }
     }
 
