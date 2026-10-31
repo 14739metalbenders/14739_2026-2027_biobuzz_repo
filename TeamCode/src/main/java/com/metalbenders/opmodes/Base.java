@@ -134,7 +134,9 @@ public abstract class Base extends CommandOpMode {
         turretState = configFile.getTurretState();
         if (getOpModeType() == Constants.OpModeType.AUTO) {
             Auto auto = (Auto) this;
-            auto.startingFieldSide = configFile.getStartingFieldSide();
+            auto.startingFieldSide = (allianceColor == Constants.AllianceColor.RED)
+                    == configFile.isStartingOnActiveSide()
+                    ? Constants.FieldSide.AUDIENCE_SIDE : Constants.FieldSide.SCORE_SIDE;
             auto.autoStrategyType = configFile.getAutoStrategyType();
         }
     }

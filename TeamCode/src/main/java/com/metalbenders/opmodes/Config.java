@@ -42,7 +42,7 @@ public class Config extends LinearOpMode {
                 telemetry.addLine("Configuration saved successfully!");
                 telemetry.addLine("-----------Saved Configurations------------");
                 telemetry.addData("Alliance Color", configFile.getAllianceColor());
-                telemetry.addData("Starting Field Side", configFile.getStartingFieldSide());
+                telemetry.addData("Starting on Active Side", configFile.isStartingOnActiveSide());
                 telemetry.addData("Auto Strategy", configFile.getAutoStrategyType());
                 telemetry.addData("Turret State", configFile.getTurretState());
             } catch (IOException e) {
@@ -56,10 +56,10 @@ public class Config extends LinearOpMode {
     private void promptForConfiguration(ConfigFileUtil.ConfigFile configFile) {
         List<Runnable> editors = Arrays.asList(
                 () -> configFile.setAllianceColor(promptForAllianceColor(configFile.getAllianceColor())),
-                () -> configFile.setStartingFieldSide(promptForStartingFieldSide(configFile.getStartingFieldSide())),
+                () -> configFile.setStartingOnActiveSide(promptForStartingOnActiveSide(configFile.isStartingOnActiveSide())),
                 () -> configFile.setAutoStrategyType(promptForAutoStrategy(configFile.getAutoStrategyType())),
                 () -> configFile.setTurretState(promptForTurretState(configFile.getTurretState())));
-        String[] labels = {"Alliance Color", "Starting Field Side", "Auto Strategy", "Turret State", "Save configuration"};
+        String[] labels = {"Alliance Color", "Starting on Active Side", "Auto Strategy", "Turret State", "Save configuration"};
         int selected = 0;
         while (!isStopRequested()) {
             driverGamepad.readButtons();
@@ -68,7 +68,7 @@ public class Config extends LinearOpMode {
             telemetry.addLine("-----------Current Configuration-----------");
             Object[] values = {
                     configFile.getAllianceColor(),
-                    configFile.getStartingFieldSide(),
+                    configFile.isStartingOnActiveSide(),
                     configFile.getAutoStrategyType(),
                     configFile.getTurretState()
             };
@@ -104,12 +104,13 @@ public class Config extends LinearOpMode {
                 currentSelection);
     }
 
-    protected Constants.FieldSide promptForStartingFieldSide(Constants.FieldSide currentSelection) {
+    protected boolean promptForStartingOnActiveSide(boolean currentSelection) {
         return promptForSelection(
-                Constants.FieldSide.values(),
-                "Select Starting Field Side",
-                "Current Starting Field Side",
-                currentSelection);
+                new Boolean[]{true, false},
+                "Select Starting Side",
+                "Current Starting Side",
+                currentSelection,
+                active -> active ? "Active Side" : "Inactive Side");
     }
 
     protected AutoStrategyType promptForAutoStrategy(AutoStrategyType currentSelection) {
@@ -130,7 +131,7 @@ public class Config extends LinearOpMode {
                 currentSelection);
     }
 
-    private <T extends Enum<T>> T promptForSelection(
+    private <T> T promptForSelection(
             T[] options,
             String promptText,
             String currentLabel,
@@ -138,13 +139,14 @@ public class Config extends LinearOpMode {
         return promptForSelection(options, promptText, currentLabel, initialSelection, null);
     }
 
-    private <T extends Enum<T>> T promptForSelection(
+    private <T> T promptForSelection(
             T[] options,
             String promptText,
             String currentLabel,
             T initialSelection,
             Function<T, String> describer) {
         T currentSelection = initialSelection != null ? initialSelection : options[0];
+        List<T> selections = Arrays.asList(options);
         while (!isStopRequested()) {
             driverGamepad.readButtons();
             telemetry.addData(promptText, "Press DPAD_UP/DPAD_DOWN to select, A to confirm, B to cancel");
@@ -154,9 +156,9 @@ public class Config extends LinearOpMode {
             }
             telemetry.update();
             if (driverGamepad.wasJustPressed(GamepadKeys.Button.DPAD_UP)) {
-                currentSelection = options[(currentSelection.ordinal() + 1) % options.length];
+                currentSelection = options[(selections.indexOf(currentSelection) + 1) % options.length];
             } else if (driverGamepad.wasJustPressed(GamepadKeys.Button.DPAD_DOWN)) {
-                currentSelection = options[(currentSelection.ordinal() - 1 + options.length) % options.length];
+                currentSelection = options[(selections.indexOf(currentSelection) - 1 + options.length) % options.length];
             } else if (driverGamepad.wasJustPressed(GamepadKeys.Button.A)) {
                 return currentSelection;
             } else if (driverGamepad.wasJustPressed(GamepadKeys.Button.B)) {

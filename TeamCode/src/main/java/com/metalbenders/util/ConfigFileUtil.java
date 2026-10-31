@@ -12,7 +12,7 @@ import java.util.Properties;
 public class ConfigFileUtil {
 
     public static final String ALLIANCE_COLOR_KEY = "allianceColor";
-    public static final String STARTING_FIELD_SIDE_KEY = "startingFieldSide";
+    public static final String STARTING_ON_ACTIVE_SIDE_KEY = "startingOnActiveSide";
     public static final String AUTO_STRATEGY_KEY = "autoStrategy";
     public static final String TURRET_STATE_KEY = "turretState";
     private static final String CONFIG_FILE_NAME = "config.properties";
@@ -27,7 +27,15 @@ public class ConfigFileUtil {
         }
         ConfigFile config = new ConfigFile();
         config.allianceColor = parseEnum(properties, ALLIANCE_COLOR_KEY, config.allianceColor);
-        config.startingFieldSide = parseEnum(properties, STARTING_FIELD_SIDE_KEY, config.startingFieldSide);
+        String startingOnActiveSide = properties.getProperty(STARTING_ON_ACTIVE_SIDE_KEY);
+        if (startingOnActiveSide != null) {
+            if ("true".equalsIgnoreCase(startingOnActiveSide.trim())
+                || "false".equalsIgnoreCase(startingOnActiveSide.trim())) {
+                config.startingOnActiveSide = Boolean.parseBoolean(startingOnActiveSide.trim());
+            } else {
+                telemetry.addData("Invalid startingOnActiveSide, returning default", startingOnActiveSide);
+            }
+        }
         config.autoStrategyType = parseEnum(properties, AUTO_STRATEGY_KEY, config.autoStrategyType);
         config.turretState = parseEnum(properties, TURRET_STATE_KEY, config.turretState);
         return config;
@@ -36,7 +44,8 @@ public class ConfigFileUtil {
     public static void writeConfigFile(ConfigFile configFile) throws IOException {
         Properties propertiesToStore = new Properties();
         propertiesToStore.setProperty(ALLIANCE_COLOR_KEY, configFile.getAllianceColor().name());
-        propertiesToStore.setProperty(STARTING_FIELD_SIDE_KEY, configFile.getStartingFieldSide().name());
+        propertiesToStore.setProperty(STARTING_ON_ACTIVE_SIDE_KEY,
+                Boolean.toString(configFile.isStartingOnActiveSide()));
         propertiesToStore.setProperty(AUTO_STRATEGY_KEY, configFile.getAutoStrategyType().name());
         propertiesToStore.setProperty(TURRET_STATE_KEY, configFile.getTurretState().name());
         File file = AppUtil.getInstance().getSettingsFile(CONFIG_FILE_NAME);
@@ -60,7 +69,7 @@ public class ConfigFileUtil {
 
     public static class ConfigFile {
         private Constants.AllianceColor allianceColor = Constants.AllianceColor.RED;
-        private Constants.FieldSide startingFieldSide = Constants.FieldSide.AUDIENCE_SIDE;
+        private boolean startingOnActiveSide = true;
         private AutoStrategyType autoStrategyType = AutoStrategyType.PRELOAD_AND_PARK;
         private TurretSubsystem.TurretState turretState = TurretSubsystem.TurretState.AUTO;
 
@@ -72,12 +81,12 @@ public class ConfigFileUtil {
             this.allianceColor = allianceColor;
         }
 
-        public Constants.FieldSide getStartingFieldSide() {
-            return startingFieldSide;
+        public boolean isStartingOnActiveSide() {
+            return startingOnActiveSide;
         }
 
-        public void setStartingFieldSide(Constants.FieldSide startingFieldSide) {
-            this.startingFieldSide = startingFieldSide;
+        public void setStartingOnActiveSide(boolean startingOnActiveSide) {
+            this.startingOnActiveSide = startingOnActiveSide;
         }
 
         public AutoStrategyType getAutoStrategyType() {
