@@ -1,5 +1,7 @@
 package com.metalbenders.control.subsystems;
 
+import static com.metalbenders.constants.Constants.FlowerToolState.UP;
+
 import com.arcrobotics.ftclib.command.Subsystem;
 import com.metalbenders.constants.Constants;
 import com.qualcomm.robotcore.hardware.HardwareMap;
@@ -10,11 +12,12 @@ public class FlowerToolSubsystem implements Subsystem {
 
     private final Servo flowerToolServo;
     private final Telemetry telemetry;
-    private Constants.FlowerToolState flowerToolState = Constants.FlowerToolState.UP;
+    private Constants.FlowerToolState flowerToolState = UP;
 
     public FlowerToolSubsystem(HardwareMap hardwareMap, Telemetry telemetry) {
         this.telemetry = telemetry;
         this.flowerToolServo = hardwareMap.get(Servo.class, "flowerServo");
+        flowerToolServo.setPosition(UP.getPosition());
     }
 
     public void setFlowerToolState(Constants.FlowerToolState flowerToolState) {
@@ -33,6 +36,6 @@ public class FlowerToolSubsystem implements Subsystem {
     }
 
     public void teardown() {
-        setFlowerToolState(Constants.FlowerToolState.UP);
+        setFlowerToolState(UP);
     }
 }

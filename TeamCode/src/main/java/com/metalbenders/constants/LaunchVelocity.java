@@ -11,7 +11,8 @@ public enum LaunchVelocity {
     VELOCITY_42_46(1250.0, 42.0, 46.0, 100.0),
     VELOCITY_46_50(1270.0, 46.0, 50.0, 100.0),
     VELOCITY_50_54(1310.0, 50.0, 54.0, 100.0),
-    MAX(1350.0, 54.0, 60.0, 100.0);
+    MAX(1350.0, 54.0, 60.0, 100.0),
+    AUTONOMOUS(1145.0, null, null, 100.0);
 
 
     private Double velocity;

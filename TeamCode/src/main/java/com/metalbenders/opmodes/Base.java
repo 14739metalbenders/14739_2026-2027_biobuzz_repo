@@ -45,19 +45,19 @@ public abstract class Base extends CommandOpMode {
         intakeSubsystem = new IntakeSubsystem(hardwareMap, telemetry);
         limelightSubsystem = new LimelightSubsystem(hardwareMap, telemetry, allianceColor);
         turretSubsystem = new TurretSubsystem(hardwareMap, telemetry, allianceColor, turretState);
-        launchSubsystem = new LaunchSubsystem(hardwareMap, telemetry, allianceColor);
+        launchSubsystem = new LaunchSubsystem(hardwareMap, telemetry, allianceColor, getOpModeType());
         flowerToolSubsystem = new FlowerToolSubsystem(hardwareMap, telemetry);
 
         if (getOpModeType() == Constants.OpModeType.AUTO) {
             lidarSubsystem = new LidarSubsystem(hardwareMap, telemetry);
 //            huskyLensSubsystem = new HuskyLensSubsystem(hardwareMap, telemetry, allianceColor);
+        } else {
+            turretSubsystem.setDefaultCommand(new UpdateTurretCommand(
+                    turretSubsystem, limelightSubsystem, driveSubsystem, launchSubsystem));
+
+            launchSubsystem.setDefaultCommand(new UpdateLauncherCommand(
+                    launchSubsystem, limelightSubsystem, driveSubsystem));
         }
-
-        turretSubsystem.setDefaultCommand(new UpdateTurretCommand(
-                turretSubsystem, limelightSubsystem, driveSubsystem, launchSubsystem));
-
-        launchSubsystem.setDefaultCommand(new UpdateLauncherCommand(
-                launchSubsystem, limelightSubsystem, driveSubsystem));
     }
 
     @Override

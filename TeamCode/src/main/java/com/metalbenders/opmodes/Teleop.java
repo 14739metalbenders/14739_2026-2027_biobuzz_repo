@@ -1,9 +1,20 @@
 package com.metalbenders.opmodes;
 
+import static com.metalbenders.constants.Constants.FieldSide.AUDIENCE_SIDE;
+import static com.metalbenders.constants.Constants.FieldSide.SCORE_SIDE;
+import static com.metalbenders.constants.Constants.FlowerToolState.DOWN;
+import static com.metalbenders.constants.Constants.FlowerToolState.UP;
+import static com.metalbenders.constants.Constants.IntakeState.INTAKE;
+import static com.metalbenders.constants.Constants.IntakeState.REVERSE_INTAKE;
+import static com.metalbenders.constants.Constants.IntakeState.SHOOT;
+import static com.metalbenders.constants.Constants.IntakeState.STOP;
+import static com.metalbenders.constants.Constants.LaunchGateState.CLOSED;
+import static com.metalbenders.constants.Constants.LaunchGateState.KICK;
+import static com.metalbenders.constants.Constants.LaunchGateState.OPEN;
+
 import com.arcrobotics.ftclib.command.SequentialCommandGroup;
 import com.arcrobotics.ftclib.command.button.Trigger;
 import com.arcrobotics.ftclib.gamepad.GamepadKeys;
-import com.metalbenders.constants.Constants;
 import com.metalbenders.control.commands.*;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
@@ -25,19 +36,19 @@ public class Teleop extends Base {
 
         //SET ACTIVE FIELD SIDE TO SCORE SIDE
         driverGamepad.getGamepadButton(GamepadKeys.Button.DPAD_UP)
-                .whenPressed(new SetFieldSideOverrideCommand(limelightSubsystem, Constants.FieldSide.SCORE_SIDE));
+                .whenPressed(new SetFieldSideOverrideCommand(limelightSubsystem, SCORE_SIDE));
 
         //SET ACTIVE FIELD SIDE TO AUDIENCE SIDE
         driverGamepad.getGamepadButton(GamepadKeys.Button.DPAD_DOWN)
-                .whenPressed(new SetFieldSideOverrideCommand(limelightSubsystem, Constants.FieldSide.AUDIENCE_SIDE));
+                .whenPressed(new SetFieldSideOverrideCommand(limelightSubsystem, AUDIENCE_SIDE));
 
         //REVERSE INTAKE
         driverGamepad.getGamepadButton(GamepadKeys.Button.LEFT_BUMPER)
-                .whileActiveOnce(new SetIntakeStateCommand(intakeSubsystem, Constants.IntakeState.REVERSE_INTAKE));
+                .whileActiveOnce(new SetIntakeStateCommand(intakeSubsystem, REVERSE_INTAKE));
 
         driverGamepad.getGamepadButton(GamepadKeys.Button.A)
-                .whileActiveOnce(new SetFlowerToolState(flowerToolSubsystem, Constants.FlowerToolState.DOWN))
-                .whenInactive(new SetFlowerToolState(flowerToolSubsystem, Constants.FlowerToolState.UP));
+                .whileActiveOnce(new SetFlowerToolState(flowerToolSubsystem, DOWN))
+                .whenInactive(new SetFlowerToolState(flowerToolSubsystem, UP));
 
 
         //INTAKE
@@ -45,20 +56,20 @@ public class Teleop extends Base {
         leftTrigger
                 .whileActiveOnce(
                         new SequentialCommandGroup(
-                            new SetLaunchGateStateCommand(launchSubsystem, Constants.LaunchGateState.CLOSED),
-                            new SetIntakeStateCommand(intakeSubsystem, Constants.IntakeState.INTAKE)))
+                            new SetLaunchGateStateCommand(launchSubsystem, CLOSED),
+                            new SetIntakeStateCommand(intakeSubsystem, INTAKE)))
                 .whenInactive(
-                        new SetIntakeStateCommand(intakeSubsystem, Constants.IntakeState.STOP));
+                        new SetIntakeStateCommand(intakeSubsystem, STOP));
 
         //SHOOT
         Trigger rightTrigger = new Trigger(() -> driverGamepad.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER) > 0.2);
         rightTrigger
                 .whileActiveOnce(new SequentialCommandGroup(
-                    new SetLaunchGateStateCommand(launchSubsystem, Constants.LaunchGateState.OPEN),
-                    new SetIntakeStateCommand(intakeSubsystem, Constants.IntakeState.SHOOT)))
+                    new SetLaunchGateStateCommand(launchSubsystem, OPEN),
+                    new SetIntakeStateCommand(intakeSubsystem, SHOOT)))
                 .whenInactive(new SequentialCommandGroup(
-                    new SetIntakeStateCommand(intakeSubsystem, Constants.IntakeState.STOP),
-                    new SetLaunchGateStateCommand(launchSubsystem, Constants.LaunchGateState.KICK),
-                    new SetLaunchGateStateCommand(launchSubsystem, Constants.LaunchGateState.CLOSED)));
+                    new SetIntakeStateCommand(intakeSubsystem, STOP),
+                    new SetLaunchGateStateCommand(launchSubsystem, KICK),
+                    new SetLaunchGateStateCommand(launchSubsystem, CLOSED)));
     }
 }

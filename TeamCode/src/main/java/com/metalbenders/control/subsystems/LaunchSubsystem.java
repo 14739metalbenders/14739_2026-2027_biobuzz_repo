@@ -13,6 +13,8 @@ import java.util.List;
 
 import static com.metalbenders.constants.Constants.*;
 import static com.metalbenders.constants.Constants.LaunchGateState.CLOSED;
+import static com.metalbenders.constants.LaunchVelocity.AUTONOMOUS;
+import static com.metalbenders.constants.LaunchVelocity.IDLE;
 import static com.metalbenders.constants.LaunchVelocity.getLaunchVelocityByDistance;
 import static com.metalbenders.util.MathUtil.calculateAverageTx;
 import static com.qualcomm.robotcore.hardware.DcMotor.RunMode.RUN_USING_ENCODER;
@@ -22,12 +24,12 @@ public class LaunchSubsystem extends SubsystemBase {
     private final Telemetry telemetry;
     private final DcMotorEx launcher;
     private final Servo launchGateServo;
-    private LaunchVelocity targetLaunchVelocity = LaunchVelocity.IDLE;
+    private LaunchVelocity targetLaunchVelocity;
     private double actualLaunchVelocity;
     private LaunchGateState launchGateState;
     private final AllianceColor allianceColor;
 
-    public LaunchSubsystem(HardwareMap hardwareMap, Telemetry telemetry, AllianceColor allianceColor) {
+    public LaunchSubsystem(HardwareMap hardwareMap, Telemetry telemetry, AllianceColor allianceColor, OpModeType opModeType) {
         this.telemetry = telemetry;
         this.allianceColor = allianceColor;
         this.launchGateServo = hardwareMap.get(Servo.class, "launchServo");
@@ -41,6 +43,11 @@ public class LaunchSubsystem extends SubsystemBase {
         this.launcher.setMode(RUN_USING_ENCODER);
         this.launcher.setPIDFCoefficients(RUN_USING_ENCODER, new PIDFCoefficients(
                 LAUNCHER_VELOCITY_PID.p, LAUNCHER_VELOCITY_PID.i, LAUNCHER_VELOCITY_PID.d, LAUNCHER_VELOCITY_PID.f));
+        if (opModeType == OpModeType.AUTO) {
+            targetLaunchVelocity = AUTONOMOUS;
+        } else {
+            targetLaunchVelocity = IDLE;
+        }
     }
 
     public void setLaunchGateState(LaunchGateState launchGateState) {
