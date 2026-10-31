@@ -25,6 +25,7 @@ public class UpdateLauncherCommand extends CommandBase {
         launcherSubsystem.updateLauncherVelocity(
                 limelightSubsystem.getActiveHiveCellFieldSide(),
                 driveSubsystem.getCurrentPose(),
-                limelightSubsystem.getLastActiveSideDetections());
+                limelightSubsystem.getLastActiveSideDetections(),
+                limelightSubsystem.getTargetDistance());
     }
 }

@@ -6,6 +6,7 @@ import com.metalbenders.util.RotatingBuffer;
 import com.pedropathing.follower.Follower;
 import com.pedropathing.follower.ManualDrive;
 import com.pedropathing.math.Pose;
+import com.pedropathing.math.Twist;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import static com.pedropathing.api.Paths.*;
 
@@ -39,6 +40,8 @@ public class DriveSubsystem extends SubsystemBase {
         return follower.pose();
     }
 
+    public Twist getCurrentTwist() { return follower.twist(); }
+
     public boolean isBusy() {
         return follower.isBusy();
     }
@@ -57,6 +60,9 @@ public class DriveSubsystem extends SubsystemBase {
                 String.format(Locale.ENGLISH, "x: %.2f, y: %.2f, heading: %.2f",
                         follower.pose().x(), follower.pose().y(), Math.toDegrees(follower.pose().heading())));
         telemetry.addData("Driving", follower.isBusy() ? "Yes" : "No");
+        //telemetry.addData("Xvector", follower.twist().vx);
+        //telemetry.addData("Yvector", follower.twist().vy);
+        //telemetry.addData("Omega", follower.twist().omega);
         telemetry.addLine();
     }
 

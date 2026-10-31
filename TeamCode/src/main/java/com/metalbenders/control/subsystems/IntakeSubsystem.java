@@ -16,6 +16,7 @@ public class IntakeSubsystem extends SubsystemBase {
         this.telemetry = telemetry;
         this.intakeMotor = hardwareMap.get(DcMotorEx.class, "intakeMotor");
         this.intakeMotor.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
+        this.intakeMotor.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
     }
 
     public void setIntakeState(Constants.IntakeState intakeState) {
@@ -30,6 +31,7 @@ public class IntakeSubsystem extends SubsystemBase {
         telemetry.addLine(this.getClass().getSimpleName());
         telemetry.addLine("--------------------------------");
         telemetry.addData("Intake State", intakeState);
+        telemetry.addData("Intake Velocity", intakeMotor.getVelocity());
         telemetry.addLine();
     }
 
