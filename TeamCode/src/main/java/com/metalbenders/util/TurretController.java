@@ -15,7 +15,7 @@ public class TurretController {
         public static double AIM_Ki = 0;
         public static double AIM_Kd = 0.002;
         public static double AIM_Ks = 0.002;
-        public static double AIM_DEADBAND = 2.0;
+        public static double AIM_DEADBAND = 3.0;
         public static double maxTurretPower = 0.9;
         public static double maxTurretAccel = 0.15;
         public static double maxTurretDecel = 0.3;
@@ -197,8 +197,8 @@ public class TurretController {
         double timeOfFlight = calculateTimeOfFlight(currentRPM, ballLaunchAngle);
 
         // Calculate shot lead angle
-        double shotLeadAngle = calculateShotLead(turretMovement.getXVector(), turretMovement.getYVector(), twist.omega, timeOfFlight);
-        //double shotLeadAngle = 0;
+        //double shotLeadAngle = calculateShotLead(turretMovement.getXVector(), turretMovement.getYVector(), twist.omega, timeOfFlight);
+        double shotLeadAngle = 0;
 
         if (Math.abs(targetBearing) > 0) {
             // Desired turret angle is the current bearing plus the shot lead angle
