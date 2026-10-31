@@ -37,7 +37,7 @@ public class Teleop extends Base {
 
         driverGamepad.getGamepadButton(GamepadKeys.Button.A)
                 .whileActiveOnce(new SetFlowerToolState(flowerToolSubsystem, Constants.FlowerToolState.DOWN))
-                .whenInactive(new SetFlowerToolState(flowerToolSubsystem, Constants.FlowerToolState.DOWN));
+                .whenInactive(new SetFlowerToolState(flowerToolSubsystem, Constants.FlowerToolState.UP));
 
 
         //INTAKE
