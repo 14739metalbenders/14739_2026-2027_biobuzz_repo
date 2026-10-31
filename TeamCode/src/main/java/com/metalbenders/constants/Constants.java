@@ -62,7 +62,7 @@ public class Constants {
     }
 
     public enum FlowerToolState {
-        UP(0.85),
+        UP(0.75),
         DOWN(0.25);
 
         private final double position;

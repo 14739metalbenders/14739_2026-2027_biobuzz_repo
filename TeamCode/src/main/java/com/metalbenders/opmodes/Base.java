@@ -54,7 +54,7 @@ public abstract class Base extends CommandOpMode {
         }
 
         turretSubsystem.setDefaultCommand(new UpdateTurretCommand(
-                turretSubsystem, limelightSubsystem, driveSubsystem));
+                turretSubsystem, limelightSubsystem, driveSubsystem, launchSubsystem));
 
         launchSubsystem.setDefaultCommand(new UpdateLauncherCommand(
                 launchSubsystem, limelightSubsystem, driveSubsystem));
