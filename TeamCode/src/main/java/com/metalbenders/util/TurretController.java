@@ -15,7 +15,7 @@ public class TurretController {
         public static double AIM_Ki = 0;
         public static double AIM_Kd = 0.002;
         public static double AIM_Ks = 0.002;
-        public static double AIM_DEADBAND = 3.0;
+        public static double AIM_DEADBAND = 2.0;
         public static double maxTurretPower = 0.9;
         public static double maxTurretAccel = 0.15;
         public static double maxTurretDecel = 0.3;
