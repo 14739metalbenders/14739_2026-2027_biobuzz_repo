@@ -4,12 +4,12 @@ import com.arcrobotics.ftclib.command.CommandBase;
 import com.metalbenders.control.subsystems.DriveSubsystem;
 import com.pedropathing.math.Pose;
 
-public class DriveToPositionCommand extends CommandBase {
+public class DriveToPosition extends CommandBase {
 
     private final DriveSubsystem driveSubsystem;
     private final Pose pose;
 
-    public DriveToPositionCommand(DriveSubsystem driveSubsystem, Pose pose) {
+    public DriveToPosition(DriveSubsystem driveSubsystem, Pose pose) {
         this.driveSubsystem = driveSubsystem;
         this.pose = pose;
         addRequirements(driveSubsystem);

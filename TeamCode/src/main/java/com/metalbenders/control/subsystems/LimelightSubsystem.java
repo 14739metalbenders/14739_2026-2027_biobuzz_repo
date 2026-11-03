@@ -3,9 +3,8 @@ package com.metalbenders.control.subsystems;
 import com.arcrobotics.ftclib.command.SubsystemBase;
 import com.metalbenders.constants.AprilTag;
 import com.metalbenders.constants.Constants;
-import com.metalbenders.util.TimedEntity;
+import com.metalbenders.constants.FieldSide;
 import com.qualcomm.hardware.limelightvision.LLResult;
-import com.qualcomm.hardware.limelightvision.LLResultTypes;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.hardware.limelightvision.LLResultTypes.FiducialResult;
 import com.qualcomm.robotcore.hardware.HardwareMap;
@@ -16,166 +15,59 @@ import org.firstinspires.ftc.robotcore.external.navigation.Pose3D;
 import org.firstinspires.ftc.robotcore.external.navigation.Position;
 import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import static com.metalbenders.constants.Constants.FieldSide.AUDIENCE_SIDE;
-import static com.metalbenders.constants.Constants.FieldSide.SCORE_SIDE;
-import static com.metalbenders.util.MathUtil.calculateAverageTy;
-
 public class LimelightSubsystem extends SubsystemBase {
-
-    private enum LimelightState {
-        READY,
-        FAILED
-    }
 
     private final Telemetry telemetry;
     private final Constants.AllianceColor allianceColor;
     private final Limelight3A limelight;
-    private final LimelightState limelightState;
-    private Constants.FieldSide activeHiveCellFieldSide;
-    private TimedEntity<List<LLResultTypes.FiducialResult>> lastActiveSideDetections =
-            new TimedEntity<>(new ArrayList<>());
-    private TimedEntity<List<LLResultTypes.FiducialResult>> lastInactiveSideDetections =
-            new TimedEntity<>(new ArrayList<>());
-
+    private final Constants.LimelightState limelightState;
+    private FieldSide activeHiveCellFieldSide;
     private boolean hiveDetected = false;   // did we see hive tags during this scan?
     private double aimError = 0;            // turret error to the up cell visible tags (deg)
     private double tagDistance = 0;             // horizontal camera to tag cluster (m)
 
-    public LimelightSubsystem(HardwareMap hardwareMap, Telemetry telemetry, Constants.AllianceColor allianceColor) {
+    public LimelightSubsystem(
+            HardwareMap hardwareMap,
+            Telemetry telemetry,
+            Constants.AllianceColor allianceColor,
+            FieldSide activeHiveCellFieldSide) {
         this.telemetry = telemetry;
         this.allianceColor = allianceColor;
         this.limelight = hardwareMap.get(Limelight3A.class, "limelight");
-
-        limelight.pipelineSwitch(0);
-        limelight.start();
+        this.limelight.pipelineSwitch(0);
+        this.limelight.start();
         if (limelight.isConnected() && limelight.isRunning()) {
-            limelightState = LimelightState.READY;
+            limelightState = Constants.LimelightState.READY;
         } else {
-            limelightState = LimelightState.FAILED;
+            limelightState = Constants.LimelightState.FAILED;
         }
-
-        activeHiveCellFieldSide = (allianceColor == Constants.AllianceColor.RED) ? SCORE_SIDE : AUDIENCE_SIDE;
+        this.activeHiveCellFieldSide = activeHiveCellFieldSide;
     }
 
-    private void processLLResult(LLResult llResult) {
-        if (!isValidResult(llResult)) {
-            return;
-        }
-
-        List<LLResultTypes.FiducialResult> scoreSideResults = new ArrayList<>();
-        List<LLResultTypes.FiducialResult> audienceSideResults = new ArrayList<>();
-
-        for (LLResultTypes.FiducialResult result : llResult.getFiducialResults()) {
-            AprilTag aprilTag = AprilTag.getAprilTagById(result.getFiducialId());
-            if (aprilTag == null || aprilTag.getAllianceColor() != allianceColor) {
-                continue;
-            }
-
-            if (aprilTag.getFieldSide() == SCORE_SIDE) {
-                scoreSideResults.add(result);
-            } else {
-                audienceSideResults.add(result);
-            }
-        }
-
-        setDetections(scoreSideResults, audienceSideResults);
-        updateActiveHiveCellFieldSide();
-    }
-
-    private boolean isValidResult(LLResult llResult) {
-        return llResult != null
-                && llResult.isValid()
-                && llResult.getFiducialResults() != null
-                && !llResult.getFiducialResults().isEmpty();
-    }
-
-    private void setDetections(
-            List<LLResultTypes.FiducialResult> scoreSideResults,
-            List<LLResultTypes.FiducialResult> audienceSideResults) {
-        updateDetectionsForSide(SCORE_SIDE, scoreSideResults);
-        updateDetectionsForSide(AUDIENCE_SIDE, audienceSideResults);
-    }
-
-    private void updateDetectionsForSide(
-            Constants.FieldSide side,
-            List<LLResultTypes.FiducialResult> detections) {
-        if (detections == null || detections.isEmpty()) {
-            return;
-        }
-
-        if (activeHiveCellFieldSide == side) {
-            lastActiveSideDetections = TimedEntity.of(detections);
-        } else {
-            lastInactiveSideDetections = TimedEntity.of(detections);
-        }
-    }
-
-    private void updateActiveHiveCellFieldSide() {
-        if (Math.abs(lastActiveSideDetections.getTime() - lastInactiveSideDetections.getTime()) > 500) {
-            return;
-        }
-
-        double averageTyActiveSide = calculateAverageTy(lastActiveSideDetections.getEntity());
-        double averageTyInactiveSide = calculateAverageTy(lastInactiveSideDetections.getEntity());
-
-        // y-values are negative; the lower value is physically higher.
-        if (averageTyInactiveSide < averageTyActiveSide) {
-            switchActiveSide();
-        }
-    }
-
-    private void switchActiveSide() {
-        activeHiveCellFieldSide = (activeHiveCellFieldSide == SCORE_SIDE) ? AUDIENCE_SIDE : SCORE_SIDE;
-
-        TimedEntity<List<LLResultTypes.FiducialResult>> swap = lastActiveSideDetections;
-        lastActiveSideDetections = lastInactiveSideDetections;
-        lastInactiveSideDetections = swap;
-    }
-
-    public Constants.FieldSide getActiveHiveCellFieldSide() {
+    public FieldSide getActiveHiveCellFieldSide() {
         return activeHiveCellFieldSide;
     }
 
-    public void setFieldSideOverride(Constants.FieldSide fieldSideOverride) {
+    public void setFieldSideOverride(FieldSide fieldSideOverride) {
         activeHiveCellFieldSide = fieldSideOverride;
     }
 
-    public TimedEntity<List<LLResultTypes.FiducialResult>> getLastActiveSideDetections() {
-        return lastActiveSideDetections;
+    public Constants.LimelightState getLimelightState() {
+        return limelightState;
     }
 
     @Override
     public void periodic() {
         LLResult llResult = limelight.getLatestResult();
-        processLLResult(llResult);
         updateHiveTargeting(llResult, this.allianceColor);
 
         telemetry.addLine(this.getClass().getSimpleName());
         telemetry.addLine("--------------------------------");
         telemetry.addData("Limelight State", limelightState);
-        //telemetry.addData("Active Hive Cell Field Side", getActiveHiveCellFieldSide());
+        telemetry.addData("Active Hive Cell Field Side", getActiveHiveCellFieldSide());
         telemetry.addData("Target Distance (in)", tagDistance * 39.3701);
         telemetry.addData("Aim Error (deg)", aimError);
-        //addDetectionTelemetry("ACTIVE Side Detections", lastActiveSideDetections);
-        //addDetectionTelemetry("INACTIVE Side Detections", lastInactiveSideDetections);
-
-
         telemetry.addLine();
-    }
-
-    private void addDetectionTelemetry(
-            String header,
-            TimedEntity<List<LLResultTypes.FiducialResult>> detections) {
-        telemetry.addLine(header);
-        telemetry.addData("Time Since Last Detection",
-                System.currentTimeMillis() - detections.getTime() + " ms");
-
-        for (LLResultTypes.FiducialResult result : detections.getEntity()) {
-            telemetry.addLine("\t" + result.getFiducialId());
-        }
     }
 
     /**
@@ -203,7 +95,8 @@ public class LimelightSubsystem extends SubsystemBase {
         int[] count3d = new int[4];
         for (FiducialResult tag : currentGoal.getFiducialResults()) {
             int id = tag.getFiducialId();
-            if (!correctAllianceTag(id, allianceColor)) {
+            AprilTag aprilTag = AprilTag.getAprilTagById(id);
+            if (aprilTag == null || allianceColor != aprilTag.getAllianceColor()) {
                 continue;
             }
             int cell = (id - 30) / 4; // 0: red scoring, 1: red audience, 2: blue audience, 3: blue scoring for classing UP/DOWM and Alliance
@@ -242,6 +135,7 @@ public class LimelightSubsystem extends SubsystemBase {
                         sumHeight[cell] += height; // Camera height on robot 0.300m
                         dist = Math.hypot(p.x, fwd);
                         count3d[cell]++;
+                        activeHiveCellFieldSide = aprilTag.getFieldSide();
                     }
                 }
             }
@@ -286,7 +180,6 @@ public class LimelightSubsystem extends SubsystemBase {
         hiveTagCount = count[best];
         tagDistance = sumDist[best] / count[best];
         aimError = sumTx[best] / count[best];
-
     }
 
     /**
@@ -328,15 +221,9 @@ public class LimelightSubsystem extends SubsystemBase {
         );
     }
 
-
     public boolean isHiveDetected() { return hiveDetected; }
     public double getTargetDistance() { if (isHiveDetected()) { return tagDistance; } else { return 0; } }
     public double getAimError() { if (isHiveDetected()) { return aimError; } else { return 0; } }
-
-    private static boolean correctAllianceTag(int id, Constants.AllianceColor color) {
-        return color == Constants.AllianceColor.RED ? (id >= 30 && id <= 37) : (id >= 38 && id <= 45);
-    }
-
     public void teardown() {
         limelight.stop();
     }

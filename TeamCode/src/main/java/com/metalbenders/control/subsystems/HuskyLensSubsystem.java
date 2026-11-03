@@ -10,8 +10,6 @@ import static com.metalbenders.constants.Constants.*;
 
 public class HuskyLensSubsystem implements Subsystem {
 
-
-
     private final HuskyLens huskyLens;
     private final Telemetry telemetry;
     private final Constants.AllianceColor allianceColor;
@@ -26,6 +24,10 @@ public class HuskyLensSubsystem implements Subsystem {
         } else {
             state = Constants.HuskyLensState.READY;
         }
+    }
+
+    public Constants.HuskyLensState getHuskyLensState() {
+        return state;
     }
 
     public HuskyLens.Block[] getBlocksOfType(Constants.ArtifactType artifactType) {

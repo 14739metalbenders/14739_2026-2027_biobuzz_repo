@@ -15,24 +15,15 @@ public class Constants {
         BLUE
     }
 
-    public enum FieldSide {
-        SCORE_SIDE,
-        AUDIENCE_SIDE;
-
-        public static FieldSide getOppositeSide(FieldSide fieldSide) {
-            return fieldSide == SCORE_SIDE ? AUDIENCE_SIDE : SCORE_SIDE;
-        }
-    }
-
     public enum ArtifactType {
         POLLEN,
         NECTAR
     }
 
     public enum IntakeState {
-        SHOOT(2000),
-        INTAKE(2000),
-        REVERSE_INTAKE(-2000),
+        SHOOT(2400),
+        INTAKE(1800),
+        REVERSE_INTAKE(-1500),
         STOP(0);
 
         private final double targetVelocity;
@@ -46,9 +37,9 @@ public class Constants {
     }
 
     public enum LaunchGateState {
-        OPEN(0.52),
-        CLOSED(0.75),
-        KICK(0.08);
+        OPEN(0.5),
+        CLOSED(0.85),
+        KICK(0.12);
 
         private final double position;
 
@@ -62,8 +53,8 @@ public class Constants {
     }
 
     public enum FlowerToolState {
-        UP(0.75),
-        DOWN(0.25);
+        UP(1.0),
+        DOWN(0.26);
 
         private final double position;
 
@@ -81,18 +72,51 @@ public class Constants {
         FAILED
     }
 
+    public enum LimelightState {
+        READY,
+        FAILED
+    }
+
     public enum LidarState {
         CONNECTED,
         FAILED
+    }
+
+    public enum IndicatorLedEnum {
+        BLACK(0.0),
+        RED(0.280),
+        ORANGE(0.326),
+        YELLOW(0.391),
+        GREEN(0.503),
+        BLUE(0.625),
+        PURPLE(0.725),
+        WHITE(1.0);
+
+        private final double value;
+
+        IndicatorLedEnum(double value) {
+            this.value = value;
+        }
+
+        public double getLedValue() {
+            return value;
+        }
+    }
+
+    public enum IndicatorAnimationEnum {
+        BLINK,
+        SOLID
     }
 
     public static final Pose DEFAULT_POSE = new Pose(0, 0, Math.toRadians(90));
 
     /*LAUNCHER CONSTANTS*/
     public static final long LAUNCH_GATE_POSITION_DELAY_MILLI = 125;
-    public static final double MAX_TURRET_ROTATION_DEGREES = 120.0;
     public static final PIDFCoefficients LAUNCHER_VELOCITY_PID = new PIDFCoefficients(150, 0, 0, 15);
     public static final PIDFCoefficients TURRET_VELOCITY_PID = new PIDFCoefficients(23.25, 0.0, 0.8, 7.5);
+
+    /*FLOWER TOOL CONSTANTS*/
+    public static final long FLOWER_TOOL_POSITION_DELAY_MILLIS = 200;
 
     /*HUSKY LENS CONSTANTS*/
     public static final int POLLEN_BLOCK_ID = 1;
@@ -100,7 +124,10 @@ public class Constants {
     public static final int RED_NECTAR_BLOCK_ID = 3;
 
     /*AUTO CONSTANTS*/
-    public static final long MILLIS_TO_WAIT_DURING_AUTO_SHOOT = 750;
-    public static final long MILLIS_TO_WAIT_FOR_HIVE_SWITCH = 5000;
-    public static final long MILLIS_TO_WAIT_FOR_GARDEN_TRAVEL = 1000;
+    public static final long AUTO_PARK_OVERRIDE_DELAY_MILLIS = 25000;
+    public static final long AUTO_SHOOT_TIMEOUT_MILLIS = 750;
+    public static final long HIVE_SWITCH_TIMEOUT_MILLIS = 5000;
+    public static final long GARDEN_INTAKE_TIMEOUT_MILLIS = 1000;
+    public static final long FLOWER_INTAKE_TIMEOUT_MILLIS = 1000;
+    public static final double DISTANCE_TO_TRAVEL_TO_INTAKE_FROM_FLOWER = 15.0;
 }

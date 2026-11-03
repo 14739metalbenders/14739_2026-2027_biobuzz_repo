@@ -32,9 +32,9 @@ public enum FieldLocation {
             new Pose(12.5, 122, Math.toRadians(0)), Symmetry.ROTATE_180),
     //Flower Locations
     OTHER_FLOWER(
-            new Pose(48, 136, Math.toRadians(90)), Symmetry.ROTATE_180),
+            new Pose(48, 126, Math.toRadians(90)), Symmetry.ROTATE_180),
     PARK_SIDE_FLOWER(
-            new Pose(8, 48, Math.toRadians(180)), Symmetry.ROTATE_180),
+            new Pose(18, 48, Math.toRadians(180)), Symmetry.ROTATE_180),
     //Garden Locations
     GARDEN_START(
             new Pose(22, 7, Math.toRadians(180)), Symmetry.ROTATE_180),
@@ -65,32 +65,32 @@ public enum FieldLocation {
         return alliance == AllianceColor.RED ? redPose : bluePose;
     }
 
-    public static FieldLocation getLaunchLocation(Constants.FieldSide fieldSide) {
+    public static FieldLocation getLaunchLocation(FieldSide fieldSide) {
         return selectByFieldSide(fieldSide, SCORE_SIDE_LAUNCH, AUDIENCE_SIDE_LAUNCH);
     }
 
-    public static FieldLocation getOuterWaypointLocation(Constants.FieldSide fieldSide) {
+    public static FieldLocation getOuterWaypointLocation(FieldSide fieldSide) {
         return selectByFieldSide(fieldSide, SCORE_SIDE_OUTER_WAYPOINT, AUDIENCE_SIDE_OUTER_WAYPOINT);
     }
 
-    public static FieldLocation getInnerWaypointLocation(Constants.FieldSide fieldSide) {
+    public static FieldLocation getInnerWaypointLocation(FieldSide fieldSide) {
         return selectByFieldSide(fieldSide, SCORE_SIDE_INNER_WAYPOINT, AUDIENCE_SIDE_INNER_WAYPOINT);
     }
 
-    public static FieldLocation getParkLocation(Constants.FieldSide fieldSide) {
+    public static FieldLocation getParkLocation(FieldSide fieldSide) {
         return selectByFieldSide(fieldSide, SCORE_SIDE_PARK, AUDIENCE_SIDE_PARK);
     }
 
-    public static FieldLocation getStartLocation(Constants.FieldSide fieldSide) {
+    public static FieldLocation getStartLocation(FieldSide fieldSide) {
         return selectByFieldSide(fieldSide, SCORE_SIDE_START_POSE, AUDIENCE_SIDE_START_POSE);
     }
 
-    public static FieldLocation getHiveCellLocation(Constants.FieldSide fieldSide) {
+    public static FieldLocation getHiveCellLocation(FieldSide fieldSide) {
         return selectByFieldSide(fieldSide, SCORE_SIDE_HIVE_CELL, AUDIENCE_SIDE_HIVE_CELL);
     }
 
     private static FieldLocation selectByFieldSide(
-            Constants.FieldSide fieldSide, FieldLocation scoreSide, FieldLocation audienceSide) {
-        return fieldSide == Constants.FieldSide.SCORE_SIDE ? scoreSide : audienceSide;
+            FieldSide fieldSide, FieldLocation scoreSide, FieldLocation audienceSide) {
+        return fieldSide == FieldSide.SCORE_SIDE ? scoreSide : audienceSide;
     }
 }

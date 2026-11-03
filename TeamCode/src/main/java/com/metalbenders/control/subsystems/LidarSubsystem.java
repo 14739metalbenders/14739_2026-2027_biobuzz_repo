@@ -25,6 +25,10 @@ public class LidarSubsystem implements Subsystem {
         }
     }
 
+    public Constants.LidarState getLidarState() {
+        return state;
+    }
+
     public double[] getDistanceInDegreeRange(int startDegreeRange, int endDegreeRange) {
         return Arrays.copyOfRange(studicaLidar.getRanges(true), startDegreeRange, endDegreeRange);
     }
