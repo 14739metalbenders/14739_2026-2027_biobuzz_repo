@@ -70,9 +70,9 @@ public abstract class Base extends CommandOpMode {
             if (lidarSubsystem.getLidarState() == Constants.LidarState.FAILED) {
                 errorDetected = true;
             }
-            if ( huskyLensSubsystem.getHuskyLensState() == Constants.HuskyLensState.FAILED) {
-                errorDetected = true;
-            }
+//            if (huskyLensSubsystem.getHuskyLensState() == Constants.HuskyLensState.FAILED) {
+//                errorDetected = true;
+//            }
         }
         if ( limelightSubsystem.getLimelightState() == Constants.LimelightState.FAILED) {
             errorDetected = true;

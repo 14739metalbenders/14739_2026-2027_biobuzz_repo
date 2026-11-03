@@ -32,9 +32,9 @@ public enum FieldLocation {
             new Pose(12.5, 122, Math.toRadians(0)), Symmetry.ROTATE_180),
     //Flower Locations
     OTHER_FLOWER(
-            new Pose(48, 126, Math.toRadians(90)), Symmetry.ROTATE_180),
+            new Pose(48, 120, Math.toRadians(90)), Symmetry.ROTATE_180),
     PARK_SIDE_FLOWER(
-            new Pose(18, 48, Math.toRadians(180)), Symmetry.ROTATE_180),
+            new Pose(24, 48, Math.toRadians(180)), Symmetry.ROTATE_180),
     //Garden Locations
     GARDEN_START(
             new Pose(22, 7, Math.toRadians(180)), Symmetry.ROTATE_180),

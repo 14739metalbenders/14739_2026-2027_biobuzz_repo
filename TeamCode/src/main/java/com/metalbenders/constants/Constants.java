@@ -129,5 +129,5 @@ public class Constants {
     public static final long HIVE_SWITCH_TIMEOUT_MILLIS = 5000;
     public static final long GARDEN_INTAKE_TIMEOUT_MILLIS = 1000;
     public static final long FLOWER_INTAKE_TIMEOUT_MILLIS = 1000;
-    public static final double DISTANCE_TO_TRAVEL_TO_INTAKE_FROM_FLOWER = 15.0;
+    public static final double DISTANCE_TO_TRAVEL_TO_INTAKE_FROM_FLOWER = 20.0;
 }
