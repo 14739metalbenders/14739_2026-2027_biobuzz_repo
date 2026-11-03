@@ -30,9 +30,9 @@ public class Constants {
     }
 
     public enum IntakeState {
-        SHOOT(2000),
-        INTAKE(2000),
-        REVERSE_INTAKE(-2000),
+        SHOOT(2100),
+        INTAKE(1800),
+        REVERSE_INTAKE(-1500),
         STOP(0);
 
         private final double targetVelocity;
@@ -47,7 +47,7 @@ public class Constants {
 
     public enum LaunchGateState {
         OPEN(0.52),
-        CLOSED(0.75),
+        CLOSED(0.77),
         KICK(0.08);
 
         private final double position;
@@ -62,8 +62,8 @@ public class Constants {
     }
 
     public enum FlowerToolState {
-        UP(0.75),
-        DOWN(0.25);
+        UP(1.0),
+        DOWN(0.26);
 
         private final double position;
 
