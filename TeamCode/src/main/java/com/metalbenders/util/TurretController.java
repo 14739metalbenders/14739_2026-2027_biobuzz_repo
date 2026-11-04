@@ -11,9 +11,9 @@ public class TurretController {
         private static final double GRAVITY = 9.81; // in m/s2
 
         // PID controller parameters
-        public static double AIM_Kp = 0.022;
+        public static double AIM_Kp = 0.028;
         public static double AIM_Ki = 0;
-        public static double AIM_Kd = 0.002;
+        public static double AIM_Kd = 0.0025;
         public static double AIM_Ks = 0.002;
         public static double AIM_DEADBAND = 2.0;
         public static double maxTurretPower = 0.9;
@@ -23,7 +23,7 @@ public class TurretController {
         private static double aimIntegral = 0;
         private static double aimLastError = 0;
         private static final ElapsedTime aimTimer = new ElapsedTime();
-        public static double turretAngleLimit = 45; // Maximum angle limit for turret movement
+        public static double turretAngleLimit = 70; // Maximum angle limit for turret movement
         private static double integral;
         private static double previousError;
         private static final double INCHES_TO_METERS = 0.0254;
@@ -204,9 +204,9 @@ public class TurretController {
             // Desired turret angle is the current bearing plus the shot lead angle
             double adjustedTargetBearing = (targetBearing + shotLeadAngle);
 
-            // Clamp desired turret angle to within -90 and 90 degrees
+            // Clamp desired turret angle to within -turretAngleLimit and turretAngleLimit degrees
             if (Math.abs(adjustedTargetBearing + turretAngle) > turretAngleLimit) {
-                adjustedTargetBearing = (Math.signum(adjustedTargetBearing) * 90) - turretAngle;
+                adjustedTargetBearing = (Math.signum(adjustedTargetBearing) * turretAngleLimit) - turretAngle;
             }
 
             double turretError = adjustedTargetBearing;
