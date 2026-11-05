@@ -7,8 +7,9 @@ import com.arcrobotics.ftclib.gamepad.GamepadEx;
 import com.metalbenders.constants.Constants;
 import com.metalbenders.constants.Constants.AllianceColor;
 import com.metalbenders.constants.FieldLocation;
-import com.metalbenders.control.commands.UpdateLauncherCommand;
-import com.metalbenders.control.commands.UpdateTurretCommand;
+import com.metalbenders.constants.FieldSide;
+import com.metalbenders.control.commands.UpdateLauncher;
+import com.metalbenders.control.commands.UpdateTurret;
 import com.metalbenders.control.subsystems.*;
 import com.metalbenders.util.AutonomousStorage;
 import com.metalbenders.util.ConfigFileUtil;
@@ -28,8 +29,8 @@ public abstract class Base extends CommandOpMode {
     protected HuskyLensSubsystem huskyLensSubsystem;
     protected FlowerToolSubsystem flowerToolSubsystem;
     protected LaunchSubsystem launchSubsystem;
+    protected LightingSubsystem lightingSubsystem;
     protected AllianceColor allianceColor;
-    protected TurretSubsystem.TurretState turretState;
 
     @Override
     public void initialize() {
@@ -44,27 +45,46 @@ public abstract class Base extends CommandOpMode {
         driveSubsystem = new DriveSubsystem(hardwareMap, telemetry, getStartingPose());
         intakeSubsystem = new IntakeSubsystem(hardwareMap, telemetry);
         limelightSubsystem = new LimelightSubsystem(hardwareMap, telemetry, allianceColor);
-        turretSubsystem = new TurretSubsystem(hardwareMap, telemetry, allianceColor, turretState);
+        turretSubsystem = new TurretSubsystem(hardwareMap, telemetry, allianceColor);
         launchSubsystem = new LaunchSubsystem(hardwareMap, telemetry, allianceColor, getOpModeType());
         flowerToolSubsystem = new FlowerToolSubsystem(hardwareMap, telemetry);
+        lightingSubsystem = new LightingSubsystem(hardwareMap, telemetry, allianceColor);
 
         if (getOpModeType() == Constants.OpModeType.AUTO) {
             lidarSubsystem = new LidarSubsystem(hardwareMap, telemetry);
 //            huskyLensSubsystem = new HuskyLensSubsystem(hardwareMap, telemetry, allianceColor);
         } else {
-            turretSubsystem.setDefaultCommand(new UpdateTurretCommand(
+            turretSubsystem.setDefaultCommand(new UpdateTurret(
                     turretSubsystem, limelightSubsystem, driveSubsystem, launchSubsystem));
 
-            launchSubsystem.setDefaultCommand(new UpdateLauncherCommand(
-                    launchSubsystem, limelightSubsystem, driveSubsystem));
+            launchSubsystem.setDefaultCommand(new UpdateLauncher(
+                    launchSubsystem, limelightSubsystem));
         }
+        subsystemHealthCheck();
     }
 
     @Override
     public void run() {
         long startTime = System.currentTimeMillis();
         super.run();
+        subsystemHealthCheck();
         updateTelemetry(startTime);
+    }
+
+    private void subsystemHealthCheck() {
+        boolean errorDetected = !limelightSubsystem.isHealthy();
+        if (!errorDetected && getOpModeType() == AUTO) {
+            if (lidarSubsystem != null && !lidarSubsystem.isHealthy()) {
+                errorDetected = true;
+            } else if (huskyLensSubsystem != null && !huskyLensSubsystem.isHealthy()) {
+                errorDetected = true;
+            }
+        }
+        if (errorDetected) {
+            lightingSubsystem.setCurrentAnimation(Constants.IndicatorAnimationEnum.BLINK);
+        } else {
+            lightingSubsystem.setCurrentAnimation(Constants.IndicatorAnimationEnum.SOLID);
+        }
     }
 
     private void updateTelemetry(long startTime) {
@@ -123,20 +143,17 @@ public abstract class Base extends CommandOpMode {
         if (getOpModeType() == Constants.OpModeType.AUTO) {
             Auto auto = (Auto) this;
             return FieldLocation.getStartLocation(auto.startingFieldSide).getPose(allianceColor);
-        } else {
-            return AutonomousStorage.endPose == null ? DEFAULT_POSE : AutonomousStorage.endPose;
         }
+//            return AutonomousStorage.endPose == null ? DEFAULT_POSE : AutonomousStorage.endPose;
+        return DEFAULT_POSE;
     }
 
     private void initializeConfigurations() {
         ConfigFileUtil.ConfigFile configFile = ConfigFileUtil.readConfigFile(telemetry);
         allianceColor = configFile.getAllianceColor();
-        turretState = configFile.getTurretState();
         if (getOpModeType() == Constants.OpModeType.AUTO) {
             Auto auto = (Auto) this;
-            auto.startingFieldSide = (allianceColor == Constants.AllianceColor.RED)
-                    == configFile.isStartingOnActiveSide()
-                    ? Constants.FieldSide.AUDIENCE_SIDE : Constants.FieldSide.SCORE_SIDE;
+            auto.startingFieldSide = FieldSide.getStartingFieldSide(allianceColor, configFile.isStartingOnActiveSide());
             auto.autoStrategyType = configFile.getAutoStrategyType();
         }
     }

@@ -1,7 +1,5 @@
 package com.metalbenders.constants;
 
-import com.acmerobotics.dashboard.config.Config;
-
 public enum LaunchVelocity {
     IDLE(1100.0, 0.0, 24.0, 100.0),
     VELOCITY_24_26(1130.0, 24.0, 26.0, 100.0),

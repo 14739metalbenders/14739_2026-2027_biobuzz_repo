@@ -15,15 +15,6 @@ public class Constants {
         BLUE
     }
 
-    public enum FieldSide {
-        SCORE_SIDE,
-        AUDIENCE_SIDE;
-
-        public static FieldSide getOppositeSide(FieldSide fieldSide) {
-            return fieldSide == SCORE_SIDE ? AUDIENCE_SIDE : SCORE_SIDE;
-        }
-    }
-
     public enum ArtifactType {
         POLLEN,
         NECTAR
@@ -46,9 +37,9 @@ public class Constants {
     }
 
     public enum LaunchGateState {
-        OPEN(0.52),
-        CLOSED(0.77),
-        KICK(0.08);
+        OPEN(0.5),
+        CLOSED(0.85),
+        KICK(0.12);
 
         private final double position;
 
@@ -86,6 +77,37 @@ public class Constants {
         FAILED
     }
 
+    public enum LimelightState {
+        READY,
+        FAILED
+    }
+
+    public enum IndicatorLedEnum {
+        BLACK(0.0),
+        RED(0.280),
+        ORANGE(0.326),
+        YELLOW(0.391),
+        GREEN(0.503),
+        BLUE(0.625),
+        PURPLE(0.725),
+        WHITE(1.0);
+
+        private final double value;
+
+        IndicatorLedEnum(double value) {
+            this.value = value;
+        }
+
+        public double getLedValue() {
+            return value;
+        }
+    }
+
+    public enum IndicatorAnimationEnum {
+        BLINK,
+        SOLID
+    }
+
     public static final Pose DEFAULT_POSE = new Pose(0, 0, Math.toRadians(90));
 
     /*LAUNCHER CONSTANTS*/
@@ -103,4 +125,8 @@ public class Constants {
     public static final long MILLIS_TO_WAIT_DURING_AUTO_SHOOT = 750;
     public static final long MILLIS_TO_WAIT_FOR_HIVE_SWITCH = 5000;
     public static final long MILLIS_TO_WAIT_FOR_GARDEN_TRAVEL = 1000;
+    public static final long MILLIS_TO_WAIT_FOR_FLOWER_INTAKE = 2000;
+    public static final long MILLIS_TO_WAIT_FOR_FLOWER_TRAVEL = 2000;
+    public static final long FLOWER_TOOL_POSITION_DELAY_MILLIS = 200;
+    public static final double FLOWER_COLLECTION_MAX_SPEED = 0.7;
 }

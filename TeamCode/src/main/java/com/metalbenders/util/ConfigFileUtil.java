@@ -2,7 +2,6 @@ package com.metalbenders.util;
 
 import com.metalbenders.strategies.AutoStrategyType;
 import com.metalbenders.constants.Constants;
-import com.metalbenders.control.subsystems.TurretSubsystem;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.internal.system.AppUtil;
 
@@ -14,7 +13,6 @@ public class ConfigFileUtil {
     public static final String ALLIANCE_COLOR_KEY = "allianceColor";
     public static final String STARTING_ON_ACTIVE_SIDE_KEY = "startingOnActiveSide";
     public static final String AUTO_STRATEGY_KEY = "autoStrategy";
-    public static final String TURRET_STATE_KEY = "turretState";
     private static final String CONFIG_FILE_NAME = "config.properties";
 
     public static ConfigFile readConfigFile(Telemetry telemetry) {
@@ -37,7 +35,6 @@ public class ConfigFileUtil {
             }
         }
         config.autoStrategyType = parseEnum(properties, AUTO_STRATEGY_KEY, config.autoStrategyType);
-        config.turretState = parseEnum(properties, TURRET_STATE_KEY, config.turretState);
         return config;
     }
 
@@ -47,7 +44,6 @@ public class ConfigFileUtil {
         propertiesToStore.setProperty(STARTING_ON_ACTIVE_SIDE_KEY,
                 Boolean.toString(configFile.isStartingOnActiveSide()));
         propertiesToStore.setProperty(AUTO_STRATEGY_KEY, configFile.getAutoStrategyType().name());
-        propertiesToStore.setProperty(TURRET_STATE_KEY, configFile.getTurretState().name());
         File file = AppUtil.getInstance().getSettingsFile(CONFIG_FILE_NAME);
         try (OutputStream outputStream = new FileOutputStream(file)) {
             propertiesToStore.store(outputStream, null);
@@ -71,7 +67,6 @@ public class ConfigFileUtil {
         private Constants.AllianceColor allianceColor = Constants.AllianceColor.RED;
         private boolean startingOnActiveSide = true;
         private AutoStrategyType autoStrategyType = AutoStrategyType.PRELOAD_AND_PARK;
-        private TurretSubsystem.TurretState turretState = TurretSubsystem.TurretState.AUTO;
 
         public Constants.AllianceColor getAllianceColor() {
             return allianceColor;
@@ -95,14 +90,6 @@ public class ConfigFileUtil {
 
         public void setAutoStrategyType(AutoStrategyType autoStrategyType) {
             this.autoStrategyType = autoStrategyType;
-        }
-
-        public TurretSubsystem.TurretState getTurretState() {
-            return turretState;
-        }
-
-        public void setTurretState(TurretSubsystem.TurretState turretState) {
-            this.turretState = turretState;
         }
     }
 }

@@ -2,7 +2,6 @@ package com.metalbenders.control.subsystems;
 
 
 import com.arcrobotics.ftclib.command.SubsystemBase;
-import com.metalbenders.util.RotatingBuffer;
 import com.pedropathing.follower.Follower;
 import com.pedropathing.follower.ManualDrive;
 import com.pedropathing.math.Pose;
@@ -18,7 +17,6 @@ import java.util.Locale;
 public class DriveSubsystem extends SubsystemBase {
 
     private final Follower follower;
-    private final RotatingBuffer<Pose> poseHistory = new RotatingBuffer<>(10);
     private final Telemetry telemetry;
 
     public DriveSubsystem(HardwareMap hardwareMap, Telemetry telemetry, Pose initialPose) {
@@ -32,8 +30,14 @@ public class DriveSubsystem extends SubsystemBase {
                 ManualDrive.fieldCentric(forward, strafe, heading, follower.pose().heading()));
     }
 
-    public void driveToPosition(Pose pose) {
-        follower.follow(line(follower.pose(), pose).constant(pose.heading()));
+    public void driveToPosition(Pose pose, Double maxSpeed) {
+        if (maxSpeed == null) {
+            follower.follow(line(follower.pose(), pose).constant(pose.heading()));
+        } else {
+            follower.follow(
+                    line(follower.pose(), pose).constant(pose.heading())
+                            .with(Constants.foresightConfig.maxPathSpeed.at(maxSpeed)));
+        }
     }
 
     public Pose getCurrentPose() {
@@ -52,7 +56,6 @@ public class DriveSubsystem extends SubsystemBase {
 
     @Override
     public void periodic() {
-        poseHistory.put(follower.pose());
         follower.update();
         telemetry.addLine(this.getClass().getSimpleName());
         telemetry.addLine("--------------------------------");

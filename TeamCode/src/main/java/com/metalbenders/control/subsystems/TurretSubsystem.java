@@ -2,12 +2,8 @@ package com.metalbenders.control.subsystems;
 
 import com.arcrobotics.ftclib.command.SubsystemBase;
 import com.metalbenders.constants.Constants;
-import com.metalbenders.constants.FieldLocation;
 import com.metalbenders.hardware.AS5600;
-import com.metalbenders.util.TimedEntity;
-import com.pedropathing.math.Pose;
 import com.pedropathing.math.Twist;
-import com.qualcomm.hardware.limelightvision.LLResultTypes;
 import com.qualcomm.robotcore.hardware.*;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
@@ -15,23 +11,11 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import com.metalbenders.util.TurretController.TurretRotateCalc;
 import static com.metalbenders.util.TurretController.calculateTurretLead;
 
-import java.util.List;
-
-import static com.metalbenders.constants.Constants.*;
-
 public class TurretSubsystem extends SubsystemBase {
-
-    public enum TurretState {
-        AUTO,
-        MANUAL
-    }
 
     private final Telemetry telemetry;
     private final DcMotorEx turretMotor;
     private final AS5600 turretEncoder;
-    private double targetHeadingDegrees = 0.0;
-    private double turretHeadingDegrees = 0.0;
-    private final Constants.AllianceColor allianceColor;
     private double turretMotorEncoderZero = 0;
     public double TURRET_TICKS_PER_DEGREE = ( 1425.1 / 360 ) * 1.872340426;
 
@@ -40,13 +24,10 @@ public class TurretSubsystem extends SubsystemBase {
     private double targetBearing = 0;
     private double turretPower = 0;
     private double turretAngle = 0;
-    private final TurretState turretState;
 
 
-    public TurretSubsystem(HardwareMap hardwareMap, Telemetry telemetry, Constants.AllianceColor allianceColor, TurretState turretState) {
+    public TurretSubsystem(HardwareMap hardwareMap, Telemetry telemetry, Constants.AllianceColor allianceColor) {
         this.telemetry = telemetry;
-        this.allianceColor = allianceColor;
-        this.turretState = turretState;
 
         //turret motor setup
         this.turretMotor = hardwareMap.get(DcMotorEx.class, "turretMotor");
@@ -61,59 +42,10 @@ public class TurretSubsystem extends SubsystemBase {
     }
 
     public void updateTurretPosition(
-            Constants.FieldSide activeHiveCellFieldSide,
-            Pose currentPose,
             Twist currentTwist,
-            TimedEntity<List<LLResultTypes.FiducialResult>> lastActiveSideDetections,
             double aimError,
             double launcherRPM) {
-        setTargetHeadingDegrees(activeHiveCellFieldSide, currentPose, lastActiveSideDetections);
-        turretPower(currentTwist, aimError, launcherRPM);
-    }
-
-    private void setTargetHeadingDegrees(
-            Constants.FieldSide activeHiveCellFieldSide,
-            Pose currentPose,
-            TimedEntity<List<LLResultTypes.FiducialResult>> lastActiveSideDetections) {
-        double targetHeadingDegrees;
-        if (areDetectionsValid(lastActiveSideDetections)) {
-            targetHeadingDegrees = calculateHeadingDegreesFromDetections(
-                    lastActiveSideDetections.getEntity(), currentPose);
-        } else {
-            targetHeadingDegrees = getHeadingDegreesFromOdometry(activeHiveCellFieldSide, currentPose);
-        }
-        setHeadingDegrees(targetHeadingDegrees, currentPose);
-    }
-
-    private double calculateHeadingDegreesFromDetections(
-            List<LLResultTypes.FiducialResult> fiducialResults, Pose currentPose) {
-        return 0;
-    }
-
-    private double getHeadingDegreesFromOdometry(Constants.FieldSide activeHiveCellFieldSide, Pose currentPose) {
-        FieldLocation hiveLocation = FieldLocation.getHiveCellLocation(activeHiveCellFieldSide);
-        return Math.toDegrees(
-                Math.atan2(
-                        hiveLocation.getPose(allianceColor).y() - currentPose.y(),
-                        hiveLocation.getPose(allianceColor).x() - currentPose.x()));
-    }
-
-    private void setHeadingDegrees(double targetHeadingDegrees, Pose currentPose) {
-        this.targetHeadingDegrees = targetHeadingDegrees;
-        double turretHeadingDegrees =  Math.toDegrees(currentPose.heading()) - targetHeadingDegrees;
-        if (turretHeadingDegrees > MAX_TURRET_ROTATION_DEGREES) {
-            turretHeadingDegrees = MAX_TURRET_ROTATION_DEGREES;
-        } else if (turretHeadingDegrees < -MAX_TURRET_ROTATION_DEGREES) {
-            turretHeadingDegrees = -MAX_TURRET_ROTATION_DEGREES;
-        }
-        this.turretHeadingDegrees = turretHeadingDegrees;
-    }
-
-    private boolean areDetectionsValid(TimedEntity<List<LLResultTypes.FiducialResult>> lastActiveSideDetections) {
-        return lastActiveSideDetections != null
-                && lastActiveSideDetections.getTime() < 500
-                && lastActiveSideDetections.getEntity() != null
-                && !lastActiveSideDetections.getEntity().isEmpty();
+        setTurretPower(currentTwist, aimError, launcherRPM);
     }
 
     private double getTurretEncoderFixed() {
@@ -135,7 +67,7 @@ public class TurretSubsystem extends SubsystemBase {
         return AngleUnit.normalizeDegrees((getTurretEncoderFixed() / 1.872340426));
     }
 
-    private void turretPower(Twist currentTwist, double aimError, double launcherRPM) {
+    private void setTurretPower(Twist currentTwist, double aimError, double launcherRPM) {
         TurretRotateCalc calculateTurretLead = calculateTurretLead(currentTwist, aimError, getTurretAngleFromMotor(), launcherRPM, 15);
         shotLeadAngle = calculateTurretLead.getShotLeadAngle();
         shotTimeOfFLight = calculateTurretLead.getTimeOfFlight();
@@ -152,9 +84,6 @@ public class TurretSubsystem extends SubsystemBase {
     public void periodic() {
         telemetry.addLine(this.getClass().getSimpleName());
         telemetry.addLine("--------------------------------");
-        //telemetry.addData("Target Heading (degrees)", targetHeadingDegrees);
-        //telemetry.addData("Turret Heading (degrees)", turretHeadingDegrees);
-        telemetry.addData("Turret State", turretState);
         telemetry.addData("Turret Power", turretPower);
         telemetry.addData("Turret Angle (deg)", turretAngle);
         telemetry.addData("Target Lead (deg)", shotLeadAngle);

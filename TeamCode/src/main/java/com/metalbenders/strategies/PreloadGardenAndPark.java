@@ -6,9 +6,10 @@ import com.arcrobotics.ftclib.command.SequentialCommandGroup;
 import com.arcrobotics.ftclib.command.WaitCommand;
 import com.metalbenders.constants.Constants;
 import com.metalbenders.constants.FieldLocation;
+import com.metalbenders.constants.FieldSide;
 import com.metalbenders.control.commands.AutoShoot;
-import com.metalbenders.control.commands.DriveToPositionCommand;
-import com.metalbenders.control.commands.SetIntakeStateCommand;
+import com.metalbenders.control.commands.DriveToPosition;
+import com.metalbenders.control.commands.SetIntakeState;
 import com.metalbenders.control.subsystems.*;
 import com.pedropathing.math.Pose;
 
@@ -32,6 +33,7 @@ public class PreloadGardenAndPark extends AutoStrategy {
             HuskyLensSubsystem huskyLensSubsystem,
             LimelightSubsystem limelightSubsystem,
             LidarSubsystem lidarSubsystem,
+            FlowerToolSubsystem flowerToolSubsystem,
             boolean startingOnActiveSide) {
         scheduleAuto(driveSubsystem, intakeSubsystem, launchSubsystem, startingOnActiveSide);
     }
@@ -54,19 +56,19 @@ public class PreloadGardenAndPark extends AutoStrategy {
             LaunchSubsystem launchSubsystem) {
         SequentialCommandGroup commands = new SequentialCommandGroup();
         commands.addCommands(
-                new DriveToPositionCommand(driveSubsystem, FieldLocation.getLaunchLocation(startingFieldSide).getPose(allianceColor)),
+                new DriveToPosition(driveSubsystem, FieldLocation.getLaunchLocation(startingFieldSide).getPose(allianceColor)),
                 new AutoShoot(intakeSubsystem, launchSubsystem),
-                new DriveToPositionCommand(driveSubsystem, GARDEN_START.getPose(allianceColor)).withTimeout(2000),
+                new DriveToPosition(driveSubsystem, GARDEN_START.getPose(allianceColor)).withTimeout(2000),
                 new ParallelDeadlineGroup(
-                        new DriveToPositionCommand(driveSubsystem, GARDEN_END.getPose(allianceColor))
+                        new DriveToPosition(driveSubsystem, GARDEN_END.getPose(allianceColor))
                                 .withTimeout(MILLIS_TO_WAIT_FOR_GARDEN_TRAVEL),
-                        new SetIntakeStateCommand(intakeSubsystem, Constants.IntakeState.INTAKE)),
-                new DriveToPositionCommand(driveSubsystem, getWaypointPose(startingFieldSide)),
-                new DriveToPositionCommand(driveSubsystem, getWaypointPose(oppositeFieldSide)),
-                new DriveToPositionCommand(driveSubsystem, FieldLocation.getLaunchLocation(oppositeFieldSide).getPose(allianceColor)),
+                        new SetIntakeState(intakeSubsystem, Constants.IntakeState.INTAKE)),
+                new DriveToPosition(driveSubsystem, getWaypointPose(startingFieldSide)),
+                new DriveToPosition(driveSubsystem, getWaypointPose(oppositeFieldSide)),
+                new DriveToPosition(driveSubsystem, FieldLocation.getLaunchLocation(oppositeFieldSide).getPose(allianceColor)),
                 new AutoShoot(intakeSubsystem, launchSubsystem),
-                new DriveToPositionCommand(driveSubsystem, FieldLocation.getOuterWaypointLocation(oppositeFieldSide).getPose(allianceColor)),
-                new DriveToPositionCommand(driveSubsystem, FieldLocation.getParkLocation(startingFieldSide).getPose(allianceColor)));
+                new DriveToPosition(driveSubsystem, FieldLocation.getOuterWaypointLocation(oppositeFieldSide).getPose(allianceColor)),
+                new DriveToPosition(driveSubsystem, FieldLocation.getParkLocation(startingFieldSide).getPose(allianceColor)));
         CommandScheduler.getInstance().schedule(commands);
     }
 
@@ -76,24 +78,24 @@ public class PreloadGardenAndPark extends AutoStrategy {
             LaunchSubsystem launchSubsystem) {
         SequentialCommandGroup commands = new SequentialCommandGroup();
         commands.addCommands(
-                new DriveToPositionCommand(driveSubsystem, FieldLocation.getLaunchLocation(startingFieldSide).getPose(allianceColor)),
+                new DriveToPosition(driveSubsystem, FieldLocation.getLaunchLocation(startingFieldSide).getPose(allianceColor)),
                 new WaitCommand(MILLIS_TO_WAIT_FOR_HIVE_SWITCH),
                 new AutoShoot(intakeSubsystem, launchSubsystem),
-                new DriveToPositionCommand(driveSubsystem, getWaypointPose(startingFieldSide)),
-                new DriveToPositionCommand(driveSubsystem, getWaypointPose(oppositeFieldSide)),
-                new DriveToPositionCommand(driveSubsystem, GARDEN_START.getPose(allianceColor)).withTimeout(2000),
+                new DriveToPosition(driveSubsystem, getWaypointPose(startingFieldSide)),
+                new DriveToPosition(driveSubsystem, getWaypointPose(oppositeFieldSide)),
+                new DriveToPosition(driveSubsystem, GARDEN_START.getPose(allianceColor)).withTimeout(2000),
                 new ParallelDeadlineGroup(
-                        new DriveToPositionCommand(driveSubsystem, GARDEN_END.getPose(allianceColor))
+                        new DriveToPosition(driveSubsystem, GARDEN_END.getPose(allianceColor))
                                 .withTimeout(MILLIS_TO_WAIT_FOR_GARDEN_TRAVEL),
-                        new SetIntakeStateCommand(intakeSubsystem, Constants.IntakeState.INTAKE)),
-                new DriveToPositionCommand(driveSubsystem, FieldLocation.getLaunchLocation(startingFieldSide).getPose(allianceColor)),
+                        new SetIntakeState(intakeSubsystem, Constants.IntakeState.INTAKE)),
+                new DriveToPosition(driveSubsystem, FieldLocation.getLaunchLocation(startingFieldSide).getPose(allianceColor)),
                 new AutoShoot(intakeSubsystem, launchSubsystem),
-                new DriveToPositionCommand(driveSubsystem, FieldLocation.getOuterWaypointLocation(startingFieldSide).getPose(allianceColor)),
-                new DriveToPositionCommand(driveSubsystem, FieldLocation.getParkLocation(startingFieldSide).getPose(allianceColor)));
+                new DriveToPosition(driveSubsystem, FieldLocation.getOuterWaypointLocation(startingFieldSide).getPose(allianceColor)),
+                new DriveToPosition(driveSubsystem, FieldLocation.getParkLocation(startingFieldSide).getPose(allianceColor)));
         CommandScheduler.getInstance().schedule(commands);
     }
 
-    private Pose getWaypointPose(Constants.FieldSide fieldSide) {
+    private Pose getWaypointPose(FieldSide fieldSide) {
         return useInsideWaypoints ? FieldLocation.getInnerWaypointLocation(fieldSide).getPose(allianceColor)
                 : FieldLocation.getOuterWaypointLocation(fieldSide).getPose(allianceColor);
     }

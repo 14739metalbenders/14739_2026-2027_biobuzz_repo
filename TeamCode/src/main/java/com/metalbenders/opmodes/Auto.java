@@ -1,14 +1,14 @@
 package com.metalbenders.opmodes;
 
+import com.metalbenders.constants.FieldSide;
 import com.metalbenders.strategies.AutoStrategyType;
 import com.metalbenders.constants.AutoFieldBoundary;
-import com.metalbenders.constants.Constants;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
-@Autonomous(name = "Auto", group = "Auto", preselectTeleOp = "TeleOp")
+@Autonomous(name = "Auto", group = "Auto", preselectTeleOp = "Teleop")
 public class Auto extends Base {
 
-    protected Constants.FieldSide startingFieldSide;
+    protected FieldSide startingFieldSide;
     protected AutoStrategyType autoStrategyType;
 
     public AutoFieldBoundary getAutoFieldBoundary() {
@@ -27,6 +27,7 @@ public class Auto extends Base {
                 turretSubsystem,
                 huskyLensSubsystem,
                 limelightSubsystem,
-                lidarSubsystem);
+                lidarSubsystem,
+                flowerToolSubsystem);
     }
 }

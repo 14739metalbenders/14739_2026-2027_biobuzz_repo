@@ -6,7 +6,6 @@ import com.arcrobotics.ftclib.gamepad.GamepadEx;
 import com.arcrobotics.ftclib.gamepad.GamepadKeys;
 import com.metalbenders.strategies.AutoStrategyType;
 import com.metalbenders.constants.Constants;
-import com.metalbenders.control.subsystems.TurretSubsystem;
 import com.metalbenders.util.ConfigFileUtil;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -44,7 +43,6 @@ public class Config extends LinearOpMode {
                 telemetry.addData("Alliance Color", configFile.getAllianceColor());
                 telemetry.addData("Starting on Active Side", configFile.isStartingOnActiveSide());
                 telemetry.addData("Auto Strategy", configFile.getAutoStrategyType());
-                telemetry.addData("Turret State", configFile.getTurretState());
             } catch (IOException e) {
                 telemetry.addData("Error saving configuration", e.getMessage());
             }
@@ -57,9 +55,8 @@ public class Config extends LinearOpMode {
         List<Runnable> editors = Arrays.asList(
                 () -> configFile.setAllianceColor(promptForAllianceColor(configFile.getAllianceColor())),
                 () -> configFile.setStartingOnActiveSide(promptForStartingOnActiveSide(configFile.isStartingOnActiveSide())),
-                () -> configFile.setAutoStrategyType(promptForAutoStrategy(configFile.getAutoStrategyType())),
-                () -> configFile.setTurretState(promptForTurretState(configFile.getTurretState())));
-        String[] labels = {"Alliance Color", "Starting on Active Side", "Auto Strategy", "Turret State", "Save configuration"};
+                () -> configFile.setAutoStrategyType(promptForAutoStrategy(configFile.getAutoStrategyType())));
+        String[] labels = {"Alliance Color", "Starting on Active Side", "Auto Strategy", "Save configuration"};
         int selected = 0;
         while (!isStopRequested()) {
             driverGamepad.readButtons();
@@ -69,8 +66,7 @@ public class Config extends LinearOpMode {
             Object[] values = {
                     configFile.getAllianceColor(),
                     configFile.isStartingOnActiveSide(),
-                    configFile.getAutoStrategyType(),
-                    configFile.getTurretState()
+                    configFile.getAutoStrategyType()
             };
             for (int i = 0; i < labels.length; i++) {
                 String label = (selected == i ? "> " : "  ") + labels[i];
@@ -122,15 +118,6 @@ public class Config extends LinearOpMode {
                 AutoStrategyType::getDescription);
     }
 
-    protected TurretSubsystem.TurretState promptForTurretState(
-            TurretSubsystem.TurretState currentSelection) {
-        return promptForSelection(
-                TurretSubsystem.TurretState.values(),
-                "Select Turret State",
-                "Current Turret State",
-                currentSelection);
-    }
-
     private <T> T promptForSelection(
             T[] options,
             String promptText,
@@ -156,9 +143,9 @@ public class Config extends LinearOpMode {
             }
             telemetry.update();
             if (driverGamepad.wasJustPressed(GamepadKeys.Button.DPAD_UP)) {
-                currentSelection = options[(selections.indexOf(currentSelection) + 1) % options.length];
-            } else if (driverGamepad.wasJustPressed(GamepadKeys.Button.DPAD_DOWN)) {
                 currentSelection = options[(selections.indexOf(currentSelection) - 1 + options.length) % options.length];
+            } else if (driverGamepad.wasJustPressed(GamepadKeys.Button.DPAD_DOWN)) {
+                currentSelection = options[(selections.indexOf(currentSelection) + 1) % options.length];
             } else if (driverGamepad.wasJustPressed(GamepadKeys.Button.A)) {
                 return currentSelection;
             } else if (driverGamepad.wasJustPressed(GamepadKeys.Button.B)) {

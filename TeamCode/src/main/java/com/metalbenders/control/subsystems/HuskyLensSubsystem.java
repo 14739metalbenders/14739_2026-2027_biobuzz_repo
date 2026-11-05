@@ -1,6 +1,6 @@
 package com.metalbenders.control.subsystems;
 
-import com.arcrobotics.ftclib.command.Subsystem;
+import com.arcrobotics.ftclib.command.SubsystemBase;
 import com.metalbenders.constants.Constants;
 import com.qualcomm.hardware.dfrobot.HuskyLens;
 import com.qualcomm.robotcore.hardware.HardwareMap;
@@ -8,24 +8,18 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 import static com.metalbenders.constants.Constants.*;
 
-public class HuskyLensSubsystem implements Subsystem {
-
-
+public class HuskyLensSubsystem extends SubsystemBase {
 
     private final HuskyLens huskyLens;
     private final Telemetry telemetry;
     private final Constants.AllianceColor allianceColor;
-    private final Constants.HuskyLensState state;
+    private Constants.HuskyLensState state;
 
     public HuskyLensSubsystem(HardwareMap hardwareMap, Telemetry telemetry, Constants.AllianceColor allianceColor) {
         this.huskyLens = hardwareMap.get(HuskyLens.class, "huskylens");
         this.telemetry = telemetry;
         this.allianceColor = allianceColor;
-        if (!huskyLens.knock()) {
-            state = Constants.HuskyLensState.FAILED;
-        } else {
-            state = Constants.HuskyLensState.READY;
-        }
+        setState();
     }
 
     public HuskyLens.Block[] getBlocksOfType(Constants.ArtifactType artifactType) {
@@ -44,6 +38,7 @@ public class HuskyLensSubsystem implements Subsystem {
 
     @Override
     public void periodic() {
+        setState();
         telemetry.addLine(this.getClass().getSimpleName());
         telemetry.addLine("--------------------------------");
         telemetry.addData("HuskyLens State", state);
@@ -52,5 +47,17 @@ public class HuskyLensSubsystem implements Subsystem {
 
     public void teardown() {
         //no teardown needed for HuskyLens
+    }
+
+    private void setState() {
+        if (!huskyLens.knock()) {
+            state = Constants.HuskyLensState.FAILED;
+        } else {
+            state = Constants.HuskyLensState.READY;
+        }
+    }
+
+    public boolean isHealthy() {
+        return state == Constants.HuskyLensState.READY;
     }
 }

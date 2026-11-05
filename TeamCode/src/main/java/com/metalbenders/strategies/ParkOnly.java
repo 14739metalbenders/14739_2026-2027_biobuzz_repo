@@ -1,12 +1,9 @@
 package com.metalbenders.strategies;
 
 import com.arcrobotics.ftclib.command.CommandScheduler;
-import com.metalbenders.constants.Constants;
 import com.metalbenders.constants.FieldLocation;
-import com.metalbenders.control.commands.DriveToPositionCommand;
+import com.metalbenders.control.commands.DriveToPosition;
 import com.metalbenders.control.subsystems.*;
-
-import static com.metalbenders.constants.FieldLocation.*;
 
 public class ParkOnly extends AutoStrategy {
 
@@ -19,9 +16,10 @@ public class ParkOnly extends AutoStrategy {
             HuskyLensSubsystem huskyLensSubsystem,
             LimelightSubsystem limelightSubsystem,
             LidarSubsystem lidarSubsystem,
+            FlowerToolSubsystem flowerToolSubsystem,
             boolean startingOnActiveSide) {
         CommandScheduler.getInstance().schedule(
-                new DriveToPositionCommand(driveSubsystem, FieldLocation.getOuterWaypointLocation(startingFieldSide).getPose(allianceColor)),
-                new DriveToPositionCommand(driveSubsystem, FieldLocation.getParkLocation(startingFieldSide).getPose(allianceColor)));
+                new DriveToPosition(driveSubsystem, FieldLocation.getOuterWaypointLocation(startingFieldSide).getPose(allianceColor)),
+                new DriveToPosition(driveSubsystem, FieldLocation.getParkLocation(startingFieldSide).getPose(allianceColor)));
     }
 }

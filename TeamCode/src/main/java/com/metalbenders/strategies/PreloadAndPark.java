@@ -5,7 +5,7 @@ import com.arcrobotics.ftclib.command.SequentialCommandGroup;
 import com.arcrobotics.ftclib.command.WaitCommand;
 import com.metalbenders.constants.FieldLocation;
 import com.metalbenders.control.commands.AutoShoot;
-import com.metalbenders.control.commands.DriveToPositionCommand;
+import com.metalbenders.control.commands.DriveToPosition;
 import com.metalbenders.control.subsystems.*;
 
 import static com.metalbenders.constants.Constants.MILLIS_TO_WAIT_FOR_HIVE_SWITCH;
@@ -21,6 +21,7 @@ public class PreloadAndPark extends AutoStrategy {
             HuskyLensSubsystem huskyLensSubsystem,
             LimelightSubsystem limelightSubsystem,
             LidarSubsystem lidarSubsystem,
+            FlowerToolSubsystem flowerToolSubsystem,
             boolean startingOnActiveSide) {
         scheduleAuto(driveSubsystem, intakeSubsystem, launchSubsystem, startingOnActiveSide);
     }
@@ -31,14 +32,14 @@ public class PreloadAndPark extends AutoStrategy {
             LaunchSubsystem launchSubsystem,
             boolean startingOnActiveSide) {
         SequentialCommandGroup commands = new SequentialCommandGroup();
-        commands.addCommands(new DriveToPositionCommand(driveSubsystem, FieldLocation.getLaunchLocation(startingFieldSide).getPose(allianceColor)));
+        commands.addCommands(new DriveToPosition(driveSubsystem, FieldLocation.getLaunchLocation(startingFieldSide).getPose(allianceColor)));
         if (!startingOnActiveSide) {
             commands.addCommands(new WaitCommand(MILLIS_TO_WAIT_FOR_HIVE_SWITCH));
         }
         commands.addCommands(
                 new AutoShoot(intakeSubsystem, launchSubsystem),
-                new DriveToPositionCommand(driveSubsystem, FieldLocation.getOuterWaypointLocation(startingFieldSide).getPose(allianceColor)),
-                new DriveToPositionCommand(driveSubsystem, FieldLocation.getParkLocation(startingFieldSide).getPose(allianceColor)));
+                new DriveToPosition(driveSubsystem, FieldLocation.getOuterWaypointLocation(startingFieldSide).getPose(allianceColor)),
+                new DriveToPosition(driveSubsystem, FieldLocation.getParkLocation(startingFieldSide).getPose(allianceColor)));
         CommandScheduler.getInstance().schedule(commands);
     }
 }

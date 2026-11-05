@@ -1,11 +1,9 @@
 package com.metalbenders.constants;
 
-import com.metalbenders.constants.Constants.FieldSide;
-
 import static com.metalbenders.constants.Constants.AllianceColor.BLUE;
 import static com.metalbenders.constants.Constants.AllianceColor.RED;
-import static com.metalbenders.constants.Constants.FieldSide.AUDIENCE_SIDE;
-import static com.metalbenders.constants.Constants.FieldSide.SCORE_SIDE;
+import static com.metalbenders.constants.FieldSide.AUDIENCE_SIDE;
+import static com.metalbenders.constants.FieldSide.SCORE_SIDE;
 
 public enum AprilTag {
     RED_SCORE_SIDE_INSIDE(30, RED, SCORE_SIDE),
