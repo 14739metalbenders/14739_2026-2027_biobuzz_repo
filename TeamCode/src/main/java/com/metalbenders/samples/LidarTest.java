@@ -1,12 +1,14 @@
 package com.metalbenders.samples;
 
 import com.acmerobotics.dashboard.FtcDashboard;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 
 import com.metalbenders.hardware.StudicaLidar;
 
+@Disabled
 @TeleOp(name = "Studica T-Mini Lidar Test", group = "Sensors")
 public class LidarTest extends LinearOpMode{
 

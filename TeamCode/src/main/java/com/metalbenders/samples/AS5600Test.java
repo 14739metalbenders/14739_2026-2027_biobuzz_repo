@@ -1,6 +1,7 @@
 package com.metalbenders.samples;
 
 import com.acmerobotics.dashboard.FtcDashboard;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -10,7 +11,7 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import com.metalbenders.hardware.AS5600;
 
-//@Disabled
+@Disabled
 @TeleOp(name="AS5600 i2c Test", group="Sensors")
 public class AS5600Test extends LinearOpMode {
 

@@ -6,6 +6,7 @@ import static com.qualcomm.robotcore.hardware.DcMotor.RunMode.RUN_WITHOUT_ENCODE
 import static com.qualcomm.robotcore.hardware.DcMotor.ZeroPowerBehavior.BRAKE;
 
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -23,7 +24,7 @@ import com.metalbenders.hardware.StudicaLidar;
 
 import java.util.List;
 
-//@Disabled
+@Disabled
 @TeleOp(name = "DriveTest", group="sample")
 public class DriveTest extends LinearOpMode {
 
