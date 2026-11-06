@@ -21,9 +21,9 @@ public class Constants {
     }
 
     public enum IntakeState {
-        SHOOT(2000),
-        INTAKE(1800),
-        REVERSE_INTAKE(-1500),
+        SHOOT(1),
+        INTAKE(.8),
+        REVERSE_INTAKE(-8),
         STOP(0);
 
         private final double targetVelocity;
@@ -129,4 +129,5 @@ public class Constants {
     public static final long MILLIS_TO_WAIT_FOR_FLOWER_TRAVEL = 2000;
     public static final long FLOWER_TOOL_POSITION_DELAY_MILLIS = 200;
     public static final double FLOWER_COLLECTION_MAX_SPEED = 0.7;
+    public static final double AUTO_SPEED_MULTIPLIER = 0.8;
 }

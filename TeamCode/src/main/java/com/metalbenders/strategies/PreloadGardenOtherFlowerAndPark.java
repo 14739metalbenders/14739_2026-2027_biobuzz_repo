@@ -7,18 +7,15 @@ import com.arcrobotics.ftclib.command.WaitCommand;
 import com.metalbenders.constants.Constants;
 import com.metalbenders.constants.FieldLocation;
 import com.metalbenders.constants.FieldSide;
-import com.metalbenders.control.commands.AutoShoot;
-import com.metalbenders.control.commands.DriveToPosition;
-import com.metalbenders.control.commands.SetFlowerToolState;
-import com.metalbenders.control.commands.SetIntakeState;
+import com.metalbenders.control.commands.*;
 import com.metalbenders.control.subsystems.*;
 import com.pedropathing.math.Pose;
 
 import static com.metalbenders.constants.Constants.*;
+import static com.metalbenders.constants.Constants.AllianceColor.RED;
 import static com.metalbenders.constants.Constants.FlowerToolState.DOWN;
 import static com.metalbenders.constants.Constants.FlowerToolState.UP;
-import static com.metalbenders.constants.FieldLocation.GARDEN_END;
-import static com.metalbenders.constants.FieldLocation.GARDEN_START;
+import static com.metalbenders.constants.FieldLocation.*;
 
 public class PreloadGardenOtherFlowerAndPark extends AutoStrategy {
 
@@ -71,6 +68,9 @@ public class PreloadGardenOtherFlowerAndPark extends AutoStrategy {
                         new DriveToPosition(driveSubsystem, GARDEN_END.getPose(allianceColor))
                                 .withTimeout(MILLIS_TO_WAIT_FOR_GARDEN_TRAVEL),
                         new SetIntakeState(intakeSubsystem, Constants.IntakeState.INTAKE)),
+                new ParallelDeadlineGroup(
+                        new WaitCommand(500),
+                        new SetIntakeState(intakeSubsystem, Constants.IntakeState.INTAKE)),
                 new DriveToPosition(driveSubsystem, getWaypointPose(startingFieldSide)),
                 new DriveToPosition(driveSubsystem, getWaypointPose(oppositeFieldSide)),
                 new DriveToPosition(driveSubsystem, FieldLocation.getLaunchLocation(oppositeFieldSide).getPose(allianceColor)),
@@ -84,6 +84,9 @@ public class PreloadGardenOtherFlowerAndPark extends AutoStrategy {
                         new SetIntakeState(intakeSubsystem, Constants.IntakeState.INTAKE)),
                 new ParallelDeadlineGroup(
                         new WaitCommand(Constants.MILLIS_TO_WAIT_FOR_FLOWER_INTAKE),
+                        new SetIntakeState(intakeSubsystem, Constants.IntakeState.INTAKE)),
+                new ParallelDeadlineGroup(
+                        new DriveToPosition(driveSubsystem, getFlowerBackupPose(allianceColor)),
                         new SetIntakeState(intakeSubsystem, Constants.IntakeState.INTAKE)),
                 new SetIntakeState(intakeSubsystem, Constants.IntakeState.STOP),
 
@@ -118,6 +121,9 @@ public class PreloadGardenOtherFlowerAndPark extends AutoStrategy {
                 new ParallelDeadlineGroup(
                         new WaitCommand(Constants.MILLIS_TO_WAIT_FOR_FLOWER_INTAKE),
                         new SetIntakeState(intakeSubsystem, Constants.IntakeState.INTAKE)),
+                new ParallelDeadlineGroup(
+                        new DriveToPosition(driveSubsystem, getFlowerBackupPose(allianceColor)),
+                        new SetIntakeState(intakeSubsystem, Constants.IntakeState.INTAKE)),
                 new SetIntakeState(intakeSubsystem, Constants.IntakeState.STOP),
 
                 new DriveToPosition(driveSubsystem, FieldLocation.getLaunchLocation(startingFieldSide).getPose(allianceColor)),
@@ -131,6 +137,9 @@ public class PreloadGardenOtherFlowerAndPark extends AutoStrategy {
                 new ParallelDeadlineGroup(
                         new DriveToPosition(driveSubsystem, GARDEN_END.getPose(allianceColor))
                                 .withTimeout(MILLIS_TO_WAIT_FOR_GARDEN_TRAVEL),
+                        new SetIntakeState(intakeSubsystem, Constants.IntakeState.INTAKE)),
+                new ParallelDeadlineGroup(
+                        new WaitCommand(500),
                         new SetIntakeState(intakeSubsystem, Constants.IntakeState.INTAKE)),
                 new DriveToPosition(driveSubsystem, FieldLocation.getLaunchLocation(oppositeFieldSide).getPose(allianceColor)),
                 new AutoShoot(intakeSubsystem, launchSubsystem),
@@ -146,5 +155,13 @@ public class PreloadGardenOtherFlowerAndPark extends AutoStrategy {
     private Pose getWaypointPose(FieldSide fieldSide) {
         return useInsideWaypoints ? FieldLocation.getInnerWaypointLocation(fieldSide).getPose(allianceColor)
                 : FieldLocation.getOuterWaypointLocation(fieldSide).getPose(allianceColor);
+    }
+
+    private Pose getFlowerBackupPose(AllianceColor allianceColor) {
+        Pose flowerPose = OTHER_FLOWER.getPose(allianceColor);
+        if (allianceColor == RED) {
+            return new Pose(flowerPose.x(), flowerPose.y() - 10, flowerPose.heading());
+        }
+        return new Pose(flowerPose.x(), flowerPose.y() + 10, flowerPose.heading());
     }
 }

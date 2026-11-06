@@ -44,12 +44,10 @@ public class Teleop extends Base {
         //INTAKE
         Trigger leftTrigger = new Trigger(() -> driverGamepad.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER) > 0.2);
         leftTrigger
-                .whileActiveOnce(
+                .whileActiveContinuous(
                         new SequentialCommandGroup(
                             new SetLaunchGateState(launchSubsystem, CLOSED),
-                            new SetIntakeState(intakeSubsystem, INTAKE)))
-                .whenInactive(
-                        new SetIntakeState(intakeSubsystem, STOP));
+                            new SetIntakeState(intakeSubsystem, INTAKE)));
 
         //SHOOT
         Trigger rightTrigger = new Trigger(() -> driverGamepad.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER) > 0.2);

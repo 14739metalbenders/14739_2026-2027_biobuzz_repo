@@ -7,6 +7,8 @@ import com.pedropathing.follower.ManualDrive;
 import com.pedropathing.math.Pose;
 import com.pedropathing.math.Twist;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+
+import static com.metalbenders.constants.Constants.AUTO_SPEED_MULTIPLIER;
 import static com.pedropathing.api.Paths.*;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
@@ -32,12 +34,11 @@ public class DriveSubsystem extends SubsystemBase {
 
     public void driveToPosition(Pose pose, Double maxSpeed) {
         if (maxSpeed == null) {
-            follower.follow(line(follower.pose(), pose).constant(pose.heading()));
-        } else {
-            follower.follow(
-                    line(follower.pose(), pose).constant(pose.heading())
-                            .with(Constants.foresightConfig.maxPathSpeed.at(maxSpeed)));
+            maxSpeed = 1.0;
         }
+        follower.follow(
+                line(follower.pose(), pose).constant(pose.heading())
+                        .with(Constants.foresightConfig.maxPathSpeed.at(maxSpeed * AUTO_SPEED_MULTIPLIER)));
     }
 
     public Pose getCurrentPose() {
