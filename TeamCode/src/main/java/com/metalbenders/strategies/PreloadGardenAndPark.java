@@ -88,6 +88,8 @@ public class PreloadGardenAndPark extends AutoStrategy {
                         new DriveToPosition(driveSubsystem, GARDEN_END.getPose(allianceColor))
                                 .withTimeout(MILLIS_TO_WAIT_FOR_GARDEN_TRAVEL),
                         new SetIntakeState(intakeSubsystem, Constants.IntakeState.INTAKE)),
+                new DriveToPosition(driveSubsystem, getWaypointPose(oppositeFieldSide)),
+                new DriveToPosition(driveSubsystem, getWaypointPose(startingFieldSide)),
                 new DriveToPosition(driveSubsystem, FieldLocation.getLaunchLocation(startingFieldSide).getPose(allianceColor)),
                 new AutoShoot(intakeSubsystem, launchSubsystem),
                 new DriveToPosition(driveSubsystem, FieldLocation.getOuterWaypointLocation(startingFieldSide).getPose(allianceColor)),
