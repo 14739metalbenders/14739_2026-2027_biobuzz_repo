@@ -21,8 +21,8 @@ public class Constants {
     }
 
     public enum IntakeState {
-        SHOOT(1),
-        INTAKE(0.8),
+        SHOOT(0.95),
+        INTAKE(0.9),
         REVERSE_INTAKE(-0.8),
         STOP(0);
 

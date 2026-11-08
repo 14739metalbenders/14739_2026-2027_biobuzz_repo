@@ -16,7 +16,7 @@ public enum FieldLocation {
     AUDIENCE_SIDE_HIVE_CELL(
             new Pose(57.75, 57, Math.toRadians(270)), Symmetry.MIRROR_X),
     PARK(
-            new Pose(12.5, 92, Math.toRadians(0)), Symmetry.ROTATE_180),
+            new Pose(10, 92, Math.toRadians(0)), Symmetry.ROTATE_180),
     //SCORE_SIDE specific locations
     SCORE_SIDE_START_POSE(
             new Pose(57.75, 137, Math.toRadians(270)), Symmetry.MIRROR_X),
