@@ -1,14 +1,15 @@
 package com.metalbenders.control.subsystems;
 
 import com.arcrobotics.ftclib.command.SubsystemBase;
-import com.metalbenders.constants.Constants;
 import com.metalbenders.hardware.AS5600;
+import com.metalbenders.util.TurretController.TurretRotateCalc;
 import com.pedropathing.math.Twist;
-import com.qualcomm.robotcore.hardware.*;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.HardwareMap;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 
-import com.metalbenders.util.TurretController.TurretRotateCalc;
 import static com.metalbenders.util.TurretController.calculateTurretLead;
 
 public class TurretSubsystem extends SubsystemBase {
@@ -16,9 +17,8 @@ public class TurretSubsystem extends SubsystemBase {
     private final Telemetry telemetry;
     private final DcMotorEx turretMotor;
     private final AS5600 turretEncoder;
+    public double TURRET_TICKS_PER_DEGREE = (1425.1 / 360) * 1.872340426;
     private double turretMotorEncoderZero = 0;
-    public double TURRET_TICKS_PER_DEGREE = ( 1425.1 / 360 ) * 1.872340426;
-
     private double shotLeadAngle = 0;
     private double shotTimeOfFLight = 0;
     private double targetBearing = 0;
@@ -26,7 +26,7 @@ public class TurretSubsystem extends SubsystemBase {
     private double turretAngle = 0;
 
 
-    public TurretSubsystem(HardwareMap hardwareMap, Telemetry telemetry, Constants.AllianceColor allianceColor) {
+    public TurretSubsystem(HardwareMap hardwareMap, Telemetry telemetry) {
         this.telemetry = telemetry;
 
         //turret motor setup
@@ -35,8 +35,6 @@ public class TurretSubsystem extends SubsystemBase {
         this.turretMotor.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
         this.turretMotor.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
         this.turretMotor.setDirection(DcMotorSimple.Direction.FORWARD);
-        //this.turretMotor.setPIDFCoefficients(RUN_USING_ENCODER, new PIDFCoefficients(
-        //        TURRET_VELOCITY_PID.p, TURRET_VELOCITY_PID.i, TURRET_VELOCITY_PID.d, TURRET_VELOCITY_PID.f));
         this.turretEncoder = hardwareMap.get(AS5600.class, "turretEncoder");
         setTurretEncoderToMotorEncoderOffset();
     }
@@ -54,7 +52,7 @@ public class TurretSubsystem extends SubsystemBase {
 
     private void setTurretEncoderToMotorEncoderOffset() {
         long currentTurretMotorEncoderValue = turretMotor.getCurrentPosition();
-        turretMotorEncoderZero = currentTurretMotorEncoderValue - (long)(getTurretAngleFromEncoder() * TURRET_TICKS_PER_DEGREE);
+        turretMotorEncoderZero = currentTurretMotorEncoderValue - (long) (getTurretAngleFromEncoder() * TURRET_TICKS_PER_DEGREE);
     }
 
     private double getTurretAngleFromMotor() {
@@ -68,7 +66,8 @@ public class TurretSubsystem extends SubsystemBase {
     }
 
     private void setTurretPower(Twist currentTwist, double aimError, double launcherRPM) {
-        TurretRotateCalc calculateTurretLead = calculateTurretLead(currentTwist, aimError, getTurretAngleFromMotor(), launcherRPM, 15);
+        TurretRotateCalc calculateTurretLead =
+                calculateTurretLead(currentTwist, aimError, getTurretAngleFromMotor(), launcherRPM, 15);
         shotLeadAngle = calculateTurretLead.getShotLeadAngle();
         shotTimeOfFLight = calculateTurretLead.getTimeOfFlight();
         targetBearing = calculateTurretLead.getTargetBearing();

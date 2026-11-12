@@ -1,4 +1,4 @@
-package com.metalbenders.control.commands;
+package com.metalbenders.control.commands.launcher;
 
 import com.arcrobotics.ftclib.command.CommandBase;
 import com.metalbenders.control.subsystems.LaunchSubsystem;

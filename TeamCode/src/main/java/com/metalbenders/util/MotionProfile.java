@@ -12,9 +12,9 @@ package com.metalbenders.util;
  */
 
 public class MotionProfile {
-    private double maxPower;
-    private double acceleration;
-    private double deceleration;
+    private final double maxPower;
+    private final double acceleration;
+    private final double deceleration;
     private double targetPower;
     private double currentPower;
 

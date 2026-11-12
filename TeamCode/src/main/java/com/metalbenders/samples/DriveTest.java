@@ -1,10 +1,8 @@
 package com.metalbenders.samples;
 
-import static com.qualcomm.hardware.rev.RevHubOrientationOnRobot.UsbFacingDirection.LEFT;
-import static com.qualcomm.hardware.rev.RevHubOrientationOnRobot.LogoFacingDirection.UP;
-import static com.qualcomm.robotcore.hardware.DcMotor.RunMode.RUN_WITHOUT_ENCODER;
-import static com.qualcomm.robotcore.hardware.DcMotor.ZeroPowerBehavior.BRAKE;
-
+import com.acmerobotics.dashboard.FtcDashboard;
+import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
+import com.metalbenders.hardware.StudicaLidar;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -14,26 +12,26 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.hardware.ImuOrientationOnRobot;
-
-import com.acmerobotics.dashboard.FtcDashboard;
-import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
-
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
-import com.metalbenders.hardware.StudicaLidar;
 
 import java.util.List;
 
+import static com.qualcomm.hardware.rev.RevHubOrientationOnRobot.LogoFacingDirection.UP;
+import static com.qualcomm.hardware.rev.RevHubOrientationOnRobot.UsbFacingDirection.LEFT;
+import static com.qualcomm.robotcore.hardware.DcMotor.RunMode.RUN_WITHOUT_ENCODER;
+import static com.qualcomm.robotcore.hardware.DcMotor.ZeroPowerBehavior.BRAKE;
+
 @Disabled
-@TeleOp(name = "DriveTest", group="sample")
+@TeleOp(name = "DriveTest", group = "sample")
 public class DriveTest extends LinearOpMode {
 
+    private final StudicaLidar studicaLidar = new StudicaLidar();
     private DcMotorEx rightRearMotor;
     private DcMotorEx leftRearMotor;
     private DcMotorEx rightFrontMotor;
     private DcMotorEx leftFrontMotor;
     private IMU imu;
-    private StudicaLidar studicaLidar = new StudicaLidar();
 
     private void setupHardware() {
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
@@ -104,15 +102,15 @@ public class DriveTest extends LinearOpMode {
                 }
             }
 
-            leftFrontMotor.setPower(leftFrontPower*1.00);
-            rightFrontMotor.setPower(rightFrontPower*1.00);
-            leftRearMotor.setPower(leftRearPower*1.00);
-            rightRearMotor.setPower(rightRearPower*1.00);
+            leftFrontMotor.setPower(leftFrontPower);
+            rightFrontMotor.setPower(rightFrontPower);
+            leftRearMotor.setPower(leftRearPower);
+            rightRearMotor.setPower(rightRearPower);
 
-            telemetry.addData("Relative Bot Direction","%.2f", movementAngle);
+            telemetry.addData("Relative Bot Direction", "%.2f", movementAngle);
             telemetry.addData("Motor (Left Front)", "%.2f", leftFrontPower);
             telemetry.addData("Motor (Right Front)", "%.2f", rightFrontPower);
-            telemetry.addData("Motor (Left Rear)","%.2f", leftRearPower);
+            telemetry.addData("Motor (Left Rear)", "%.2f", leftRearPower);
             telemetry.addData("Motor (Right Rear)", "%.2f", leftRearPower);
             telemetry.addData("X", lateral);
             telemetry.addData("Y", axial);
@@ -135,13 +133,13 @@ public class DriveTest extends LinearOpMode {
         sleep(1000);
     }
 
-    private void initializeHardware(){
-        for(DcMotor motor : List.of(rightFrontMotor, rightRearMotor)) {
+    private void initializeHardware() {
+        for (DcMotor motor : List.of(rightFrontMotor, rightRearMotor)) {
             motor.setMode(RUN_WITHOUT_ENCODER);
             motor.setZeroPowerBehavior(BRAKE);
             motor.setDirection(DcMotorSimple.Direction.REVERSE);
         }
-        for(DcMotor motor : List.of(leftFrontMotor, leftRearMotor)) {
+        for (DcMotor motor : List.of(leftFrontMotor, leftRearMotor)) {
             motor.setMode(RUN_WITHOUT_ENCODER);
             motor.setZeroPowerBehavior(BRAKE);
             motor.setDirection(DcMotorSimple.Direction.FORWARD);
@@ -151,8 +149,8 @@ public class DriveTest extends LinearOpMode {
     /**
      * Get Robot Direction of travel in Robot Reference Frame.
      *
-     * @param stickX value from gamepad left stick X
-     * @param stickY value from gamepad left stick Y
+     * @param stickX       value from gamepad left stick X
+     * @param stickY       value from gamepad left stick Y
      * @param robotHeading from IMU in radians
      * @return robot direction of travel robot reference frame
      */
@@ -173,9 +171,9 @@ public class DriveTest extends LinearOpMode {
     /**
      * Gets closest lidar ping +/- offset degrees from bot heading. Offset should be
      *
-     * @param heading current robot movement direction in degrees (robot reference frame)
+     * @param heading       current robot movement direction in degrees (robot reference frame)
      * @param robotDiameter the circular diameter of the robot in mm (corner to corner)
-     * @param distance the distance in mm that we want to stop before running into object
+     * @param distance      the distance in mm that we want to stop before running into object
      * @return True for OK to proceed or False for not OK.
      */
     private boolean findClosestPointOnPath(double heading, double robotDiameter, double distance) {

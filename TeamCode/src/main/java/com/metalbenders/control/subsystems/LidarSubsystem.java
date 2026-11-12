@@ -13,6 +13,7 @@ public class LidarSubsystem extends SubsystemBase {
     private final StudicaLidar studicaLidar;
     private final Telemetry telemetry;
     private Constants.LidarState state;
+
     public LidarSubsystem(HardwareMap hardwareMap, Telemetry telemetry) {
         this.studicaLidar = new StudicaLidar();
         this.telemetry = telemetry;

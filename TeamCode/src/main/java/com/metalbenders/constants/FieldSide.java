@@ -1,54 +1,49 @@
+
 package com.metalbenders.constants;
 
 import com.pedropathing.math.Pose;
 
 import static com.metalbenders.constants.AutoFieldBoundary.AUDIENCE_SIDE_FIELD_BOUNDARY;
+import static com.metalbenders.constants.Constants.AllianceColor.isRed;
 
 public enum FieldSide {
-    SCORE_SIDE,
-    AUDIENCE_SIDE;
-
-    public FieldSide getOppositeSide() {
-        if (this == SCORE_SIDE) {
-            return AUDIENCE_SIDE;
-        }
-        return SCORE_SIDE;
-    }
+    SCORING,
+    AUDIENCE;
 
     public static FieldSide getParkFieldSide(Constants.AllianceColor allianceColor) {
-        return allianceColor == Constants.AllianceColor.RED ? SCORE_SIDE : AUDIENCE_SIDE;
+        return isRed(allianceColor) ? SCORING : AUDIENCE;
     }
 
     public static FieldSide getGardenFieldSide(Constants.AllianceColor allianceColor) {
-        return allianceColor == Constants.AllianceColor.RED ? AUDIENCE_SIDE : SCORE_SIDE;
+        return isRed(allianceColor) ? AUDIENCE : SCORING;
     }
 
-    public static FieldSide getOtherFlowerFieldSide(Constants.AllianceColor allianceColor) {
-        return allianceColor == Constants.AllianceColor.RED ? SCORE_SIDE : AUDIENCE_SIDE;
+    public static FieldSide getHiveSideFlowerFieldSide(Constants.AllianceColor allianceColor) {
+        return getParkFieldSide(allianceColor);
     }
 
     public static FieldSide getParkSideFlowerFieldSide(Constants.AllianceColor allianceColor) {
-        return allianceColor == Constants.AllianceColor.RED ? AUDIENCE_SIDE : SCORE_SIDE;
+        return getGardenFieldSide(allianceColor);
     }
 
-    public static FieldSide getStartingFieldSide(Constants.AllianceColor allianceColor, boolean startingOnActiveSide) {
-        if (allianceColor == Constants.AllianceColor.RED) {
-            return startingOnActiveSide ? AUDIENCE_SIDE : SCORE_SIDE;
-        }
-        return startingOnActiveSide ? SCORE_SIDE : AUDIENCE_SIDE;
+    public static FieldSide getRobotStartingFieldSide(
+            Constants.AllianceColor allianceColor, boolean startingOnActiveSide) {
+        return startingOnActiveSide
+                ? getGardenFieldSide(allianceColor)
+                : getParkFieldSide(allianceColor);
     }
 
     public static FieldSide getStartingHiveCellFieldSide(Constants.AllianceColor allianceColor) {
-        if (allianceColor == Constants.AllianceColor.RED) {
-            return AUDIENCE_SIDE;
-        }
-        return SCORE_SIDE;
+        return getGardenFieldSide(allianceColor);
     }
 
     public static FieldSide getCurrentFieldSide(Pose currentPose) {
-        if (AUDIENCE_SIDE_FIELD_BOUNDARY.isPoseWithinBoundary(currentPose)) {
-            return AUDIENCE_SIDE;
-        }
-        return SCORE_SIDE;
+        return AUDIENCE_SIDE_FIELD_BOUNDARY.isPoseWithinBoundary(currentPose)
+                ? AUDIENCE
+                : SCORING;
+    }
+
+    public FieldSide getOppositeSide() {
+        return this == SCORING ? AUDIENCE : SCORING;
     }
 }

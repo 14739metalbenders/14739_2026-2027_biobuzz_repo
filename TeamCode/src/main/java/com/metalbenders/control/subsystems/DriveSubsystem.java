@@ -7,14 +7,13 @@ import com.pedropathing.follower.ManualDrive;
 import com.pedropathing.math.Pose;
 import com.pedropathing.math.Twist;
 import com.qualcomm.robotcore.hardware.HardwareMap;
-
-import static com.metalbenders.constants.Constants.AUTO_SPEED_MULTIPLIER;
-import static com.pedropathing.api.Paths.*;
-
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.pedro.Constants;
 
 import java.util.Locale;
+
+import static com.metalbenders.constants.Constants.AUTO_SPEED_MULTIPLIER;
+import static com.pedropathing.api.Paths.line;
 
 public class DriveSubsystem extends SubsystemBase {
 
@@ -45,7 +44,9 @@ public class DriveSubsystem extends SubsystemBase {
         return follower.pose();
     }
 
-    public Twist getCurrentTwist() { return follower.twist(); }
+    public Twist getCurrentTwist() {
+        return follower.twist();
+    }
 
     public boolean isBusy() {
         return follower.isBusy();

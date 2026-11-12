@@ -1,24 +1,23 @@
 package com.metalbenders.samples;
 
 import com.acmerobotics.dashboard.FtcDashboard;
+import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
+import com.metalbenders.hardware.AS5600;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
-
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
-import com.metalbenders.hardware.AS5600;
 
 @Disabled
-@TeleOp(name="AS5600 i2c Test", group="Sensors")
+@TeleOp(name = "AS5600 i2c Test", group = "Sensors")
 public class AS5600Test extends LinearOpMode {
 
+    public double TURRET_TICKS_PER_DEGREE = (1425.1 / 360) * 1.872340426;
     private double turretMotorEncoderZero = 0;
     private AS5600 turretEncoder;
     private DcMotorEx turretMotor;
-    public double TURRET_TICKS_PER_DEGREE = ( 1425.1 / 360 ) * 1.872340426;
 
     @Override
     public void runOpMode() {
@@ -52,7 +51,7 @@ public class AS5600Test extends LinearOpMode {
     }
 
     private void initialize() {
-        turretMotor = hardwareMap.get(DcMotorEx .class, "turretMotor");
+        turretMotor = hardwareMap.get(DcMotorEx.class, "turretMotor");
         turretEncoder = hardwareMap.get(AS5600.class, "turretEncoder");
         turretMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         setTurretEncoderToMotorEncoderOffset();
@@ -64,7 +63,7 @@ public class AS5600Test extends LinearOpMode {
 
     private void setTurretEncoderToMotorEncoderOffset() {
         long currentTurretMotorEncoderValue = turretMotor.getCurrentPosition();
-        turretMotorEncoderZero = currentTurretMotorEncoderValue - (long)(getTurretAngleFromEncoder() * TURRET_TICKS_PER_DEGREE);
+        turretMotorEncoderZero = currentTurretMotorEncoderValue - (long) (getTurretAngleFromEncoder() * TURRET_TICKS_PER_DEGREE);
     }
 
     private double getTurretAngleFromMotor() {

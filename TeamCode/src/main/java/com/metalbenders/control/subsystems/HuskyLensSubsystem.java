@@ -6,7 +6,10 @@ import com.qualcomm.hardware.dfrobot.HuskyLens;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
-import static com.metalbenders.constants.Constants.*;
+import static com.metalbenders.constants.Constants.AllianceColor.isRed;
+import static com.metalbenders.constants.Constants.BLUE_NECTAR_BLOCK_ID;
+import static com.metalbenders.constants.Constants.POLLEN_BLOCK_ID;
+import static com.metalbenders.constants.Constants.RED_NECTAR_BLOCK_ID;
 
 public class HuskyLensSubsystem extends SubsystemBase {
 
@@ -27,7 +30,7 @@ public class HuskyLensSubsystem extends SubsystemBase {
             case POLLEN:
                 return huskyLens.blocks(POLLEN_BLOCK_ID);
             case NECTAR:
-                if (allianceColor == Constants.AllianceColor.RED) {
+                if (isRed(allianceColor)) {
                     return huskyLens.blocks(RED_NECTAR_BLOCK_ID);
                 } else {
                     return huskyLens.blocks(BLUE_NECTAR_BLOCK_ID);

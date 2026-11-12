@@ -8,31 +8,30 @@ import com.qualcomm.robotcore.util.Range;
 @Config
 public class TurretController {
 
-        private static final double GRAVITY = 9.81; // in m/s2
-
-        // PID controller parameters
-        public static double AIM_Kp = 0.028;
-        public static double AIM_Ki = 0;
-        public static double AIM_Kd = 0.0025;
-        public static double AIM_Ks = 0.002;
-        public static double AIM_DEADBAND = 2.0;
-        public static double maxTurretPower = 0.9;
-        public static double maxTurretAccel = 0.15;
-        public static double maxTurretDecel = 0.3;
-        private static final MotionProfile profiledPower = new MotionProfile(maxTurretPower, maxTurretAccel, maxTurretDecel);
-        private static double aimIntegral = 0;
-        private static double aimLastError = 0;
-        private static final ElapsedTime aimTimer = new ElapsedTime();
-        public static double turretAngleLimit = 70; // Maximum angle limit for turret movement
-        private static double integral;
-        private static double previousError;
-        private static final double INCHES_TO_METERS = 0.0254;
+    private static final double GRAVITY = 9.81; // in m/s2
+    private static final ElapsedTime aimTimer = new ElapsedTime();
+    private static final double INCHES_TO_METERS = 0.0254;
+    // PID controller parameters
+    public static double AIM_Kp = 0.028;
+    public static double AIM_Ki = 0;
+    public static double AIM_Kd = 0.0025;
+    public static double AIM_Ks = 0.002;
+    public static double AIM_DEADBAND = 2.0;
+    public static double maxTurretPower = 0.9;
+    public static double maxTurretAccel = 0.15;
+    public static double maxTurretDecel = 0.3;
+    private static final MotionProfile profiledPower = new MotionProfile(maxTurretPower, maxTurretAccel, maxTurretDecel);
+    public static double turretAngleLimit = 70; // Maximum angle limit for turret movement
+    private static double aimIntegral = 0;
+    private static double aimLastError = 0;
+    private static double integral;
+    private static double previousError;
 
     public TurretController(double Kp, double Ki, double Kd, double Ks) {
-        this.AIM_Kp = Kp;
-        this.AIM_Ki = Ki;
-        this.AIM_Kd = Kd;
-        this.AIM_Ks = Ks;
+        AIM_Kp = Kp;
+        AIM_Ki = Ki;
+        AIM_Kd = Kd;
+        AIM_Ks = Ks;
     }
 
     /**
@@ -51,7 +50,7 @@ public class TurretController {
     /**
      * Calculates time of flight for a projectile
      *
-     * @param currentRPM Flywheel RPM
+     * @param currentRPM      Flywheel RPM
      * @param ballLaunchAngle Launch angle of projectile
      * @return Time of flight for projectile
      */
@@ -79,10 +78,10 @@ public class TurretController {
     /**
      * Calculates the target lead angle based on robot's current movement and time of flight.
      *
-     * @param xVector X vector of the robot's motion in inches per second (Turret Reference Frame)
-     * @param yVector Y vector of the robot's motion in inches per second (Turret Reference Frame)
+     * @param xVector       X vector of the robot's motion in inches per second (Turret Reference Frame)
+     * @param yVector       Y vector of the robot's motion in inches per second (Turret Reference Frame)
      * @param angularMoment Angular moment of the robot in degrees per second
-     * @param timeOfFlight Ball time of flight
+     * @param timeOfFlight  Ball time of flight
      * @return Shot lead in degrees
      */
     private static double calculateShotLead(double xVector, double yVector, double angularMoment, double timeOfFlight) {
@@ -142,8 +141,8 @@ public class TurretController {
     /**
      * Transforms xVector and yVector from Robot Reference Frame to Turret Reference Frame.
      *
-     * @param xVector X vector of the robot's motion in inches per second
-     * @param yVector Y vector of the robot's motion in inches per second
+     * @param xVector     X vector of the robot's motion in inches per second
+     * @param yVector     Y vector of the robot's motion in inches per second
      * @param turretAngle Current angle of the turret relative to the robot
      * @return TurretRobotTransform containing the transformed xVector and yVector
      */
@@ -158,29 +157,14 @@ public class TurretController {
         return new TurretRobotTransform(transformedXVector, transformedYVector);
     }
 
-    public static class TurretRobotTransform {
-        private double xVector;
-        private double yVector;
-        public TurretRobotTransform(double xVector, double yVector) {
-            this.xVector = xVector;
-            this.yVector = yVector;
-        }
-        public double getXVector() {
-            return xVector;
-        }
-        public double getYVector() {
-            return yVector;
-        }
-    }
-
     /**
      * Calculates the adjusted turret error to target factoring in target bearing, robot movement, and turret angle
      * Implements a PID controller and motion profile to smooth out movment.
      *
-     * @param twist twist from pedro follower
-     * @param targetBearing current bearing of target from limelight
-     * @param turretAngle turret angle on robot
-     * @param currentRPM launcher flywheel rpm
+     * @param twist           twist from pedro follower
+     * @param targetBearing   current bearing of target from limelight
+     * @param turretAngle     turret angle on robot
+     * @param currentRPM      launcher flywheel rpm
      * @param ballLaunchAngle ball launch angle
      * @return TurretRotateCalc containing turretPower, targetBearing, shotLeadAngle, timeOfFlight
      */
@@ -229,11 +213,29 @@ public class TurretController {
         return new TurretRotateCalc(turretPower, targetBearing, shotLeadAngle, timeOfFlight);
     }
 
+    public static class TurretRobotTransform {
+        private final double xVector;
+        private final double yVector;
+
+        public TurretRobotTransform(double xVector, double yVector) {
+            this.xVector = xVector;
+            this.yVector = yVector;
+        }
+
+        public double getXVector() {
+            return xVector;
+        }
+
+        public double getYVector() {
+            return yVector;
+        }
+    }
+
     public static class TurretRotateCalc {
-        private double turretPower;
-        private double targetBearing;
-        private double shotLeadAngle;
-        private double timeOfFlight;
+        private final double turretPower;
+        private final double targetBearing;
+        private final double shotLeadAngle;
+        private final double timeOfFlight;
 
         public TurretRotateCalc(double turretPower, double targetBearing, double shotLeadAngle, double timeOfFlight) {
             this.turretPower = turretPower;

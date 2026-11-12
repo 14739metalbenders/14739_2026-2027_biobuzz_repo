@@ -8,7 +8,6 @@ import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose3D;
@@ -16,7 +15,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.Position;
 import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
 
 @Disabled
-@TeleOp(name = "Limelight Targeting", group="sample")
+@TeleOp(name = "Limelight Targeting", group = "sample")
 public class LimelightTargeting extends LinearOpMode {
 
 
@@ -151,7 +150,7 @@ public class LimelightTargeting extends LinearOpMode {
     /**
      * Transforms the known static cell-center offset into Camera Space without using .compose()
      *
-     * @param tagId The visible AprilTag ID
+     * @param tagId            The visible AprilTag ID
      * @param tagInCameraSpace The Limelight fiducial target object
      * @return A Pose3D representing the exact position and orientation of the cell center relative to the camera lens
      */
@@ -170,10 +169,18 @@ public class LimelightTargeting extends LinearOpMode {
         // Determine where the Cell Center lives relative to the Tag's own origin (Tag Space)
         // - If Tag 1 or 3 (Left side of cell face), the center is to its right (+X)
         // - If Tag 2 or 4 (Right side of cell face), the center is to its left (-X)
-        if (tagId == 30 || tagId == 34 || tagId == 38 || tagId == 42) { xOffset = 0.165; }
-        if (tagId == 31 || tagId == 35 || tagId == 39 || tagId == 43) { xOffset = 0.070; }
-        if (tagId == 32 || tagId == 36 || tagId == 40 || tagId == 44) { xOffset = -0.070; }
-        if (tagId == 33 || tagId == 37 || tagId == 41 || tagId == 45) { xOffset = -0.165; }
+        if (tagId == 30 || tagId == 34 || tagId == 38 || tagId == 42) {
+            xOffset = 0.165;
+        }
+        if (tagId == 31 || tagId == 35 || tagId == 39 || tagId == 43) {
+            xOffset = 0.070;
+        }
+        if (tagId == 32 || tagId == 36 || tagId == 40 || tagId == 44) {
+            xOffset = -0.070;
+        }
+        if (tagId == 33 || tagId == 37 || tagId == 41 || tagId == 45) {
+            xOffset = -0.165;
+        }
 
         // Manually rotate the local X-offset into Camera Space using the tag's Yaw angle
         double correctedX = tagPos.x + (xOffset * Math.cos(yawRadians));

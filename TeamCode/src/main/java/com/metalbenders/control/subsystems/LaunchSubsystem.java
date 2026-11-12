@@ -2,11 +2,18 @@ package com.metalbenders.control.subsystems;
 
 import com.arcrobotics.ftclib.command.SubsystemBase;
 import com.metalbenders.constants.LaunchVelocity;
-import com.qualcomm.robotcore.hardware.*;
+import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.PIDFCoefficients;
+import com.qualcomm.robotcore.hardware.Servo;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
-import static com.metalbenders.constants.Constants.*;
+import static com.metalbenders.constants.Constants.CONVERT_METERS_TO_INCHES;
+import static com.metalbenders.constants.Constants.LAUNCHER_VELOCITY_PID;
+import static com.metalbenders.constants.Constants.LaunchGateState;
 import static com.metalbenders.constants.Constants.LaunchGateState.CLOSED;
+import static com.metalbenders.constants.Constants.OpModeType;
 import static com.metalbenders.constants.LaunchVelocity.AUTONOMOUS;
 import static com.metalbenders.constants.LaunchVelocity.IDLE;
 import static com.metalbenders.constants.LaunchVelocity.getLaunchVelocityByDistance;
@@ -18,10 +25,9 @@ public class LaunchSubsystem extends SubsystemBase {
     private final DcMotorEx launcher;
     private final Servo launchGateServo;
     private LaunchVelocity targetLaunchVelocity;
-    private double actualLaunchVelocity;
     private LaunchGateState launchGateState;
 
-    public LaunchSubsystem(HardwareMap hardwareMap, Telemetry telemetry, AllianceColor allianceColor, OpModeType opModeType) {
+    public LaunchSubsystem(HardwareMap hardwareMap, Telemetry telemetry, OpModeType opModeType) {
         this.telemetry = telemetry;
         this.launchGateServo = hardwareMap.get(Servo.class, "launchServo");
         // Force a known startup position/state so first shot command can open the gate.
@@ -47,7 +53,10 @@ public class LaunchSubsystem extends SubsystemBase {
     }
 
     public void updateLauncherVelocity(double distance) {
-        this.targetLaunchVelocity = getLaunchVelocityByDistance(distance * 39.3701);    }
+        if (distance > 0) {
+            this.targetLaunchVelocity = getLaunchVelocityByDistance(distance * CONVERT_METERS_TO_INCHES);
+        }
+    }
 
     public double getLauncherRPM() {
         // (Velocity from motor * 60 sec) / 1425.1 (PPR For goBilda 117 RPM Motor)
@@ -57,12 +66,11 @@ public class LaunchSubsystem extends SubsystemBase {
     @Override
     public void periodic() {
         launcher.setVelocity(targetLaunchVelocity.getVelocity());
-        actualLaunchVelocity = launcher.getVelocity();
         telemetry.addLine(this.getClass().getSimpleName());
         telemetry.addLine("--------------------------------");
         telemetry.addData("Target Velocity",
                 targetLaunchVelocity.name() + " (" + targetLaunchVelocity.getVelocity() + " rpm)");
-        telemetry.addData("Actual Velocity", actualLaunchVelocity);
+        telemetry.addData("Actual Velocity", launcher.getVelocity());
         telemetry.addData("Launch Gate State", launchGateState);
         telemetry.addLine();
     }

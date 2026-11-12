@@ -29,27 +29,15 @@ public enum FieldLocation {
     SCORE_SIDE_HIVE_CELL(
             new Pose(57.75, 87, Math.toRadians(90)), Symmetry.MIRROR_X),
     //Flower Locations
-    OTHER_FLOWER(
+    HIVE_SIDE_FLOWER(
             new Pose(47, 131.5, Math.toRadians(90)), Symmetry.ROTATE_180),
     PARK_SIDE_FLOWER(
-            new Pose(14, 48, Math.toRadians(180)), Symmetry.ROTATE_180),
+            new Pose(12.5, 47, Math.toRadians(180)), Symmetry.ROTATE_180),
     //Garden Locations
     GARDEN_START(
             new Pose(22, 7, Math.toRadians(180)), Symmetry.ROTATE_180),
     GARDEN_END(
             new Pose(7.0, 7, Math.toRadians(180)), Symmetry.ROTATE_180);
-
-    private enum Symmetry {
-        MIRROR_X,
-        ROTATE_180;
-
-        private Pose apply(Pose pose) {
-            double heading = this == MIRROR_X ? Math.PI - pose.heading() : pose.heading() + Math.PI;
-            double fullTurn = 2 * Math.PI;
-            heading = ((heading % fullTurn) + fullTurn) % fullTurn;
-            return new Pose(144 - pose.x(), this == MIRROR_X ? pose.y() : 144 - pose.y(), heading);
-        }
-    }
 
     private final Pose redPose;
     private final Pose bluePose;
@@ -59,12 +47,13 @@ public enum FieldLocation {
         this.bluePose = symmetry.apply(redPose);
     }
 
-    public Pose getPose(AllianceColor alliance) {
-        return alliance == AllianceColor.RED ? redPose : bluePose;
-    }
-
     public static FieldLocation getLaunchLocation(FieldSide fieldSide) {
         return selectByFieldSide(fieldSide, SCORE_SIDE_LAUNCH, AUDIENCE_SIDE_LAUNCH);
+    }
+
+    public static FieldLocation getWaypointLocation(FieldSide fieldSide, Constants.WaypointSeriesType waypointSeriesType) {
+        return Constants.WaypointSeriesType.INNER == waypointSeriesType
+                ? getInnerWaypointLocation(fieldSide) : getOuterWaypointLocation(fieldSide);
     }
 
     public static FieldLocation getOuterWaypointLocation(FieldSide fieldSide) {
@@ -75,7 +64,7 @@ public enum FieldLocation {
         return selectByFieldSide(fieldSide, SCORE_SIDE_INNER_WAYPOINT, AUDIENCE_SIDE_INNER_WAYPOINT);
     }
 
-    public static FieldLocation getParkLocation(FieldSide fieldSide) {
+    public static FieldLocation getParkLocation() {
         return PARK;
     }
 
@@ -89,6 +78,22 @@ public enum FieldLocation {
 
     private static FieldLocation selectByFieldSide(
             FieldSide fieldSide, FieldLocation scoreSide, FieldLocation audienceSide) {
-        return fieldSide == FieldSide.SCORE_SIDE ? scoreSide : audienceSide;
+        return fieldSide == FieldSide.SCORING ? scoreSide : audienceSide;
+    }
+
+    public Pose getPose(AllianceColor alliance) {
+        return Constants.AllianceColor.isRed(alliance) ? redPose : bluePose;
+    }
+
+    private enum Symmetry {
+        MIRROR_X,
+        ROTATE_180;
+
+        private Pose apply(Pose pose) {
+            double heading = this == MIRROR_X ? Math.PI - pose.heading() : pose.heading() + Math.PI;
+            double fullTurn = 2 * Math.PI;
+            heading = ((heading % fullTurn) + fullTurn) % fullTurn;
+            return new Pose(144 - pose.x(), this == MIRROR_X ? pose.y() : 144 - pose.y(), heading);
+        }
     }
 }

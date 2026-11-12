@@ -7,7 +7,6 @@ import android.hardware.usb.UsbDeviceConnection;
 import android.hardware.usb.UsbEndpoint;
 import android.hardware.usb.UsbInterface;
 import android.hardware.usb.UsbManager;
-
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import java.util.Arrays;
@@ -113,19 +112,18 @@ public class StudicaLidar {
     // Background Worker Thread
     // ----------------------------------------------------------------------------------
     private static class LidarThread extends Thread {
+        private static final int TIMEOUT_MS = 500;
         private final Context context;
+        private final double[] ranges360 = new double[360];
+        private final byte[] streamRingBuffer = new byte[65536];
+        private final double[][] filterHistory = new double[360][4];
         private UsbDeviceConnection usbConnection;
         private UsbInterface usbInterface;
         private UsbEndpoint endpointIn;
         private UsbEndpoint endpointOut;
         private volatile boolean running = true;
-
-        private final double[] ranges360 = new double[360];
-        private static final int TIMEOUT_MS = 500;
-        private final byte[] streamRingBuffer = new byte[65536];
         private int ringBufferLength = 0;
         private long totalPacketsParsed = 0;
-        private final double[][] filterHistory = new double[360][4];
 
         public LidarThread(Context context) {
             this.context = context;
@@ -272,8 +270,7 @@ public class StudicaLidar {
         public double[] getRanges(boolean inverted) {
             double[] snapshot = new double[360];
             synchronized (ranges360) {
-                if (inverted)
-                {
+                if (inverted) {
                     System.arraycopy(ranges360, 0, snapshot, 0, 360);
                     snapshot = reverseSensorArray(snapshot);
                 } else {

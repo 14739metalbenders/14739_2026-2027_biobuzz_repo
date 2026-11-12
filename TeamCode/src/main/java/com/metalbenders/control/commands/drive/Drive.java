@@ -1,4 +1,4 @@
-package com.metalbenders.control.commands;
+package com.metalbenders.control.commands.drive;
 
 import com.arcrobotics.ftclib.command.CommandBase;
 import com.metalbenders.control.subsystems.DriveSubsystem;
@@ -13,9 +13,9 @@ public class Drive extends CommandBase {
     private final DoubleSupplier headingSupplier;
 
     public Drive(DriveSubsystem driveSubsystem,
-                        DoubleSupplier forwardSupplier,
-                        DoubleSupplier strafeSupplier,
-                        DoubleSupplier headingSupplier) {
+                 DoubleSupplier forwardSupplier,
+                 DoubleSupplier strafeSupplier,
+                 DoubleSupplier headingSupplier) {
         this.driveSubsystem = driveSubsystem;
         this.forwardSupplier = forwardSupplier;
         this.strafeSupplier = strafeSupplier;

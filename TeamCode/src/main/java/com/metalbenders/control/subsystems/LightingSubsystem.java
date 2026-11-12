@@ -10,7 +10,6 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 public class LightingSubsystem extends SubsystemBase {
 
     private static final double BLINK_INTERVAL_SECONDS = 2.0;
-
     private final Servo lightingServo;
     private final Telemetry telemetry;
     private final ElapsedTime animationTimer = new ElapsedTime();
@@ -29,7 +28,9 @@ public class LightingSubsystem extends SubsystemBase {
         updateColor();
     }
 
-    /** Starts a new animation with the selected color; BLINK alternates every two seconds. */
+    /**
+     * Starts a new animation with the selected color; BLINK alternates every two seconds.
+     */
     public void setCurrentAnimation(Constants.IndicatorAnimationEnum animation) {
         if (currentAnimation != animation) {
             currentAnimation = animation;

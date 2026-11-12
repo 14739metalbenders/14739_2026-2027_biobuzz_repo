@@ -2,26 +2,26 @@ package com.metalbenders.constants;
 
 import static com.metalbenders.constants.Constants.AllianceColor.BLUE;
 import static com.metalbenders.constants.Constants.AllianceColor.RED;
-import static com.metalbenders.constants.FieldSide.AUDIENCE_SIDE;
-import static com.metalbenders.constants.FieldSide.SCORE_SIDE;
+import static com.metalbenders.constants.FieldSide.AUDIENCE;
+import static com.metalbenders.constants.FieldSide.SCORING;
 
 public enum AprilTag {
-    RED_SCORE_SIDE_INSIDE(30, RED, SCORE_SIDE),
-    RED_SCORE_SIDE_INSIDE_CENTER(31, RED, SCORE_SIDE),
-    RED_SCORE_SIDE_OUTSIDE_CENTER(32, RED, SCORE_SIDE),
-    RED_SCORE_SIDE_OUTSIDE(33, RED, SCORE_SIDE),
-    RED_AUDIENCE_SIDE_INSIDE(37, RED, AUDIENCE_SIDE),
-    RED_AUDIENCE_SIDE_INSIDE_CENTER(36, RED, AUDIENCE_SIDE),
-    RED_AUDIENCE_SIDE_OUTSIDE_CENTER(35, RED, AUDIENCE_SIDE),
-    RED_AUDIENCE_SIDE_OUTSIDE(34, RED, AUDIENCE_SIDE),
-    BLUE_SCORE_SIDE_INSIDE(45, BLUE, SCORE_SIDE),
-    BLUE_SCORE_SIDE_INSIDE_CENTER(44, BLUE, SCORE_SIDE),
-    BLUE_SCORE_SIDE_OUTSIDE_CENTER(43, BLUE, SCORE_SIDE),
-    BLUE_SCORE_SIDE_OUTSIDE(42, BLUE, SCORE_SIDE),
-    BLUE_AUDIENCE_SIDE_INSIDE(38, BLUE, AUDIENCE_SIDE),
-    BLUE_AUDIENCE_SIDE_INSIDE_CENTER(39, BLUE, AUDIENCE_SIDE),
-    BLUE_AUDIENCE_SIDE_OUTSIDE_CENTER(40, BLUE, AUDIENCE_SIDE),
-    BLUE_AUDIENCE_SIDE_OUTSIDE(41, BLUE, AUDIENCE_SIDE);
+    RED_SCORE_SIDE_INSIDE(30, RED, SCORING),
+    RED_SCORE_SIDE_INSIDE_CENTER(31, RED, SCORING),
+    RED_SCORE_SIDE_OUTSIDE_CENTER(32, RED, SCORING),
+    RED_SCORE_SIDE_OUTSIDE(33, RED, SCORING),
+    RED_AUDIENCE_SIDE_INSIDE(37, RED, AUDIENCE),
+    RED_AUDIENCE_SIDE_INSIDE_CENTER(36, RED, AUDIENCE),
+    RED_AUDIENCE_SIDE_OUTSIDE_CENTER(35, RED, AUDIENCE),
+    RED_AUDIENCE_SIDE_OUTSIDE(34, RED, AUDIENCE),
+    BLUE_SCORE_SIDE_INSIDE(45, BLUE, SCORING),
+    BLUE_SCORE_SIDE_INSIDE_CENTER(44, BLUE, SCORING),
+    BLUE_SCORE_SIDE_OUTSIDE_CENTER(43, BLUE, SCORING),
+    BLUE_SCORE_SIDE_OUTSIDE(42, BLUE, SCORING),
+    BLUE_AUDIENCE_SIDE_INSIDE(38, BLUE, AUDIENCE),
+    BLUE_AUDIENCE_SIDE_INSIDE_CENTER(39, BLUE, AUDIENCE),
+    BLUE_AUDIENCE_SIDE_OUTSIDE_CENTER(40, BLUE, AUDIENCE),
+    BLUE_AUDIENCE_SIDE_OUTSIDE(41, BLUE, AUDIENCE);
 
     private final Constants.AllianceColor allianceColor;
     private final int id;
@@ -31,6 +31,15 @@ public enum AprilTag {
         this.allianceColor = allianceColor;
         this.id = id;
         this.fieldSide = fieldSide;
+    }
+
+    public static AprilTag fromId(int id) {
+        for (AprilTag aprilTag : AprilTag.values()) {
+            if (aprilTag.getId() == id) {
+                return aprilTag;
+            }
+        }
+        return null;
     }
 
     public Constants.AllianceColor getAllianceColor() {
@@ -43,14 +52,5 @@ public enum AprilTag {
 
     public FieldSide getFieldSide() {
         return fieldSide;
-    }
-
-    public static AprilTag getAprilTagById(int id) {
-        for (AprilTag aprilTag : AprilTag.values()) {
-            if (aprilTag.getId() == id) {
-                return aprilTag;
-            }
-        }
-        return null;
     }
 }

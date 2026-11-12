@@ -1,12 +1,12 @@
 package com.metalbenders.control.subsystems;
 
-import static com.metalbenders.constants.Constants.FlowerToolState.UP;
-
 import com.arcrobotics.ftclib.command.SubsystemBase;
 import com.metalbenders.constants.Constants;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+
+import static com.metalbenders.constants.Constants.FlowerToolState.UP;
 
 public class FlowerToolSubsystem extends SubsystemBase {
 

@@ -1,4 +1,4 @@
-package com.metalbenders.control.commands;
+package com.metalbenders.control.commands.turret;
 
 import com.arcrobotics.ftclib.command.CommandBase;
 import com.metalbenders.control.subsystems.DriveSubsystem;

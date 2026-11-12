@@ -10,6 +10,18 @@ To use this Android Studio project, you will need Android Studio Narwhal 3 Featu
 
 To program your robot in Blocks or OnBot Java, you do not need Android Studio.
 
+## Auto Strategy Configuration
+
+In the **Config** OpMode's Auto Strategy editor, adding a garden or flower
+challenge automatically includes **PRELOAD** if it is missing. **PRELOAD** cannot
+be removed while any garden or flower challenge remains. Remove those challenges
+first to make **PRELOAD** optional again; a park-only or empty strategy is allowed.
+Whenever **PRELOAD** is included, it is placed first and cannot be reordered.
+Other challenges cannot move ahead of it.
+Whenever **PARK** is included, it is placed last and cannot be reordered.
+Other challenges cannot move after it; **PARK** remains optional.
+Accept the list with **Y**, then select **Save configuration** to persist it.
+
 ## Getting Started
 If you are new to robotics or new to the *FIRST* Tech Challenge, then you should consider reviewing the [FTC Blocks Tutorial](https://ftc-docs.firstinspires.org/programming_resources/blocks/Blocks-Tutorial.html) to get familiar with how to use the control system:
 
