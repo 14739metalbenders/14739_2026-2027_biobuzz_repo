@@ -9,7 +9,7 @@ public class Constants {
     public static final double CONVERT_METERS_TO_INCHES = 39.3701;
     /*LAUNCHER CONSTANTS*/
     public static final long LAUNCH_GATE_POSITION_DELAY_MILLI = 125;
-    public static final PIDFCoefficients LAUNCHER_VELOCITY_PID = new PIDFCoefficients(125, 0, 0, 15);
+    public static final PIDFCoefficients LAUNCHER_VELOCITY_PID = new PIDFCoefficients(115, 0, 0, 15);
     public static final long TIME_TO_WAIT_TO_SHOOT_BEFORE_KICK = 500;
     /*HUSKY LENS CONSTANTS*/
     public static final int POLLEN_BLOCK_ID = 1;
@@ -59,7 +59,7 @@ public class Constants {
     }
 
     public enum IntakeState {
-        SHOOT(0.7),
+        SHOOT(0.6),
         INTAKE(0.9),
         REVERSE(-0.8),
         STOP(0);
@@ -78,7 +78,7 @@ public class Constants {
     public enum LaunchGateState {
         OPEN(0.5),
         CLOSED(0.85),
-        KICK(0.12);
+        KICK(0.16);
 
         private final double position;
 

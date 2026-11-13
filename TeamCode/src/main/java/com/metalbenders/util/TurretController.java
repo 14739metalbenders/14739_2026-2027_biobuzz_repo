@@ -62,7 +62,7 @@ public class TurretController {
         // Quadratic equation to solve for time of flight: h = vt + 0.5at^2
         double a = -0.5 * GRAVITY;
         double b = verticalVelocity;
-        double c = heightDifference;
+        double c = -heightDifference;
 
         double discriminant = Math.pow(b, 2) - (4 * a * c);
         if (discriminant < 0) {
@@ -80,18 +80,25 @@ public class TurretController {
      *
      * @param xVector       X vector of the robot's motion in inches per second (Turret Reference Frame)
      * @param yVector       Y vector of the robot's motion in inches per second (Turret Reference Frame)
-     * @param angularMoment Angular moment of the robot in degrees per second
+     * @param angularVelocity Angular moment of the robot in degrees per second
      * @param timeOfFlight  Ball time of flight
+     * @param distanceToTarget
      * @return Shot lead in degrees
      */
-    private static double calculateShotLead(double xVector, double yVector, double angularMoment, double timeOfFlight) {
-        // Calculate components of target lead angle
-        double xComponent = xVector * timeOfFlight;
-        double yComponent = yVector * timeOfFlight;
-        double angularComponent = angularMoment * timeOfFlight;
 
-        // Convert Cartesian coordinates to polar coordinates (bearing)
-        return Math.toDegrees(Math.atan2(yComponent, xComponent)) + angularComponent;
+    private static double calculateShotLead(double xVector, double yVector, double angularVelocity, double timeOfFlight, double distanceToTarget) {
+
+        // 1. Calculate where the target appears to move relative to the robot (opposite of robot motion)
+        double virtualTargetX = distanceToTarget - (xVector * timeOfFlight);
+        double virtualTargetY = -(yVector * timeOfFlight);
+
+        // 2. Calculate the angle to that virtual target position
+        double translationalLeadDeg = Math.toDegrees(Math.atan2(virtualTargetY, virtualTargetX));
+
+        // 3. Subtract angular motion (if robot spins CCW, turret must aim CW to compensate)
+        double angularLeadDeg = -(angularVelocity * timeOfFlight);
+
+        return translationalLeadDeg + angularLeadDeg;
     }
 
     /**
