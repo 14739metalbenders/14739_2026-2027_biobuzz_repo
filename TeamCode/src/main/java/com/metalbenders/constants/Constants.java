@@ -10,7 +10,7 @@ public class Constants {
     /*LAUNCHER CONSTANTS*/
     public static final long LAUNCH_GATE_POSITION_DELAY_MILLI = 125;
     public static final PIDFCoefficients LAUNCHER_VELOCITY_PID = new PIDFCoefficients(115, 0, 0, 15);
-    public static final long TIME_TO_WAIT_TO_SHOOT_BEFORE_KICK = 500;
+    public static final long TIME_TO_WAIT_TO_SHOOT_BEFORE_KICK = 750;
     /*HUSKY LENS CONSTANTS*/
     public static final int POLLEN_BLOCK_ID = 1;
     public static final int BLUE_NECTAR_BLOCK_ID = 2;
@@ -22,7 +22,7 @@ public class Constants {
     public static final long MILLIS_TO_WAIT_FOR_FLOWER_INTAKE = 1000;
     public static final long MILLIS_TO_WAIT_FOR_FLOWER_TRAVEL = 2000;
     public static final long FLOWER_TOOL_POSITION_DELAY_MILLIS = 200;
-    public static final double FLOWER_COLLECTION_MAX_SPEED = 0.8;
+    public static final double FLOWER_COLLECTION_MAX_SPEED = 1.0;
     public static final double FLOWER_DISTANCE_TO_BACKUP_WHEN_COLLECTING = 5.0;
     public static final double FLOWER_DISTANCE_TO_BACKUP_WHEN_FINISHED_COLLECTING = 10.0;
     public static final double FLOWER_COLLECT_OSCILLATION_HEADING_VARIATION = Math.toRadians(8.0);
@@ -31,7 +31,7 @@ public class Constants {
     public static final long AUTO_PARK_OVERRIDE_DELAY_MILLIS = 25000;
     public static final long MAX_TIME_TO_COMPARE_TAG_DETECTIONS = 500;
     public static final double MIN_HEIGHT_DIFFERENCE_TO_DETECT_TRANSITION = 0.000254; //0.5 inches in meters
-    public static final double MIN_ACTIVE_HIVE_CELL_HEIGHT = 1.3; //meters
+    public static final double MIN_ACTIVE_HIVE_CELL_HEIGHT = 1.2; //meters
     public static final long DEFAULT_TIME_TO_WAIT_FOR_TRANSITION_STATE_MILLIS = 1000;
     public static final long MAX_TIME_TO_WAIT_FOR_TRANSITION_WHEN_STARTING_INACTIVE = 2000;
 
@@ -78,7 +78,7 @@ public class Constants {
     public enum LaunchGateState {
         OPEN(0.5),
         CLOSED(0.85),
-        KICK(0.16);
+        KICK(0.12);
 
         private final double position;
 

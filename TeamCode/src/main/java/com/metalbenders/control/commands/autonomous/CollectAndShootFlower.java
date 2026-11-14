@@ -58,17 +58,16 @@ public class CollectAndShootFlower extends SequentialCommandGroup {
                 new RunIntake(intakeSubsystem, INTAKE),
                 collectFromFLower(driveSubsystem, autoChallengeType, allianceColor),
                 new StopIntake(intakeSubsystem),
-                new ParallelCommandGroup(
-                        new DriveToLaunchAndShoot(
-                                driveSubsystem,
-                                intakeSubsystem,
-                                launchSubsystem,
-                                turretSubsystem,
-                                limelightSubsystem,
-                                allianceColor,
-                                waypointSeriesType,
-                                activeHiveCellFieldSideSupplier),
-                        new SetFlowerToolState(flowerToolSubsystem, UP)));
+                new DriveToLaunchAndShoot(
+                        driveSubsystem,
+                        intakeSubsystem,
+                        launchSubsystem,
+                        turretSubsystem,
+                        limelightSubsystem,
+                        allianceColor,
+                        waypointSeriesType,
+                        activeHiveCellFieldSideSupplier),
+                new SetFlowerToolState(flowerToolSubsystem, UP));
     }
 
     private static SequentialCommandGroup collectFromFLower(
@@ -83,14 +82,14 @@ public class CollectAndShootFlower extends SequentialCommandGroup {
                 oscillateOnFlower(flowerPose, driveSubsystem),
                 new DriveToPosition(
                         driveSubsystem,
-                        getFlowerBackupPose(autoChallengeType, allianceColor, FLOWER_DISTANCE_TO_BACKUP_WHEN_COLLECTING)),
-                new DriveToPosition(driveSubsystem, flowerPose, FLOWER_COLLECTION_MAX_SPEED)
-                        .withTimeout(MILLIS_TO_WAIT_FOR_FLOWER_TRAVEL),
-                new WaitCommand(MILLIS_TO_WAIT_FOR_FLOWER_INTAKE),
-                oscillateOnFlower(flowerPose, driveSubsystem),
-                new DriveToPosition(
-                        driveSubsystem,
-                        getFlowerBackupPose(autoChallengeType, allianceColor, FLOWER_DISTANCE_TO_BACKUP_WHEN_FINISHED_COLLECTING)));
+                        getFlowerBackupPose(autoChallengeType, allianceColor, FLOWER_DISTANCE_TO_BACKUP_WHEN_COLLECTING)));
+//                new DriveToPosition(driveSubsystem, flowerPose, FLOWER_COLLECTION_MAX_SPEED)
+//                        .withTimeout(MILLIS_TO_WAIT_FOR_FLOWER_TRAVEL),
+//                new WaitCommand(MILLIS_TO_WAIT_FOR_FLOWER_INTAKE),
+//                oscillateOnFlower(flowerPose, driveSubsystem),
+//                new DriveToPosition(
+//                        driveSubsystem,
+//                        getFlowerBackupPose(autoChallengeType, allianceColor, FLOWER_DISTANCE_TO_BACKUP_WHEN_FINISHED_COLLECTING)));
     }
 
     private static Pose getFlowerPose(AutoChallengeType autoChallengeType, AllianceColor allianceColor) {

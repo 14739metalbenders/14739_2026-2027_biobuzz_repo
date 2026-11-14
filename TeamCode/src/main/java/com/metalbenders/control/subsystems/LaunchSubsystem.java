@@ -24,7 +24,8 @@ public class LaunchSubsystem extends SubsystemBase {
     private final Telemetry telemetry;
     private final DcMotorEx launcher;
     private final Servo launchGateServo;
-    private LaunchVelocity targetLaunchVelocity;
+//    private LaunchVelocity targetLaunchVelocity;
+    private double targetLaunchVelocity;
     private LaunchGateState launchGateState;
 
     public LaunchSubsystem(HardwareMap hardwareMap, Telemetry telemetry, OpModeType opModeType) {
@@ -40,11 +41,11 @@ public class LaunchSubsystem extends SubsystemBase {
         this.launcher.setMode(RUN_USING_ENCODER);
         this.launcher.setPIDFCoefficients(RUN_USING_ENCODER, new PIDFCoefficients(
                 LAUNCHER_VELOCITY_PID.p, LAUNCHER_VELOCITY_PID.i, LAUNCHER_VELOCITY_PID.d, LAUNCHER_VELOCITY_PID.f));
-        if (opModeType == OpModeType.AUTO) {
-            targetLaunchVelocity = AUTONOMOUS;
-        } else {
-            targetLaunchVelocity = IDLE;
-        }
+//        if (opModeType == OpModeType.AUTO) {
+//            targetLaunchVelocity = AUTONOMOUS;
+//        } else {
+            targetLaunchVelocity = VelocityLookupTable.getTargetVelocity(0.0);
+//        }
     }
 
     public void setLaunchGateState(LaunchGateState launchGateState) {
@@ -54,7 +55,8 @@ public class LaunchSubsystem extends SubsystemBase {
 
     public void updateLauncherVelocity(double distance) {
         if (distance > 0) {
-            this.targetLaunchVelocity = getLaunchVelocityByDistance(distance * CONVERT_METERS_TO_INCHES);
+//            this.targetLaunchVelocity = getLaunchVelocityByDistance(distance * CONVERT_METERS_TO_INCHES);
+            targetLaunchVelocity = VelocityLookupTable.getTargetVelocity(distance * CONVERT_METERS_TO_INCHES);
         }
     }
 
@@ -65,11 +67,13 @@ public class LaunchSubsystem extends SubsystemBase {
 
     @Override
     public void periodic() {
-        launcher.setVelocity(targetLaunchVelocity.getVelocity());
+//        launcher.setVelocity(targetLaunchVelocity.getVelocity());
+        launcher.setVelocity(targetLaunchVelocity);
         telemetry.addLine(this.getClass().getSimpleName());
         telemetry.addLine("--------------------------------");
-        telemetry.addData("Target Velocity",
-                targetLaunchVelocity.name() + " (" + targetLaunchVelocity.getVelocity() + " rpm)");
+//        telemetry.addData("Target Velocity",
+//                targetLaunchVelocity.name() + " (" + targetLaunchVelocity.getVelocity() + " rpm)");
+        telemetry.addData("Target Velocity", targetLaunchVelocity);
         telemetry.addData("Actual Velocity", launcher.getVelocity());
         telemetry.addData("Launch Gate State", launchGateState);
         telemetry.addLine();

@@ -48,32 +48,39 @@ public class DriveToLaunchAndShoot extends SequentialCommandGroup {
             Supplier<FieldSide> activeHiveCellFieldSideSupplier,
             long timeToWaitForHiveSwitchMillis) {
         addCommands(
-                //drive to launch location on current field side
+                //drive to launch location on current field side (to ensure visibility of the hive)
                 new DriveToPosition(
                         driveSubsystem,
                         () -> FieldLocation
                                 .getLaunchLocation(FieldSide.getCurrentFieldSide(driveSubsystem.getCurrentPose()))
                                 .getPose(allianceColor)),
+
                 //check if the hive is transitioning
-                new CheckForHiveTransition(limelightSubsystem, timeToWaitForHiveSwitchMillis),
-                //drive to the launch location of the current hive state field side
-                new DriveToTargetFieldSide(
-                        driveSubsystem,
-                        () -> limelightSubsystem.getHiveState().getFieldSide(),
-                        allianceColor,
-                        waypointSeriesType),
-                //wait for the hive to switch to the active field side if it is not already on that side
+//                new CheckForHiveTransition(limelightSubsystem, timeToWaitForHiveSwitchMillis),
+
+                //check if hive is visible, if not drive to the opposite field side and then drive to the launch location
                 new ConditionalCommand(
                         new InstantCommand(),
-                        new WaitForHiveSwitch(limelightSubsystem, () -> limelightSubsystem.getHiveState().getFieldSide()),
-                        () -> limelightSubsystem.getHiveState().isActive()
-                ),
-                //drive to the launch location of the active hive cell field side
-                new DriveToPosition(
-                        driveSubsystem,
-                        () -> FieldLocation
-                                .getLaunchLocation(activeHiveCellFieldSideSupplier.get())
-                                .getPose(allianceColor)),
+                        new SequentialCommandGroup(
+                                new DriveToTargetFieldSide(
+                                        driveSubsystem,
+                                        () -> FieldSide.getCurrentFieldSide(driveSubsystem.getCurrentPose()).getOppositeSide(),
+                                        allianceColor,
+                                        waypointSeriesType),
+                                new DriveToPosition(
+                                        driveSubsystem,
+                                        () -> FieldLocation
+                                                .getLaunchLocation(FieldSide.getCurrentFieldSide(driveSubsystem.getCurrentPose()))
+                                                .getPose(allianceColor))),
+                        limelightSubsystem::isHiveDetected),
+
+                //wait for the hive to switch to the active field side if it is not already on that side
+//                new ConditionalCommand(
+//                        new InstantCommand(),
+//                        new WaitForHiveSwitch(limelightSubsystem, () -> limelightSubsystem.getHiveState().getFieldSide()),
+//                        () -> limelightSubsystem.getHiveState().isActive()
+//                ),
+
                 //shoot
                 new AutoShoot(intakeSubsystem, launchSubsystem, turretSubsystem));
     }

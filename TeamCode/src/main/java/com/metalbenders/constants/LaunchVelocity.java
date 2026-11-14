@@ -17,7 +17,7 @@ public enum LaunchVelocity {
     VELOCITY_48_50(1130.0, 48.0, 50.0),
     VELOCITY_50_54(1160.0, 50.0, 54.0),
     MAX(1180.0, 54.0, 60.0),
-    AUTONOMOUS(1050.0, null, null);
+    AUTONOMOUS(1040.0, null, null);
 
 
     private final Double minDistance;

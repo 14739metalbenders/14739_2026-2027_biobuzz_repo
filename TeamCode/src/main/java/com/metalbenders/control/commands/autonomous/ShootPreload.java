@@ -1,7 +1,9 @@
 package com.metalbenders.control.commands.autonomous;
 
+import com.arcrobotics.ftclib.command.ParallelRaceGroup;
 import com.arcrobotics.ftclib.command.SequentialCommandGroup;
 import com.metalbenders.constants.Constants;
+import com.metalbenders.constants.FieldLocation;
 import com.metalbenders.constants.FieldSide;
 import com.metalbenders.control.subsystems.DriveSubsystem;
 import com.metalbenders.control.subsystems.IntakeSubsystem;
@@ -25,6 +27,17 @@ public class ShootPreload extends SequentialCommandGroup {
             Constants.WaypointSeriesType waypointSeriesType,
             Supplier<FieldSide> activeHiveCellFieldSideSupplier,
             boolean waitToShoot) {
+        //drive to launch location on current field side
+        new DriveToPosition(
+                driveSubsystem,
+                () -> FieldLocation.getLaunchLocation(
+                        FieldSide.getCurrentFieldSide(driveSubsystem.getCurrentPose())).getPose(allianceColor));
+        //wait for the hive to switch
+        if (waitToShoot) {
+            addCommands(new WaitForHiveSwitch(
+                    limelightSubsystem, () -> FieldSide.getCurrentFieldSide(driveSubsystem.getCurrentPose())));
+        }
+        //drive to the launch location and shoot
         addCommands(
                 new DriveToLaunchAndShoot(
                         driveSubsystem,
