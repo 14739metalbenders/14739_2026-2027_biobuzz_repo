@@ -8,7 +8,7 @@ public enum FieldLocation {
     AUDIENCE_SIDE_START_POSE(
             new Pose(57.75, 7, Math.toRadians(90)), Symmetry.MIRROR_X),
     AUDIENCE_SIDE_LAUNCH(
-            new Pose(57.75, 30, Math.toRadians(90)), Symmetry.MIRROR_X),
+            new Pose(57.75, 27, Math.toRadians(90)), Symmetry.MIRROR_X),
     AUDIENCE_SIDE_OUTER_WAYPOINT(
             new Pose(30, 34, Math.toRadians(90)), Symmetry.MIRROR_X),
     AUDIENCE_SIDE_INNER_WAYPOINT(
@@ -21,7 +21,7 @@ public enum FieldLocation {
     SCORE_SIDE_START_POSE(
             new Pose(57.75, 137, Math.toRadians(270)), Symmetry.MIRROR_X),
     SCORE_SIDE_LAUNCH(
-            new Pose(57.75, 114, Math.toRadians(270)), Symmetry.MIRROR_X),
+            new Pose(57.75, 117, Math.toRadians(270)), Symmetry.MIRROR_X),
     SCORE_SIDE_OUTER_WAYPOINT(
             new Pose(30, 110, Math.toRadians(270)), Symmetry.MIRROR_X),
     SCORE_SIDE_INNER_WAYPOINT(

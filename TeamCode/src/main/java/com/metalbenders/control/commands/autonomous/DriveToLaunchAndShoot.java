@@ -72,7 +72,14 @@ public class DriveToLaunchAndShoot extends SequentialCommandGroup {
                                         () -> FieldLocation
                                                 .getLaunchLocation(FieldSide.getCurrentFieldSide(driveSubsystem.getCurrentPose()))
                                                 .getPose(allianceColor))),
-                        limelightSubsystem::isHiveDetected),
+                        () -> {
+                            if (!limelightSubsystem.isHiveDetected()) {
+                                return false;
+                            }
+                            Constants.HiveState hiveState = limelightSubsystem.getHiveState();
+                            //should return true regardless of whether it is transitioning to or already active on the current field side
+                            return hiveState.getFieldSide() == FieldSide.getCurrentFieldSide(driveSubsystem.getCurrentPose());
+                        }),
 
                 //wait for the hive to switch to the active field side if it is not already on that side
 //                new ConditionalCommand(

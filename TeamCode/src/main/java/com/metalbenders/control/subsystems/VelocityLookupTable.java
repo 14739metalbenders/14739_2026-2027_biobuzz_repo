@@ -9,13 +9,13 @@ public class VelocityLookupTable {
     private static final TreeMap<Double, Double> velocityTable = new TreeMap<>();
 
     static {
-        velocityTable.put(24.0, 1015.0);
-        velocityTable.put(28.0, 1025.0);
-        velocityTable.put(32.0, 1050.0);
-        velocityTable.put(36.0, 1070.0);
-        velocityTable.put(40.0, 1085.0);
-        velocityTable.put(44.0, 1100.0);
-        velocityTable.put(48.0, 1130.0);
+        velocityTable.put(21.1, 990.0);
+        velocityTable.put(27.3, 1000.0);
+        velocityTable.put(33.4, 1030.0);
+        velocityTable.put(38.0, 1055.0);
+        velocityTable.put(45.5, 1115.0);
+        velocityTable.put(49.0, 1125.0);
+        velocityTable.put(57.0, 1190.0);
         velocityTable.put(52.0, 1160.0);
         velocityTable.put(56.0, 1190.0);
         velocityTable.put(60.0, 1230.0);

@@ -27,7 +27,7 @@ public class DriveSubsystem extends SubsystemBase {
     }
 
     public void drive(double forward, double strafe, double heading) {
-        ManualDrive.driveOrHold(follower,
+        follower.manual(
                 ManualDrive.fieldCentric(forward, strafe, heading, follower.pose().heading()));
     }
 

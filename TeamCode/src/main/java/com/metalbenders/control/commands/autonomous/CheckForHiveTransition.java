@@ -13,7 +13,7 @@ public class CheckForHiveTransition extends ParallelRaceGroup {
                 new WaitCommand(timeToWaitForTransitionStateMillis),
                 new WaitUntilCommand(() -> {
                     Constants.HiveState hiveState = limelightSubsystem.getHiveState();
-                    return hiveState != null && hiveState.isTransitioning();
+                    return limelightSubsystem.isHiveDetected() && hiveState != null && hiveState.isTransitioning();
                 })
         );
     }
