@@ -48,13 +48,16 @@ public class Auto extends Base {
                 case HIVE_SIDE_FLOWER:
                     addFlower(commands, autoChallengeType);
                     break;
+                case PARK:
+                    commands.addCommands(new AutoPark(driveSubsystem, allianceColor, waypointSeriesType));
+                    break;
             }
         }
-        if (autoStrategy.contains(PARK)) {
-            autoCommands = addParkOverride(commands);
-        } else {
+//        if (autoStrategy.contains(PARK)) {
+//            autoCommands = addParkOverride(commands);
+//        } else {
             autoCommands = commands;
-        }
+//        }
     }
 
     @Override
