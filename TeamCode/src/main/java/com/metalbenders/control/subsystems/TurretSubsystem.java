@@ -42,8 +42,10 @@ public class TurretSubsystem extends SubsystemBase {
     public void updateTurretPosition(
             Twist currentTwist,
             double aimError,
-            double launcherRPM) {
-        setTurretPower(currentTwist, aimError, launcherRPM);
+            double launcherRPM,
+            double distanceToTarget) {
+        setTurretPower(currentTwist, aimError, launcherRPM, distanceToTarget);
+        telemetry.addData("Target Distance From Turret", distanceToTarget);
     }
 
     private double getTurretEncoderFixed() {
@@ -65,9 +67,9 @@ public class TurretSubsystem extends SubsystemBase {
         return AngleUnit.normalizeDegrees((getTurretEncoderFixed() / 1.872340426));
     }
 
-    private void setTurretPower(Twist currentTwist, double aimError, double launcherRPM) {
+    private void setTurretPower(Twist currentTwist, double aimError, double launcherRPM, double distanceToTarget) {
         TurretRotateCalc calculateTurretLead =
-                calculateTurretLead(currentTwist, aimError, getTurretAngleFromMotor(), launcherRPM, 15);
+                calculateTurretLead(currentTwist, aimError, getTurretAngleFromMotor(), launcherRPM, distanceToTarget, 75);
         shotLeadAngle = calculateTurretLead.getShotLeadAngle();
         shotTimeOfFLight = calculateTurretLead.getTimeOfFlight();
         targetBearing = calculateTurretLead.getTargetBearing();

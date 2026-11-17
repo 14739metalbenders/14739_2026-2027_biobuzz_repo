@@ -1,5 +1,6 @@
 package com.metalbenders.control.subsystems;
 
+import com.acmerobotics.dashboard.config.Config;
 import com.arcrobotics.ftclib.command.SubsystemBase;
 import com.metalbenders.constants.LaunchVelocity;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -19,6 +20,7 @@ import static com.metalbenders.constants.LaunchVelocity.IDLE;
 import static com.metalbenders.constants.LaunchVelocity.getLaunchVelocityByDistance;
 import static com.qualcomm.robotcore.hardware.DcMotor.RunMode.RUN_USING_ENCODER;
 
+@Config
 public class LaunchSubsystem extends SubsystemBase {
 
     private final Telemetry telemetry;
@@ -27,6 +29,8 @@ public class LaunchSubsystem extends SubsystemBase {
 //    private LaunchVelocity targetLaunchVelocity;
     private double targetLaunchVelocity;
     private LaunchGateState launchGateState;
+
+    public static double theVelocity = 1100;
 
     public LaunchSubsystem(HardwareMap hardwareMap, Telemetry telemetry, OpModeType opModeType) {
         this.telemetry = telemetry;
@@ -62,13 +66,14 @@ public class LaunchSubsystem extends SubsystemBase {
 
     public double getLauncherRPM() {
         // (Velocity from motor * 60 sec) / 1425.1 (PPR For goBilda 117 RPM Motor)
-        return (launcher.getVelocity() * 60) / 1425.1;
+        return (launcher.getVelocity() * 60) / 28;
     }
 
     @Override
     public void periodic() {
 //        launcher.setVelocity(targetLaunchVelocity.getVelocity());
         launcher.setVelocity(targetLaunchVelocity);
+        //launcher.setVelocity(theVelocity);
         telemetry.addLine(this.getClass().getSimpleName());
         telemetry.addLine("--------------------------------");
 //        telemetry.addData("Target Velocity",

@@ -27,6 +27,7 @@ public class UpdateTurret extends CommandBase {
         turretSubsystem.updateTurretPosition(
                 driveSubsystem.getCurrentTwist(),
                 limelightSubsystem.getAimError(),
-                launchSubsystem.getLauncherRPM());
+                launchSubsystem.getLauncherRPM(),
+                limelightSubsystem.getTargetDistance());
     }
 }

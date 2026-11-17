@@ -220,11 +220,17 @@ public class LimelightSubsystem extends SubsystemBase {
 
         // Convert the tag yaw angle to radians for trigonometric rotation math
         double yawRadians = Math.toRadians(tagAngles.getYaw(AngleUnit.DEGREES));
+        double pitchRadians = Math.toRadians(tagAngles.getPitch(AngleUnit.DEGREES));
+        double RollRadians = Math.toRadians(tagAngles.getRoll(AngleUnit.DEGREES));
 
         double xOffset = 0;
+        double yOffset = -0.190;
+        double zOffset = -0.150;
         // Determine where the Cell Center lives relative to the Tag's own origin (Tag Space)
         // - If Tag 1 or 3 (Left side of cell face), the center is to its right (+X)
         // - If Tag 2 or 4 (Right side of cell face), the center is to its left (-X)
+        // - Tag Y is positive Down
+        // - Tag Z is Positive Out from tag center.
         if (tagId == 30 || tagId == 34 || tagId == 38 || tagId == 42) {
             xOffset = 0.165;
         }
@@ -238,10 +244,30 @@ public class LimelightSubsystem extends SubsystemBase {
             xOffset = -0.165;
         }
 
+        double cy = Math.cos(yawRadians);
+        double sy = Math.sin(yawRadians);
+        double cp = Math.cos(pitchRadians);
+        double sp = Math.sin(pitchRadians);
+        double cr = Math.cos(RollRadians);
+        double sr = Math.sin(RollRadians);
+
+        // Rotate the local (xOffset, yOffset, zOffset) vector into Camera Space
+        double rotatedX = xOffset * (cy * cp)
+                + yOffset * (cy * sp * sr - sy * cr)
+                + zOffset * (cy * sp * cr + sy * sr);
+
+        double rotatedY = xOffset * (sy * cp)
+                + yOffset * (sy * sp * sr + cy * cr)
+                + zOffset * (sy * sp * cr - cy * sr);
+
+        double rotatedZ = xOffset * (-sp)
+                + yOffset * (cp * sr)
+                + zOffset * (cp * cr);
+
         // Manually rotate the local X-offset into Camera Space using the tag's Yaw angle
-        double correctedX = tagPos.x + (xOffset * Math.cos(yawRadians));
-        double correctedZ = tagPos.z + (xOffset * Math.sin(yawRadians));
-        double correctedY = tagPos.y; // Assumes cell center and tag share the same vertical height
+        double correctedX = tagPos.x + rotatedX;
+        double correctedY = tagPos.y + rotatedY;
+        double correctedZ = tagPos.z + rotatedZ;
 
         // Construct and return a fresh Pose3D containing the newly calculated center position
         return new Pose3D(
