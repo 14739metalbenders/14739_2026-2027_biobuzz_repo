@@ -4,6 +4,7 @@ import com.acmerobotics.dashboard.config.Config;
 import com.pedropathing.math.Twist;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 
 @Config
 public class TurretController {
@@ -11,6 +12,7 @@ public class TurretController {
     private static final double GRAVITY = 9.81; // in m/s2
     private static final ElapsedTime aimTimer = new ElapsedTime();
     private static final double INCHES_TO_METERS = 0.0254;
+    public static double TARGET_HEIGHT_TOLERANCE_METERS = 0.2;
     // PID controller parameters
     public static double AIM_Kp = 0.028;
     public static double AIM_Ki = 0;
@@ -52,51 +54,59 @@ public class TurretController {
      *
      * @param currentRPM      Flywheel RPM
      * @param ballLaunchAngle Launch angle of projectile
-     * @return Time of flight for projectile
+     * @param distanceToTarget Horizontal distance to the target in meters
+     * @return Time of flight to the target, or zero when the modeled shot misses
      */
-    private static double calculateTimeOfFlight(double currentRPM, double ballLaunchAngle) {
-        // Using projectile motion equations
-        double heightDifference = 1.261 - 0.300;
-        double verticalVelocity = calculateLaunchVelocity(currentRPM) * Math.sin(Math.toRadians(ballLaunchAngle));
-
-        // Quadratic equation: -0.5*g*t^2 + vy*t - h = 0
-        double a = -0.5 * GRAVITY;
-        double b = verticalVelocity;
-        double c = -heightDifference;
-
-        double discriminant = (b * b) - (4 * a * c);
-        if (discriminant < 0) {
-            return 0.0; // Flywheel speed too low to reach target height
+    static double calculateTimeOfFlight(
+            double currentRPM, double ballLaunchAngle, double distanceToTarget) {
+        if (!Double.isFinite(currentRPM)
+                || !Double.isFinite(ballLaunchAngle)
+                || !Double.isFinite(distanceToTarget)
+                || currentRPM <= 0
+                || distanceToTarget <= 0
+                || TARGET_HEIGHT_TOLERANCE_METERS < 0) {
+            return 0.0;
         }
 
-        double timeOfFlight1 = (-b + Math.sqrt(discriminant)) / (2 * a);
-        double timeOfFlight2 = (-b - Math.sqrt(discriminant)) / (2 * a);
+        double launchVelocity = calculateLaunchVelocity(currentRPM);
+        double launchAngleRadians = Math.toRadians(ballLaunchAngle);
+        double horizontalVelocity = launchVelocity * Math.cos(launchAngleRadians);
+        if (horizontalVelocity <= 0) {
+            return 0.0;
+        }
 
-        double tof = Math.max(timeOfFlight1, timeOfFlight2);
-        return Math.max(0.0, tof);
+        double timeOfFlight = distanceToTarget / horizontalVelocity;
+        double verticalVelocity = launchVelocity * Math.sin(launchAngleRadians);
+        double heightDifference = 1.261 - 0.300;
+        double projectileHeight = verticalVelocity * timeOfFlight
+                - 0.5 * GRAVITY * timeOfFlight * timeOfFlight;
+        return Math.abs(projectileHeight - heightDifference) <= TARGET_HEIGHT_TOLERANCE_METERS
+                ? timeOfFlight
+                : 0.0;
     }
 
     /**
      * Calculates the target lead angle based on robot's current movement and time of flight.
      *
-     * @param xVector       X vector of the robot's motion in inches per second (Turret Reference Frame)
-     * @param yVector       Y vector of the robot's motion in inches per second (Turret Reference Frame)
+     * @param xVector       X vector of the robot's motion in meters per second (Turret Reference Frame)
+     * @param yVector       Y vector of the robot's motion in meters per second (Turret Reference Frame)
      * @param timeOfFlight  Ball time of flight
-*      @param distanceToTarget targetDistanceInMeters
-     * @param distanceToTarget
+     * @param distanceToTarget Target distance in meters
+     * @param targetBearing Target bearing in degrees
      * @return Shot lead in degrees
      */
 
-    private static double calculateShotLead(double xVector, double yVector, double timeOfFlight, double distanceToTarget) {
+    static double calculateShotLead(
+            double xVector, double yVector, double timeOfFlight,
+            double distanceToTarget, double targetBearing) {
+        double targetBearingRadians = Math.toRadians(targetBearing);
+        double targetX = distanceToTarget * Math.cos(targetBearingRadians);
+        double targetY = distanceToTarget * Math.sin(targetBearingRadians);
+        double virtualTargetX = targetX - (xVector * timeOfFlight);
+        double virtualTargetY = targetY - (yVector * timeOfFlight);
 
-        // 1. Calculate where the target appears to move relative to the robot (opposite of robot motion)
-        double virtualTargetX = distanceToTarget - (xVector * timeOfFlight);
-        double virtualTargetY = -(yVector * timeOfFlight);
-
-        // 2. Calculate the angle to that virtual target position
-        double translationalLeadDeg = Math.toDegrees(Math.atan2(virtualTargetY, virtualTargetX));
-
-        return translationalLeadDeg;
+        double compensatedBearing = Math.toDegrees(Math.atan2(virtualTargetY, virtualTargetX));
+        return AngleUnit.normalizeDegrees(compensatedBearing - targetBearing);
     }
 
     /**
@@ -146,8 +156,8 @@ public class TurretController {
     /**
      * Transforms xVector and yVector from Robot Reference Frame to Turret Reference Frame.
      *
-     * @param xVector     X vector of the robot's motion in inches per second
-     * @param yVector     Y vector of the robot's motion in inches per second
+     * @param xVector     X vector of the robot's motion in meters per second
+     * @param yVector     Y vector of the robot's motion in meters per second
      * @param turretAngle Current angle of the turret relative to the robot
      * @return TurretRobotTransform containing the transformed xVector and yVector
      */
@@ -170,10 +180,21 @@ public class TurretController {
      * @param targetBearing   current bearing of target from limelight
      * @param turretAngle     turret angle on robot
      * @param currentRPM      launcher flywheel rpm
+     * @param distanceToTarget horizontal distance to the target in meters
      * @param ballLaunchAngle ball launch angle
+     * @param targetVisible   whether the Limelight currently detects a target
      * @return TurretRotateCalc containing turretPower, targetBearing, shotLeadAngle, timeOfFlight
      */
-    public static TurretRotateCalc calculateTurretLead(Twist twist, double targetBearing, double turretAngle, double currentRPM, double distanceToTarget, double ballLaunchAngle) {
+    public static TurretRotateCalc calculateTurretLead(
+            Twist twist, double targetBearing, double turretAngle, double currentRPM,
+            double distanceToTarget, double ballLaunchAngle, boolean targetVisible) {
+        if (!targetVisible || !Double.isFinite(targetBearing) || !Double.isFinite(turretAngle)) {
+            aimIntegral = 0;
+            aimLastError = 0;
+            aimTimer.reset();
+            return new TurretRotateCalc(0, targetBearing, 0, 0);
+        }
+
         // Convert Twist velocities from inches per second to meters per second
         double vx_mps = twist.vx * INCHES_TO_METERS;
         double vy_mps = twist.vy * INCHES_TO_METERS;
@@ -183,37 +204,30 @@ public class TurretController {
         double turretPower = 0;
 
         // Calculate time of flight
-        double timeOfFlight = calculateTimeOfFlight(currentRPM, ballLaunchAngle);
-        //double timeOfFlight = 4;
+        double timeOfFlight = calculateTimeOfFlight(currentRPM, ballLaunchAngle, distanceToTarget);
 
         // Calculate shot lead angle
-        double shotLeadAngle = 0.75 * calculateShotLead(turretMovement.getXVector(), turretMovement.getYVector(), timeOfFlight, distanceToTarget);
-        //double shotLeadAngle = 0;
+        double shotLeadAngle = timeOfFlight > 0
+                ? calculateShotLead(turretMovement.getXVector(), turretMovement.getYVector(),
+                        timeOfFlight, distanceToTarget, targetBearing)
+                : 0;
 
-        if (Math.abs(targetBearing) > 0.001) {
-            // Desired turret angle is the current bearing plus the shot lead angle
-            double adjustedTargetBearing = (targetBearing + shotLeadAngle);
+        double adjustedTargetBearing = targetBearing + shotLeadAngle;
 
-            // Clamp desired turret angle to within -turretAngleLimit and turretAngleLimit degrees
-            if (Math.abs(adjustedTargetBearing + turretAngle) > turretAngleLimit) {
-                adjustedTargetBearing = (Math.signum(adjustedTargetBearing) * turretAngleLimit) - turretAngle;
-            }
+        // Clamp desired turret angle to within -turretAngleLimit and turretAngleLimit degrees
+        if (Math.abs(adjustedTargetBearing + turretAngle) > turretAngleLimit) {
+            adjustedTargetBearing = (Math.signum(adjustedTargetBearing) * turretAngleLimit) - turretAngle;
+        }
 
-            double turretError = adjustedTargetBearing;
+        double turretError = adjustedTargetBearing;
 
-            // Calculate PID control for turret motor
-            turretPower = calculatePID(turretError);
+        // Calculate PID control for turret motor
+        turretPower = calculatePID(turretError);
 
-            if (Math.abs(turretPower) > 0.01 && Math.abs(adjustedTargetBearing) > AIM_DEADBAND && Math.abs(targetBearing) != 0.0) {
-                turretPower = profiledPower.update(turretPower);
-            } else {
-                turretPower = 0;
-            }
-
+        if (Math.abs(turretPower) > 0.01 && Math.abs(adjustedTargetBearing) > AIM_DEADBAND) {
+            turretPower = profiledPower.update(turretPower);
         } else {
             turretPower = 0;
-            shotLeadAngle = 0;
-            timeOfFlight = 0;
         }
 
         return new TurretRotateCalc(turretPower, targetBearing, shotLeadAngle, timeOfFlight);

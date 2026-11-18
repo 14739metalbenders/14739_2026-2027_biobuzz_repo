@@ -28,6 +28,7 @@ public class UpdateTurret extends CommandBase {
                 driveSubsystem.getCurrentTwist(),
                 limelightSubsystem.getAimError(),
                 launchSubsystem.getLauncherRPM(),
-                limelightSubsystem.getTargetDistance());
+                limelightSubsystem.getTargetDistance(),
+                limelightSubsystem.isHiveDetected());
     }
 }

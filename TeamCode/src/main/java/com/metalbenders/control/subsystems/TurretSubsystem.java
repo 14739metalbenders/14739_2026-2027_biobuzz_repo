@@ -43,8 +43,9 @@ public class TurretSubsystem extends SubsystemBase {
             Twist currentTwist,
             double aimError,
             double launcherRPM,
-            double distanceToTarget) {
-        setTurretPower(currentTwist, aimError, launcherRPM, distanceToTarget);
+            double distanceToTarget,
+            boolean targetVisible) {
+        setTurretPower(currentTwist, aimError, launcherRPM, distanceToTarget, targetVisible);
         telemetry.addData("Target Distance From Turret", distanceToTarget);
     }
 
@@ -57,7 +58,8 @@ public class TurretSubsystem extends SubsystemBase {
         turretMotorEncoderZero = currentTurretMotorEncoderValue - (long) (getTurretAngleFromEncoder() * TURRET_TICKS_PER_DEGREE);
     }
 
-    private double getTurretAngleFromMotor() {
+    /** Returns the current calibrated turret angle in degrees, including between commands. */
+    public double getTurretAngleFromMotor() {
         long currentTurretMotorEncoderValue = turretMotor.getCurrentPosition();
         turretAngle = AngleUnit.normalizeDegrees((currentTurretMotorEncoderValue - turretMotorEncoderZero) / TURRET_TICKS_PER_DEGREE);
         return turretAngle;
@@ -67,9 +69,12 @@ public class TurretSubsystem extends SubsystemBase {
         return AngleUnit.normalizeDegrees((getTurretEncoderFixed() / 1.872340426));
     }
 
-    private void setTurretPower(Twist currentTwist, double aimError, double launcherRPM, double distanceToTarget) {
+    private void setTurretPower(
+            Twist currentTwist, double aimError, double launcherRPM,
+            double distanceToTarget, boolean targetVisible) {
         TurretRotateCalc calculateTurretLead =
-                calculateTurretLead(currentTwist, aimError, getTurretAngleFromMotor(), launcherRPM, distanceToTarget, 75);
+                calculateTurretLead(currentTwist, aimError, getTurretAngleFromMotor(),
+                        launcherRPM, distanceToTarget, 75, targetVisible);
         shotLeadAngle = calculateTurretLead.getShotLeadAngle();
         shotTimeOfFLight = calculateTurretLead.getTimeOfFlight();
         targetBearing = calculateTurretLead.getTargetBearing();
