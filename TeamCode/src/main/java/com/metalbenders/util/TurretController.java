@@ -9,10 +9,8 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 @Config
 public class TurretController {
 
-    private static final double GRAVITY = 9.81; // in m/s2
     private static final ElapsedTime aimTimer = new ElapsedTime();
     private static final double INCHES_TO_METERS = 0.0254;
-    public static double TARGET_HEIGHT_TOLERANCE_METERS = 0.2;
     // PID controller parameters
     public static double AIM_Kp = 0.028;
     public static double AIM_Ki = 0;
@@ -50,12 +48,14 @@ public class TurretController {
 
 
     /**
-     * Calculates time of flight for a projectile
+     * Estimates flight time from horizontal range and launch speed.
+     * The approximate launch model must not reject empirically calibrated shots
+     * based on predicted target height.
      *
      * @param currentRPM      Flywheel RPM
      * @param ballLaunchAngle Launch angle of projectile
      * @param distanceToTarget Horizontal distance to the target in meters
-     * @return Time of flight to the target, or zero when the modeled shot misses
+     * @return Estimated flight time in seconds, or zero when inputs are invalid
      */
     static double calculateTimeOfFlight(
             double currentRPM, double ballLaunchAngle, double distanceToTarget) {
@@ -64,7 +64,8 @@ public class TurretController {
                 || !Double.isFinite(distanceToTarget)
                 || currentRPM <= 0
                 || distanceToTarget <= 0
-                || TARGET_HEIGHT_TOLERANCE_METERS < 0) {
+                || ballLaunchAngle < 0
+                || ballLaunchAngle >= 90) {
             return 0.0;
         }
 
@@ -76,13 +77,7 @@ public class TurretController {
         }
 
         double timeOfFlight = distanceToTarget / horizontalVelocity;
-        double verticalVelocity = launchVelocity * Math.sin(launchAngleRadians);
-        double heightDifference = 1.261 - 0.300;
-        double projectileHeight = verticalVelocity * timeOfFlight
-                - 0.5 * GRAVITY * timeOfFlight * timeOfFlight;
-        return Math.abs(projectileHeight - heightDifference) <= TARGET_HEIGHT_TOLERANCE_METERS
-                ? timeOfFlight
-                : 0.0;
+        return Double.isFinite(timeOfFlight) ? timeOfFlight : 0.0;
     }
 
     /**

@@ -47,6 +47,7 @@ public class TurretSubsystem extends SubsystemBase {
             boolean targetVisible) {
         setTurretPower(currentTwist, aimError, launcherRPM, distanceToTarget, targetVisible);
         telemetry.addData("Target Distance From Turret", distanceToTarget);
+        telemetry.addData("Shot Lead Available", targetVisible && shotTimeOfFLight > 0);
     }
 
     private double getTurretEncoderFixed() {

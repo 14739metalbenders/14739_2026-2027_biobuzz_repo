@@ -1,8 +1,11 @@
 package com.metalbenders.util;
 
+import com.metalbenders.control.subsystems.VelocityLookupTable;
+import com.pedropathing.math.Twist;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class TurretControllerTest {
     private static final double EPSILON = 1e-6;
@@ -24,18 +27,58 @@ public class TurretControllerTest {
     }
 
     @Test
-    public void timeOfFlightUsesTargetDistanceAndRejectsMissedHeight() {
-        double originalTolerance = TurretController.TARGET_HEIGHT_TOLERANCE_METERS;
-        try {
-            TurretController.TARGET_HEIGHT_TOLERANCE_METERS = 0.2;
-            double timeToTarget = TurretController.calculateTimeOfFlight(2000, 75, 1.08);
-            double timeToMissedTarget = TurretController.calculateTimeOfFlight(2000, 75, 2.0);
+    public void timeOfFlightScalesWithTargetDistanceWithoutHeightRejection() {
+        double horizontalSpeed = Math.PI * 0.072 * (2000.0 / 60) * 0.7
+                * Math.cos(Math.toRadians(75));
 
-            assertEquals(1.08 / (Math.PI * 0.072 * (2000.0 / 60) * 0.7 * Math.cos(Math.toRadians(75))),
-                    timeToTarget, EPSILON);
-            assertEquals(0, timeToMissedTarget, EPSILON);
-        } finally {
-            TurretController.TARGET_HEIGHT_TOLERANCE_METERS = originalTolerance;
+        assertEquals(1.08 / horizontalSpeed,
+                TurretController.calculateTimeOfFlight(2000, 75, 1.08), EPSILON);
+        assertEquals(2.0 / horizontalSpeed,
+                TurretController.calculateTimeOfFlight(2000, 75, 2.0), EPSILON);
+    }
+
+    @Test
+    public void calibratedShotsKeepLeadInBothStrafeDirections() {
+        double[] distancesInches = {21.1, 26.5, 32.0, 40.8, 45.5, 49.0, 52.0, 56.0, 60.0, 64.0};
+        for (double inches : distancesInches) {
+            double distance = inches * 0.0254;
+            double rpm = VelocityLookupTable.getTargetVelocity(inches) * 60 / 28;
+            double expectedTime = distance / (Math.PI * 0.072 * (rpm / 60) * 0.7
+                    * Math.cos(Math.toRadians(75)));
+            for (double strafe : new double[]{-20, 20}) {
+                TurretController.TurretRotateCalc result = TurretController.calculateTurretLead(
+                        new Twist(0, strafe, 0), 0, 0, rpm, distance, 75, true);
+
+                assertEquals(expectedTime, result.getTimeOfFlight(), EPSILON);
+                assertEquals(Math.toDegrees(Math.atan2(-strafe * 0.0254 * expectedTime, distance)),
+                        result.getShotLeadAngle(), EPSILON);
+                assertTrue(result.getShotLeadAngle() * strafe < 0);
+            }
         }
+    }
+
+    @Test
+    public void invalidFlightInputsRemainUnavailable() {
+        double[][] inputs = {
+                {0, 75, 1}, {-1, 75, 1}, {Double.NaN, 75, 1},
+                {Double.POSITIVE_INFINITY, 75, 1},
+                {2000, 75, 0}, {2000, 75, -1}, {2000, 75, Double.NaN},
+                {2000, 75, Double.POSITIVE_INFINITY},
+                {2000, -1, 1}, {2000, 90, 1}, {2000, 180, 1},
+                {2000, Double.NaN, 1}, {2000, Double.POSITIVE_INFINITY, 1}
+        };
+        for (double[] input : inputs) {
+            assertEquals(0, TurretController.calculateTimeOfFlight(input[0], input[1], input[2]), 0);
+        }
+    }
+
+    @Test
+    public void missingTargetDisablesLeadAndTurretPower() {
+        TurretController.TurretRotateCalc result = TurretController.calculateTurretLead(
+                new Twist(0, 20, 0), 0, 0, 2400, 1, 75, false);
+
+        assertEquals(0, result.getTimeOfFlight(), 0);
+        assertEquals(0, result.getShotLeadAngle(), 0);
+        assertEquals(0, result.getTurretPower(), 0);
     }
 }
