@@ -50,11 +50,12 @@ public abstract class Base extends CommandOpMode {
         initializeConfigurations();
 
         // Initialize subsystems
-        driveSubsystem = new DriveSubsystem(hardwareMap, telemetry, getStartingPose());
         intakeSubsystem = new IntakeSubsystem(hardwareMap, telemetry);
         limelightSubsystem = new LimelightSubsystem(
                 hardwareMap, telemetry, allianceColor, getStartingActiveHiveCellFieldSide());
         turretSubsystem = new TurretSubsystem(hardwareMap, telemetry);
+        driveSubsystem = new DriveSubsystem(hardwareMap, telemetry, getStartingPose(),
+                getOpModeType(), limelightSubsystem, turretSubsystem);
         launchSubsystem = new LaunchSubsystem(hardwareMap, telemetry, getOpModeType());
         flowerToolSubsystem = new FlowerToolSubsystem(hardwareMap, telemetry);
         lightingSubsystem = new LightingSubsystem(hardwareMap, telemetry, allianceColor);

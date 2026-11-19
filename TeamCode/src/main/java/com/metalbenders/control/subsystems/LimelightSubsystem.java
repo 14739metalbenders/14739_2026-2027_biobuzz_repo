@@ -41,6 +41,7 @@ public class LimelightSubsystem extends SubsystemBase {
     private final Constants.AllianceColor allianceColor;
     private final Limelight3A limelight;
     private Constants.LimelightState limelightState;
+    private LLResult latestResult;
     private boolean hiveDetected = false;   // did we see hive tags during this scan?
     private double aimError = 0;            // turret error to the up cell visible tags (deg)
     private double tagDistance = 0;             // horizontal camera to tag cluster (m)
@@ -69,9 +70,9 @@ public class LimelightSubsystem extends SubsystemBase {
 
     @Override
     public void periodic() {
-        LLResult llResult = limelight.getLatestResult();
-        if (isResultValid(llResult)) {
-            updateHiveTargeting(llResult.getFiducialResults());
+        latestResult = limelight.getLatestResult();
+        if (isResultValid(latestResult)) {
+            updateHiveTargeting(latestResult.getFiducialResults());
         } else {
             hiveDetected = false;
             aimError = 0;
@@ -85,6 +86,10 @@ public class LimelightSubsystem extends SubsystemBase {
         telemetry.addData("Aim Error (deg)", aimError);
         telemetry.addData("Hive State", hiveState);
         telemetry.addLine();
+    }
+
+    public LLResult getLatestResult() {
+        return latestResult;
     }
 
     /**

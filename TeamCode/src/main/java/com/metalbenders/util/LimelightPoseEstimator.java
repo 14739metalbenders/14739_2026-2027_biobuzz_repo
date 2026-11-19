@@ -27,7 +27,7 @@ import java.util.function.LongSupplier;
  * record the current Pedro pose and turret encoder angle using {@link #addSample(long, Pose, double)},
  * then pass the latest Limelight result to {@link #estimate(LLResult)}. Read the pose only
  * when the returned status is {@link Status#OK}; otherwise the pose is null. Use the
- * result promptly and do not reset the odometry frame within the retained history.
+ * result promptly and call {@link #clearOdometryHistory()} if the odometry frame is reset.
  */
 public final class LimelightPoseEstimator {
     private static final double INCHES_PER_METER = 1.0 / 0.0254;
@@ -129,6 +129,11 @@ public final class LimelightPoseEstimator {
             if (iterator.next().time >= timestampMillis - historyMillis) break;
             history.removeFirst();
         }
+    }
+
+    /** Discard samples from a previous odometry frame without refreshing the last image time. */
+    public void clearOdometryHistory() {
+        history.clear();
     }
 
     /**

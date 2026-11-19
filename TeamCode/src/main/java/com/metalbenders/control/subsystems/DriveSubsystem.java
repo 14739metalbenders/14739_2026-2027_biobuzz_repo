@@ -2,10 +2,15 @@ package com.metalbenders.control.subsystems;
 
 
 import com.arcrobotics.ftclib.command.SubsystemBase;
+import com.metalbenders.constants.Constants.OpModeType;
+import com.metalbenders.util.LimelightPoseEstimator;
+import com.metalbenders.util.LimelightPoseEstimator.Estimate;
+import com.metalbenders.util.LimelightPoseEstimator.Status;
 import com.pedropathing.follower.Follower;
 import com.pedropathing.follower.ManualDrive;
 import com.pedropathing.math.Pose;
 import com.pedropathing.math.Twist;
+import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.pedro.Constants;
@@ -16,12 +21,26 @@ import static com.metalbenders.constants.Constants.AUTO_SPEED_MULTIPLIER;
 import static com.pedropathing.api.Paths.line;
 
 public class DriveSubsystem extends SubsystemBase {
+    private static final long LOCALIZATION_HISTORY_MILLIS = 1000;
+    private static final long LOCALIZATION_MAX_PREDICTION_MILLIS = 100;
 
     private final Follower follower;
     private final Telemetry telemetry;
+    private final LimelightSubsystem limelightSubsystem;
+    private final TurretSubsystem turretSubsystem;
+    private final LimelightPoseEstimator poseEstimator;
+    private long lastSampleTime = Long.MIN_VALUE;
+    private double lastAppliedFrameTimestamp = Double.NaN;
 
-    public DriveSubsystem(HardwareMap hardwareMap, Telemetry telemetry, Pose initialPose) {
+    public DriveSubsystem(HardwareMap hardwareMap, Telemetry telemetry, Pose initialPose,
+                          OpModeType opModeType, LimelightSubsystem limelightSubsystem,
+                          TurretSubsystem turretSubsystem) {
         this.telemetry = telemetry;
+        this.limelightSubsystem = limelightSubsystem;
+        this.turretSubsystem = turretSubsystem;
+        this.poseEstimator = opModeType == OpModeType.TELEOP
+                ? new LimelightPoseEstimator(LOCALIZATION_HISTORY_MILLIS, LOCALIZATION_MAX_PREDICTION_MILLIS)
+                : null;
         this.follower = Constants.create(hardwareMap);
         this.follower.setPose(initialPose);
     }
@@ -44,6 +63,13 @@ public class DriveSubsystem extends SubsystemBase {
         return follower.pose();
     }
 
+    public void setPose(Pose pose) {
+        follower.setPose(pose);
+        if (poseEstimator != null) {
+            poseEstimator.clearOdometryHistory();
+        }
+    }
+
     public Twist getCurrentTwist() {
         return follower.twist();
     }
@@ -61,6 +87,9 @@ public class DriveSubsystem extends SubsystemBase {
         follower.update();
         telemetry.addLine(this.getClass().getSimpleName());
         telemetry.addLine("--------------------------------");
+        if (poseEstimator != null) {
+            updateLocalization();
+        }
         telemetry.addData("Pose",
                 String.format(Locale.ENGLISH, "x: %.2f, y: %.2f, heading: %.2f",
                         follower.pose().x(), follower.pose().y(), Math.toDegrees(follower.pose().heading())));
@@ -69,6 +98,38 @@ public class DriveSubsystem extends SubsystemBase {
         //telemetry.addData("Yvector", follower.twist().vy);
         //telemetry.addData("Omega", follower.twist().omega);
         telemetry.addLine();
+    }
+
+    private void updateLocalization() {
+        Pose odometry = follower.pose();
+        double turretDegrees = turretSubsystem.getTurretAngleFromMotor();
+        long sampleTime = System.currentTimeMillis();
+        if (sampleTime > lastSampleTime) {
+            poseEstimator.addSample(sampleTime, odometry, turretDegrees);
+            lastSampleTime = sampleTime;
+        }
+
+        LLResult result = limelightSubsystem.getLatestResult();
+        if (result != null && result.getTimestamp() == lastAppliedFrameTimestamp) {
+            telemetry.addData("Localization Status", "Frame already applied");
+            telemetry.addData("Localization Correction", "Not applied");
+            return;
+        }
+
+        Estimate estimate = poseEstimator.estimate(result);
+        telemetry.addData("Localization Status", estimate.status);
+        telemetry.addData("Localization Tags", estimate.tagsUsed);
+        if (estimate.status != Status.OK) {
+            telemetry.addData("Localization Correction", "Not applied");
+            return;
+        }
+
+        Pose correctedPose = estimate.pose;
+        setPose(correctedPose);
+        lastAppliedFrameTimestamp = result.getTimestamp();
+        telemetry.addData("Localization Correction", "Applied");
+        telemetry.addData("Localization Pose", "x %.2f, y %.2f, heading %.1f deg",
+                correctedPose.x(), correctedPose.y(), Math.toDegrees(correctedPose.heading()));
     }
 
     public void teardown() {

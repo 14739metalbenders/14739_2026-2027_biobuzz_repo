@@ -175,6 +175,31 @@ public class LimelightPoseEstimatorTest {
     }
 
     @Test
+    public void clearingOdometryHistoryRejectsImagesFromBeforePoseReset() throws JSONException {
+        String fiducials = "\"Fiducial\":[{\"fID\":30,\"t6t_cs\":[0,0,1,0,0,0]}]}";
+        TestResult beforeReset = new TestResult("{\"v\":1,\"ts\":123," + fiducials);
+        beforeReset.receipt = 1000;
+        TestResult afterReset = new TestResult("{\"v\":1,\"ts\":124," + fiducials);
+        afterReset.receipt = 1200;
+        LimelightLocalizationConstants.TAGS[0] =
+                new TagGeometry(100, 60, 0, 0, 0, 1, 0, 0, 1, 0);
+        AtomicLong clock = new AtomicLong(1000);
+        LimelightPoseEstimator estimator = new LimelightPoseEstimator(500, 100, clock::get);
+        estimator.addSample(900, Pose.zero(), 0);
+        estimator.addSample(1000, Pose.zero(), 0);
+        assertEquals(LimelightPoseEstimator.Status.OK, estimator.estimate(beforeReset).status);
+
+        estimator.clearOdometryHistory();
+        estimator.addSample(1100, new Pose(100, 60, 0), 0);
+        estimator.addSample(1200, new Pose(100, 60, 0), 0);
+        clock.set(1200);
+        beforeReset.receipt = 1150;
+        assertEquals(LimelightPoseEstimator.Status.INSUFFICIENT_HISTORY,
+                estimator.estimate(beforeReset).status);
+        assertEquals(LimelightPoseEstimator.Status.OK, estimator.estimate(afterReset).status);
+    }
+
+    @Test
     public void reportsUnconfiguredTagsAndMissingHistory() throws JSONException {
         LLResult result = new TestResult("{\"v\":1,\"ts\":123,\"Fiducial\":["
                 + "{\"fID\":45,\"t6t_cs\":[0,0,1,0,0,0]}]}");
