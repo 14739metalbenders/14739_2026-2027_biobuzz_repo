@@ -12,7 +12,7 @@ public enum FieldLocation {
     AUDIENCE_SIDE_OUTER_WAYPOINT(
             new Pose(30, 34, Math.toRadians(90)), Symmetry.MIRROR_X),
     AUDIENCE_SIDE_INNER_WAYPOINT(
-            new Pose(60, 34, Math.toRadians(90)), Symmetry.MIRROR_X),
+            new Pose(57.75, 34, Math.toRadians(90)), Symmetry.MIRROR_X),
     AUDIENCE_SIDE_HIVE_CELL(
             new Pose(57.75, 57, Math.toRadians(270)), Symmetry.MIRROR_X),
     PARK(
@@ -25,7 +25,7 @@ public enum FieldLocation {
     SCORE_SIDE_OUTER_WAYPOINT(
             new Pose(30, 110, Math.toRadians(270)), Symmetry.MIRROR_X),
     SCORE_SIDE_INNER_WAYPOINT(
-            new Pose(60, 110, Math.toRadians(270)), Symmetry.MIRROR_X),
+            new Pose(57.75, 110, Math.toRadians(270)), Symmetry.MIRROR_X),
     SCORE_SIDE_HIVE_CELL(
             new Pose(57.75, 87, Math.toRadians(90)), Symmetry.MIRROR_X),
     //Flower Locations

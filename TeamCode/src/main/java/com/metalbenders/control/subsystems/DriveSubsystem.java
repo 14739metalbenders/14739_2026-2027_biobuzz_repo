@@ -13,6 +13,7 @@ import com.pedropathing.math.Twist;
 import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.teamcode.pedro.Constants;
 
 import java.util.Locale;
@@ -23,6 +24,7 @@ import static com.pedropathing.api.Paths.line;
 public class DriveSubsystem extends SubsystemBase {
     private static final long LOCALIZATION_HISTORY_MILLIS = 1000;
     private static final long LOCALIZATION_MAX_PREDICTION_MILLIS = 100;
+    private static final double MAX_VISION_HEADING_ERROR_DEGREES = 15.0;
 
     private final Follower follower;
     private final Telemetry telemetry;
@@ -124,12 +126,30 @@ public class DriveSubsystem extends SubsystemBase {
             return;
         }
 
-        Pose correctedPose = estimate.pose;
+        double headingErrorDegrees = visionHeadingErrorDegrees(odometry, estimate.pose);
+        telemetry.addData("Localization Vision Heading (deg)", "%.1f",
+                Math.toDegrees(estimate.pose.heading()));
+        telemetry.addData("Localization Heading Error (deg)", "%.1f", headingErrorDegrees);
+        // Vision uses its heading to calculate X/Y, so a large disagreement also invalidates position.
+        if (!isVisionHeadingConsistent(headingErrorDegrees)) {
+            telemetry.addData("Localization Correction", "Rejected: heading disagreement");
+            return;
+        }
+
+        Pose correctedPose = new Pose(estimate.pose.x(), estimate.pose.y(), odometry.heading());
         setPose(correctedPose);
         lastAppliedFrameTimestamp = result.getTimestamp();
-        telemetry.addData("Localization Correction", "Applied");
+        telemetry.addData("Localization Correction", "Applied X/Y only");
         telemetry.addData("Localization Pose", "x %.2f, y %.2f, heading %.1f deg",
                 correctedPose.x(), correctedPose.y(), Math.toDegrees(correctedPose.heading()));
+    }
+
+    static double visionHeadingErrorDegrees(Pose odometry, Pose vision) {
+        return AngleUnit.normalizeDegrees(Math.toDegrees(vision.heading() - odometry.heading()));
+    }
+
+    static boolean isVisionHeadingConsistent(double headingErrorDegrees) {
+        return Math.abs(headingErrorDegrees) <= MAX_VISION_HEADING_ERROR_DEGREES;
     }
 
     public void teardown() {
