@@ -1,6 +1,7 @@
 package com.metalbenders.util;
 
 import com.acmerobotics.dashboard.config.Config;
+import com.metalbenders.control.subsystems.LightingSubsystem;
 import com.pedropathing.math.Twist;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
@@ -14,12 +15,12 @@ public class TurretController {
     // PID controller parameters
     public static double AIM_Kp = 0.028;
     public static double AIM_Ki = 0;
-    public static double AIM_Kd = 0.0025;
+    public static double AIM_Kd = 0.0018;
     public static double AIM_Ks = 0.002;
-    public static double AIM_DEADBAND = 2.0;
-    public static double maxTurretPower = 0.9;
-    public static double maxTurretAccel = 0.15;
-    public static double maxTurretDecel = 0.3;
+    public static double AIM_DEADBAND = 1.5;
+    public static double maxTurretPower = 1.0;
+    public static double maxTurretAccel = 0.18;
+    public static double maxTurretDecel = 0.4;
     private static final MotionProfile profiledPower = new MotionProfile(maxTurretPower, maxTurretAccel, maxTurretDecel);
     public static double turretAngleLimit = 70; // Maximum angle limit for turret movement
     private static double aimIntegral = 0;
@@ -42,7 +43,7 @@ public class TurretController {
      */
     private static double calculateLaunchVelocity(double currentRPM) {
         // PI * Flywheel Diameter(m) * RPS * Efficiency Factor
-        double efficencyFactor = 0.7;
+        double efficencyFactor = 0.6;
         return Math.PI * 0.072 * (currentRPM / 60) * efficencyFactor;
     }
 
@@ -207,6 +208,7 @@ public class TurretController {
                         timeOfFlight, distanceToTarget, targetBearing)
                 : 0;
 
+        shotLeadAngle = 0;
         double adjustedTargetBearing = targetBearing + shotLeadAngle;
 
         // Clamp desired turret angle to within -turretAngleLimit and turretAngleLimit degrees

@@ -6,34 +6,42 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.Servo;
 
-@Disabled
+//@Disabled
 @TeleOp(name = "ServoConf", group = "Hardware")
 @Config
 public class ServoConf extends LinearOpMode {
 
-    private Servo angleServo;
+    private Servo LH_Servo;
+    private Servo RH_Servo;
+
+    public double leftServoPos1 = 0.75;
+    public double leftServoPos2 = 0.15;
+
+    public double rightServoPos1 = 0.25;
+    public double rightServoPos2 = 0.85;
+
 
     @Override
     public void runOpMode() {
         initialize();
         waitForStart();
 
-        double positionGate = 0.85;
-        double positionLaunch = 0.12;
-        double positionFinish = 0.5;
+
 
         while (opModeIsActive()) {
             if (gamepad1.a) {
-                angleServo.setPosition(positionLaunch);
-            } else if (gamepad1.b) {
-                angleServo.setPosition(positionFinish);
+                LH_Servo.setPosition(leftServoPos1);
+                RH_Servo.setPosition(rightServoPos1);
             } else {
-                angleServo.setPosition(positionGate);
+                LH_Servo.setPosition(leftServoPos2);
+                RH_Servo.setPosition(rightServoPos2);
             }
         }
     }
 
     private void initialize() {
-        this.angleServo = hardwareMap.get(Servo.class, "launchServo");
+
+        this.LH_Servo = hardwareMap.get(Servo.class, "flowerServoLH");
+        this.RH_Servo = hardwareMap.get(Servo.class, "flowerServoRH");
     }
 }

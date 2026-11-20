@@ -55,7 +55,7 @@ public class Teleop extends Base {
         //SHOOT
         Trigger rightTrigger = new Trigger(() -> driverGamepad.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER) > 0.2);
         rightTrigger
-                .whileActiveOnce(new StartShooting(intakeSubsystem, launchSubsystem, turretSubsystem))
+                .whileActiveOnce(new StartShooting(intakeSubsystem, launchSubsystem))
                 .whenInactive(new StopShooting(intakeSubsystem, launchSubsystem));
     }
 }

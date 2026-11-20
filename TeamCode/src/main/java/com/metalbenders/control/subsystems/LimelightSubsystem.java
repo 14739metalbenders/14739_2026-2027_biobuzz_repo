@@ -144,7 +144,7 @@ public class LimelightSubsystem extends SubsystemBase {
             double dist = 0.0;
             boolean hasDistance = false;
 
-            double midHeight = (1.261 + 0.905) / 2.0; // Up cell = 1.261m, Down Cell = 0.905m, Midpoint between 2 positions is 1.083m
+            double midHeight = (1.411 + 1.050) / 2.0; // Up cell = 1.261m, Down Cell = 0.905m, Midpoint between 2 positions is 1.083m
 
             // If 3D pose get X/Z components and calculate distance
             Position p = offsetPose.getPosition().toUnit(DistanceUnit.METER);

@@ -9,7 +9,7 @@ public class Constants {
     public static final double CONVERT_METERS_TO_INCHES = 39.3701;
     /*LAUNCHER CONSTANTS*/
     public static final long LAUNCH_GATE_POSITION_DELAY_MILLI = 125;
-    public static final PIDFCoefficients LAUNCHER_VELOCITY_PID = new PIDFCoefficients(115, 0, 0, 15);
+    public static final PIDFCoefficients LAUNCHER_VELOCITY_PID = new PIDFCoefficients(115, 0, 0, 16);
     public static final long TIME_TO_WAIT_TO_SHOOT_BEFORE_KICK = 600;
     /*HUSKY LENS CONSTANTS*/
     public static final int POLLEN_BLOCK_ID = 1;
@@ -59,7 +59,7 @@ public class Constants {
     }
 
     public enum IntakeState {
-        SHOOT(2000),
+        SHOOT(1800),
         INTAKE(1800),
         REVERSE(-1500),
         STOP(0);
@@ -92,17 +92,23 @@ public class Constants {
     }
 
     public enum FlowerToolState {
-        UP(1.0),
-        DOWN(0.26);
+        UP(0.85, 0.15),
+        DOWN(0.25, 0.75);
 
-        private final double position;
+        private final double rightPosition;
+        private final double leftPosition;
 
-        FlowerToolState(double position) {
-            this.position = position;
+        FlowerToolState(double rightPosition, double leftPosition) {
+            this.rightPosition = rightPosition;
+            this.leftPosition = leftPosition;
         }
 
-        public double getPosition() {
-            return position;
+        public double getRightPosition() {
+            return rightPosition;
+        }
+
+        public double getLeftPosition() {
+            return leftPosition;
         }
     }
 
@@ -123,15 +129,15 @@ public class Constants {
 
     public enum IndicatorLedEnum {
         BLACK(0.0),
-        RED(0.277),
-        ORANGE(0.333),
-        YELLOW(0.388),
+        RED(0.280),
+        ORANGE(0.326),
+        YELLOW(0.391),
         SAGE(0.444),
-        GREEN(0.5),
-        AZURE(0.555),
-        BLUE(0.611),
-        INDIGO(0.666),
-        VIOLET(0.722),
+        GREEN(0.503),
+        AZURE(0.565),
+        BLUE(0.625),
+        INDIGO(0.670),
+        VIOLET(0.725),
         WHITE(1.0);
 
         private final double value;

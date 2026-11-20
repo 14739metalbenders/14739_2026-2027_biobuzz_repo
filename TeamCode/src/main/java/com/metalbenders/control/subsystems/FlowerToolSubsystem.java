@@ -10,20 +10,24 @@ import static com.metalbenders.constants.Constants.FlowerToolState.UP;
 
 public class FlowerToolSubsystem extends SubsystemBase {
 
-    private final Servo flowerToolServo;
+    private final Servo flowerToolServoLH;
+    private final Servo flowerToolServoRH;
     private final Telemetry telemetry;
     private Constants.FlowerToolState flowerToolState = UP;
 
     public FlowerToolSubsystem(HardwareMap hardwareMap, Telemetry telemetry) {
         this.telemetry = telemetry;
-        this.flowerToolServo = hardwareMap.get(Servo.class, "flowerServo");
-        flowerToolServo.setPosition(UP.getPosition());
+        this.flowerToolServoLH = hardwareMap.get(Servo.class, "flowerServoLH");
+        this.flowerToolServoRH = hardwareMap.get(Servo.class, "flowerServoRH");
+        flowerToolServoLH.setPosition(UP.getLeftPosition());
+        flowerToolServoRH.setPosition(UP.getRightPosition());
     }
 
     public void setFlowerToolState(Constants.FlowerToolState flowerToolState) {
         if (this.flowerToolState != flowerToolState) {
             this.flowerToolState = flowerToolState;
-            flowerToolServo.setPosition(flowerToolState.getPosition());
+            flowerToolServoLH.setPosition(flowerToolState.getLeftPosition());
+            flowerToolServoRH.setPosition(flowerToolState.getRightPosition());
         }
     }
 

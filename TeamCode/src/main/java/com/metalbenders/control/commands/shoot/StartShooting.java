@@ -12,13 +12,13 @@ import static com.metalbenders.constants.Constants.LaunchGateState.OPEN;
 
 public class StartShooting extends SequentialCommandGroup {
 
-    public StartShooting(IntakeSubsystem intakeSubsystem, LaunchSubsystem launchSubsystem, TurretSubsystem turretSubsystem) {
+    public StartShooting(IntakeSubsystem intakeSubsystem, LaunchSubsystem launchSubsystem) {
         addCommands(
                 new SetLaunchGateState(launchSubsystem, OPEN),
                 new RunIntake(intakeSubsystem, SHOOT)
         );
         //Note: turretSubsystem is not used in this command, but it is added as a requirement so the turret doesn't
         // move while shooting
-        addRequirements(intakeSubsystem, launchSubsystem, turretSubsystem);
+        addRequirements(intakeSubsystem, launchSubsystem);
     }
 }

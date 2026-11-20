@@ -30,7 +30,7 @@ public class LaunchSubsystem extends SubsystemBase {
     private double targetLaunchVelocity;
     private LaunchGateState launchGateState;
 
-    public static double theVelocity = 1100;
+    public static double theVelocity = 0;
 
     public LaunchSubsystem(HardwareMap hardwareMap, Telemetry telemetry, OpModeType opModeType) {
         this.telemetry = telemetry;
@@ -72,8 +72,13 @@ public class LaunchSubsystem extends SubsystemBase {
     @Override
     public void periodic() {
 //        launcher.setVelocity(targetLaunchVelocity.getVelocity());
-        launcher.setVelocity(targetLaunchVelocity);
-        //launcher.setVelocity(theVelocity);
+
+        if ( theVelocity > 0 ) {
+            launcher.setVelocity(theVelocity);
+        } else {
+            launcher.setVelocity(targetLaunchVelocity);
+        }
+
         telemetry.addLine(this.getClass().getSimpleName());
         telemetry.addLine("--------------------------------");
 //        telemetry.addData("Target Velocity",
