@@ -9,7 +9,7 @@ public class Constants {
     public static final double CONVERT_METERS_TO_INCHES = 39.3701;
     /*LAUNCHER CONSTANTS*/
     public static final long LAUNCH_GATE_POSITION_DELAY_MILLI = 125;
-    public static final PIDFCoefficients LAUNCHER_VELOCITY_PID = new PIDFCoefficients(115, 0, 0, 16);
+    public static final PIDFCoefficients LAUNCHER_VELOCITY_PID = new PIDFCoefficients(115, 0, 0, 15);
     public static final long TIME_TO_WAIT_TO_SHOOT_BEFORE_KICK = 600;
     /*HUSKY LENS CONSTANTS*/
     public static final int POLLEN_BLOCK_ID = 1;
@@ -92,7 +92,7 @@ public class Constants {
     }
 
     public enum FlowerToolState {
-        UP(0.82, 0.17),
+        UP(0.80, 0.20),
         DOWN(0.25, 0.75);
 
         private final double rightPosition;
