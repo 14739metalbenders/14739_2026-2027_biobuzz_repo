@@ -64,6 +64,7 @@ public class LimelightSubsystem extends SubsystemBase {
             hiveState = Constants.HiveState.ACTIVE_SCORING;
         }
         limelight.pipelineSwitch(0);
+        limelight.setPollRateHz(100); // Polls 100 times per second
         limelight.start();
         setState();
     }

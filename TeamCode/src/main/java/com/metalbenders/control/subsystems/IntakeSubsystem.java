@@ -7,6 +7,8 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
+import static com.metalbenders.constants.Constants.IntakeState.INTAKE;
+import static com.metalbenders.constants.Constants.IntakeState.REVERSE;
 import static com.metalbenders.constants.Constants.IntakeState.SHOOT;
 import static com.metalbenders.constants.Constants.IntakeState.STOP;
 
@@ -31,7 +33,13 @@ public class IntakeSubsystem extends SubsystemBase {
         if (this.intakeState != intakeState) {
             this.intakeState = intakeState;
             intakeMotor.setVelocity(this.intakeState.getTargetVelocity());
-            intakeMotor2.setVelocity(this.intakeState.getTargetVelocity() + 600);
+            if (intakeState == SHOOT) {
+                intakeMotor2.setVelocity(this.intakeState.getTargetVelocity() + 600);
+            } else if (intakeState == INTAKE ){
+                intakeMotor2.setVelocity(this.intakeState.getTargetVelocity() - 500);
+            } else {
+                intakeMotor2.setVelocity(this.intakeState.getTargetVelocity());
+            }
         }
     }
 

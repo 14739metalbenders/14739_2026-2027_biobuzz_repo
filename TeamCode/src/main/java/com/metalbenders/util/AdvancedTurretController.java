@@ -185,29 +185,6 @@ public class AdvancedTurretController {
     }
 
     /**
-     * Feedback hook when a shot is known to have scored or missed on cellId.
-     */
-    public boolean reportShotOutcome(String cellId, boolean scored) {
-        for (HiveCell cell : allCells) {
-            if (cell.alliance == alliance && cell.id.equals(cellId)) {
-                if (scored) {
-                    cell.consecutiveMisses = 0;
-                    cell.upwardFacing = true;
-                    return false;
-                } else {
-                    cell.consecutiveMisses++;
-                    if (cell.consecutiveMisses >= missesBeforeTip) {
-                        notifyHiveTipped(cell.hiveId);
-                        return true;
-                    }
-                }
-                break;
-            }
-        }
-        return false;
-    }
-
-    /**
      * Computes turret angle and launcher output directly from Pedro Pathing's Follower,
      * Limelight's LLResult, and the current turret encoder angle (in degrees).
      */

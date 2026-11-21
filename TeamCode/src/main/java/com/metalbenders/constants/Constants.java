@@ -60,7 +60,7 @@ public class Constants {
 
     public enum IntakeState {
         SHOOT(1800),
-        INTAKE(1800),
+        INTAKE(2400),
         REVERSE(-1500),
         STOP(0);
 
@@ -92,7 +92,7 @@ public class Constants {
     }
 
     public enum FlowerToolState {
-        UP(0.85, 0.15),
+        UP(0.82, 0.17),
         DOWN(0.25, 0.75);
 
         private final double rightPosition;
