@@ -1,57 +1,57 @@
 package com.metalbenders.control.commands.autonomous;
 
 import com.arcrobotics.ftclib.command.CommandBase;
-import com.metalbenders.control.subsystems.DriveSubsystem;
+import com.metalbenders.control.subsystems.SubsystemManager;
 import com.pedropathing.math.Pose;
 
 import java.util.function.Supplier;
 
 public class DriveToPosition extends CommandBase {
 
-    private final DriveSubsystem driveSubsystem;
+    private final SubsystemManager subsystemManager;
     private final Pose pose;
     private final Supplier<Pose> poseSupplier;
     private final Double maxSpeed;
 
-    public DriveToPosition(DriveSubsystem driveSubsystem, Pose pose) {
-        this(driveSubsystem, pose, null);
+    public DriveToPosition(SubsystemManager subsystemManager, Pose pose) {
+        this(subsystemManager, pose, null);
     }
 
-    public DriveToPosition(DriveSubsystem driveSubsystem, Pose pose, Double maxSpeed) {
-        this.driveSubsystem = driveSubsystem;
+    public DriveToPosition(SubsystemManager subsystemManager, Pose pose, Double maxSpeed) {
+        this.subsystemManager = subsystemManager;
         this.pose = pose;
         this.poseSupplier = null;
         this.maxSpeed = maxSpeed;
-        addRequirements(driveSubsystem);
+        addRequirements(subsystemManager.getDriveSubsystem());
     }
 
-    public DriveToPosition(DriveSubsystem driveSubsystem, Supplier<Pose> poseSupplier) {
-        this(driveSubsystem, poseSupplier, null);
+    public DriveToPosition(SubsystemManager subsystemManager, Supplier<Pose> poseSupplier) {
+        this(subsystemManager, poseSupplier, null);
     }
 
-    public DriveToPosition(DriveSubsystem driveSubsystem, Supplier<Pose> poseSupplier, Double maxSpeed) {
-        this.driveSubsystem = driveSubsystem;
+    public DriveToPosition(SubsystemManager subsystemManager, Supplier<Pose> poseSupplier, Double maxSpeed) {
+        this.subsystemManager = subsystemManager;
         this.pose = null;
         this.poseSupplier = poseSupplier;
         this.maxSpeed = maxSpeed;
-        addRequirements(driveSubsystem);
+        addRequirements(subsystemManager.getDriveSubsystem());
     }
 
     @Override
     public void initialize() {
         Pose targetPose = (poseSupplier != null) ? poseSupplier.get() : pose;
-        driveSubsystem.driveToPosition(targetPose, maxSpeed);
+        subsystemManager.getDriveSubsystem().driveToPosition(targetPose, maxSpeed);
     }
 
     @Override
     public boolean isFinished() {
-        return !driveSubsystem.isBusy();
+        return !subsystemManager.getDriveSubsystem().isBusy();
     }
 
     @Override
     public void end(boolean interrupted) {
         if (interrupted) {
-            driveSubsystem.stop();
+            subsystemManager.getDriveSubsystem().stop();
         }
     }
 }

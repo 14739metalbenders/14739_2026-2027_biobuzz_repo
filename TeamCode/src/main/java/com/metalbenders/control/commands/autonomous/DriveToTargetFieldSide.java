@@ -6,41 +6,40 @@ import com.arcrobotics.ftclib.command.SequentialCommandGroup;
 import com.metalbenders.constants.Constants;
 import com.metalbenders.constants.FieldLocation;
 import com.metalbenders.constants.FieldSide;
-import com.metalbenders.control.subsystems.DriveSubsystem;
+import com.metalbenders.control.subsystems.SubsystemManager;
 
 import java.util.function.Supplier;
 
 public class DriveToTargetFieldSide extends ConditionalCommand {
 
     public DriveToTargetFieldSide(
-            DriveSubsystem driveSubsystem,
+            SubsystemManager subsystemManager,
             FieldSide targetFieldSide,
             Constants.AllianceColor allianceColor,
             Constants.WaypointSeriesType waypointSeriesType) {
         this(
-                driveSubsystem,
-                () -> FieldSide.getCurrentFieldSide(driveSubsystem.getCurrentPose()),
+                subsystemManager,
+                () -> FieldSide.getCurrentFieldSide(subsystemManager.getDriveSubsystem().getCurrentPose()),
                 () -> targetFieldSide,
                 allianceColor,
                 waypointSeriesType);
     }
 
-
     public DriveToTargetFieldSide(
-            DriveSubsystem driveSubsystem,
+            SubsystemManager subsystemManager,
             Supplier<FieldSide> targetFieldSideSupplier,
             Constants.AllianceColor allianceColor,
             Constants.WaypointSeriesType waypointSeriesType) {
         this(
-                driveSubsystem,
-                () -> FieldSide.getCurrentFieldSide(driveSubsystem.getCurrentPose()),
+                subsystemManager,
+                () -> FieldSide.getCurrentFieldSide(subsystemManager.getDriveSubsystem().getCurrentPose()),
                 targetFieldSideSupplier,
                 allianceColor,
                 waypointSeriesType);
     }
 
     public DriveToTargetFieldSide(
-            DriveSubsystem driveSubsystem,
+            SubsystemManager subsystemManager,
             Supplier<FieldSide> currentFieldSideSupplier,
             Supplier<FieldSide> targetFieldSideSupplier,
             Constants.AllianceColor allianceColor,
@@ -48,14 +47,14 @@ public class DriveToTargetFieldSide extends ConditionalCommand {
         super (
                 new SequentialCommandGroup(
                         new DriveToPosition(
-                                driveSubsystem,
+                                subsystemManager,
                                 () -> FieldLocation.getWaypointLocation(
                                         currentFieldSideSupplier.get(), waypointSeriesType).getPose(allianceColor)),
                         new DriveToPosition(
-                                driveSubsystem,
+                                subsystemManager,
                                 () -> FieldLocation.getWaypointLocation(
                                         targetFieldSideSupplier.get(), waypointSeriesType).getPose(allianceColor))),
                 new InstantCommand(),
-                () -> FieldSide.getCurrentFieldSide(driveSubsystem.getCurrentPose()) != targetFieldSideSupplier.get());
+                () -> FieldSide.getCurrentFieldSide(subsystemManager.getDriveSubsystem().getCurrentPose()) != targetFieldSideSupplier.get());
     }
 }

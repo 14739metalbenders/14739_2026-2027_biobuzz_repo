@@ -20,6 +20,7 @@ public class ConfigFileUtil {
     public static final String ALLIANCE_COLOR_KEY = "allianceColor";
     public static final String STARTING_ON_ACTIVE_SIDE_KEY = "startingOnActiveSide";
     public static final String AUTO_STRATEGY_KEY = "autoStrategy";
+    public static final String ALLOW_FIELD_CROSSING_KEY = "allowFieldCrossing";
     private static final String WAYPOINTS_KEY = "waypoints";
     private static final String CONFIG_FILE_NAME = "config.properties";
 
@@ -31,6 +32,10 @@ public class ConfigFileUtil {
         } catch (IOException e) {
             telemetry.addData("Error reading config file, returning defaults", e);
         }
+        return fromProperties(properties, telemetry);
+    }
+
+    static ConfigFile fromProperties(Properties properties, Telemetry telemetry) {
         ConfigFile config = new ConfigFile();
         config.allianceColor = parseEnum(properties, ALLIANCE_COLOR_KEY, config.allianceColor);
         String startingOnActiveSide = properties.getProperty(STARTING_ON_ACTIVE_SIDE_KEY);
@@ -51,20 +56,40 @@ public class ConfigFileUtil {
             }
         }
         config.waypointSeriesType = parseEnum(properties, WAYPOINTS_KEY, config.waypointSeriesType);
+        config.allowFieldCrossing = parseAllowFieldCrossing(properties, telemetry);
         return config;
     }
 
+    static boolean parseAllowFieldCrossing(Properties properties, Telemetry telemetry) {
+        String value = properties.getProperty(ALLOW_FIELD_CROSSING_KEY);
+        if (value == null) {
+            return true;
+        }
+        if ("true".equalsIgnoreCase(value.trim()) || "false".equalsIgnoreCase(value.trim())) {
+            return Boolean.parseBoolean(value.trim());
+        }
+        telemetry.addData("Invalid allowFieldCrossing, returning default", value);
+        return true;
+    }
+
     public static void writeConfigFile(ConfigFile configFile) throws IOException {
+        Properties propertiesToStore = toProperties(configFile);
+        File file = AppUtil.getInstance().getSettingsFile(CONFIG_FILE_NAME);
+        try (OutputStream outputStream = new FileOutputStream(file)) {
+            propertiesToStore.store(outputStream, null);
+        }
+    }
+
+    static Properties toProperties(ConfigFile configFile) {
         Properties propertiesToStore = new Properties();
         propertiesToStore.setProperty(ALLIANCE_COLOR_KEY, configFile.getAllianceColor().name());
         propertiesToStore.setProperty(STARTING_ON_ACTIVE_SIDE_KEY,
                 Boolean.toString(configFile.isStartingOnActiveSide()));
         propertiesToStore.setProperty(AUTO_STRATEGY_KEY, configFile.getAutoStrategy().toString());
         propertiesToStore.setProperty(WAYPOINTS_KEY, configFile.getWaypointSeriesType().name());
-        File file = AppUtil.getInstance().getSettingsFile(CONFIG_FILE_NAME);
-        try (OutputStream outputStream = new FileOutputStream(file)) {
-            propertiesToStore.store(outputStream, null);
-        }
+        propertiesToStore.setProperty(ALLOW_FIELD_CROSSING_KEY,
+                Boolean.toString(configFile.isFieldCrossingAllowed()));
+        return propertiesToStore;
     }
 
     private static List<Constants.AutoChallengeType> parseAutoStrategy(String value) {
@@ -105,6 +130,15 @@ public class ConfigFileUtil {
         private boolean startingOnActiveSide = true;
         private List<Constants.AutoChallengeType> autoStrategy = Arrays.asList(Constants.AutoChallengeType.values());
         private Constants.WaypointSeriesType waypointSeriesType = Constants.WaypointSeriesType.OUTER;
+        private boolean allowFieldCrossing = true;
+
+        public boolean isFieldCrossingAllowed() {
+            return allowFieldCrossing;
+        }
+
+        public void setFieldCrossingAllowed(boolean allowFieldCrossing) {
+            this.allowFieldCrossing = allowFieldCrossing;
+        }
 
         public Constants.AllianceColor getAllianceColor() {
             return allianceColor;

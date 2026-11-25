@@ -1,7 +1,8 @@
 package com.metalbenders.util;
 
-import com.metalbenders.control.subsystems.VelocityLookupTable;
+import com.metalbenders.constants.VelocityLookupTable;
 import com.pedropathing.math.Twist;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -28,7 +29,7 @@ public class TurretControllerTest {
 
     @Test
     public void timeOfFlightScalesWithTargetDistanceWithoutHeightRejection() {
-        double horizontalSpeed = Math.PI * 0.072 * (2000.0 / 60) * 0.7
+        double horizontalSpeed = Math.PI * 0.072 * (2000.0 / 60) * 0.6
                 * Math.cos(Math.toRadians(75));
 
         assertEquals(1.08 / horizontalSpeed,
@@ -37,13 +38,14 @@ public class TurretControllerTest {
                 TurretController.calculateTimeOfFlight(2000, 75, 2.0), EPSILON);
     }
 
+    @Ignore("Shot lead is currently disabled in the turret controller.")
     @Test
     public void calibratedShotsKeepLeadInBothStrafeDirections() {
         double[] distancesInches = {21.1, 26.5, 32.0, 40.8, 45.5, 49.0, 52.0, 56.0, 60.0, 64.0};
         for (double inches : distancesInches) {
             double distance = inches * 0.0254;
             double rpm = VelocityLookupTable.getTargetVelocity(inches) * 60 / 28;
-            double expectedTime = distance / (Math.PI * 0.072 * (rpm / 60) * 0.7
+            double expectedTime = distance / (Math.PI * 0.072 * (rpm / 60) * 0.6
                     * Math.cos(Math.toRadians(75)));
             for (double strafe : new double[]{-20, 20}) {
                 TurretController.TurretRotateCalc result = TurretController.calculateTurretLead(

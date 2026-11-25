@@ -2,18 +2,18 @@ package com.metalbenders.control.commands.intake;
 
 import com.arcrobotics.ftclib.command.InstantCommand;
 import com.metalbenders.constants.Constants;
-import com.metalbenders.control.subsystems.IntakeSubsystem;
+import com.metalbenders.control.subsystems.SubsystemManager;
 
 public class StopIntake extends InstantCommand {
-    private final IntakeSubsystem intakeSubsystem;
+    private final SubsystemManager subsystemManager;
 
-    public StopIntake(IntakeSubsystem intakeSubsystem) {
-        this.intakeSubsystem = intakeSubsystem;
-        addRequirements(intakeSubsystem);
+    public StopIntake(SubsystemManager subsystemManager) {
+        this.subsystemManager = subsystemManager;
+        addRequirements(subsystemManager.getIntakeSubsystem());
     }
 
     @Override
     public void initialize() {
-        intakeSubsystem.setIntakeState(Constants.IntakeState.STOP);
+        subsystemManager.getIntakeSubsystem().setIntakeState(Constants.IntakeState.STOP);
     }
 }

@@ -3,6 +3,7 @@ package com.metalbenders.control.subsystems;
 
 import com.arcrobotics.ftclib.command.SubsystemBase;
 import com.metalbenders.constants.Constants.OpModeType;
+import com.metalbenders.util.PoseUtil;
 import com.metalbenders.util.LimelightPoseEstimator;
 import com.metalbenders.util.LimelightPoseEstimator.Estimate;
 import com.metalbenders.util.LimelightPoseEstimator.Status;
@@ -33,6 +34,7 @@ public class DriveSubsystem extends SubsystemBase {
     private final LimelightPoseEstimator poseEstimator;
     private long lastSampleTime = Long.MIN_VALUE;
     private double lastAppliedFrameTimestamp = Double.NaN;
+    private boolean fieldReferenced;
 
     public DriveSubsystem(HardwareMap hardwareMap, Telemetry telemetry, Pose initialPose,
                           OpModeType opModeType, LimelightSubsystem limelightSubsystem,
@@ -45,6 +47,7 @@ public class DriveSubsystem extends SubsystemBase {
                 : null;
         this.follower = Constants.create(hardwareMap);
         this.follower.setPose(initialPose);
+        this.fieldReferenced = opModeType == OpModeType.AUTO && PoseUtil.isFinite(initialPose);
     }
 
     public void drive(double forward, double strafe, double heading) {
@@ -66,10 +69,20 @@ public class DriveSubsystem extends SubsystemBase {
     }
 
     public void setPose(Pose pose) {
+        fieldReferenced = false;
         follower.setPose(pose);
         if (poseEstimator != null) {
             poseEstimator.clearOdometryHistory();
         }
+    }
+
+    public void setFieldReferencedPose(Pose pose) {
+        setPose(pose);
+        fieldReferenced = PoseUtil.isFinite(pose);
+    }
+
+    public boolean hasFieldReferencedPose() {
+        return fieldReferenced && PoseUtil.isFinite(follower.pose());
     }
 
     public Twist getCurrentTwist() {
@@ -87,6 +100,9 @@ public class DriveSubsystem extends SubsystemBase {
     @Override
     public void periodic() {
         follower.update();
+        if (!PoseUtil.isFinite(follower.pose())) {
+            fieldReferenced = false;
+        }
         telemetry.addLine(this.getClass().getSimpleName());
         telemetry.addLine("--------------------------------");
         if (poseEstimator != null) {
@@ -105,6 +121,11 @@ public class DriveSubsystem extends SubsystemBase {
     private void updateLocalization() {
         Pose odometry = follower.pose();
         double turretDegrees = turretSubsystem.getTurretAngleFromMotor();
+        if (!PoseUtil.isFinite(odometry) || !Double.isFinite(turretDegrees)) {
+            poseEstimator.clearOdometryHistory();
+            telemetry.addData("Localization Status", "Invalid pose or turret angle");
+            return;
+        }
         long sampleTime = System.currentTimeMillis();
         if (sampleTime > lastSampleTime) {
             poseEstimator.addSample(sampleTime, odometry, turretDegrees);
@@ -137,7 +158,7 @@ public class DriveSubsystem extends SubsystemBase {
         }
 
         Pose correctedPose = new Pose(estimate.pose.x(), estimate.pose.y(), odometry.heading());
-        setPose(correctedPose);
+        setFieldReferencedPose(correctedPose);
         lastAppliedFrameTimestamp = result.getTimestamp();
         telemetry.addData("Localization Correction", "Applied X/Y only");
         telemetry.addData("Localization Pose", "x %.2f, y %.2f, heading %.1f deg",

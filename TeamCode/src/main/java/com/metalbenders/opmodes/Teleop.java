@@ -20,15 +20,14 @@ import static com.metalbenders.constants.Constants.LaunchGateState.CLOSED;
 
 @TeleOp(name = "Teleop", group = "Teleop")
 public class Teleop extends Base {
-
     @Override
     public void initialize() {
         super.initialize();
 
         //DRIVE
-        driveSubsystem.setDefaultCommand(
+        subsystemManager.getDriveSubsystem().setDefaultCommand(
                 new Drive(
-                        driveSubsystem,
+                        subsystemManager,
                         () -> driverGamepad.getLeftX(),
                         () -> driverGamepad.getLeftY(),
                         () -> -driverGamepad.getRightX()
@@ -36,26 +35,26 @@ public class Teleop extends Base {
 
         //REVERSE INTAKE
         driverGamepad.getGamepadButton(GamepadKeys.Button.LEFT_BUMPER)
-                .whileActiveOnce(new RunIntake(intakeSubsystem, REVERSE))
-                .whenInactive(new StopIntake(intakeSubsystem));
+                .whileActiveOnce(new RunIntake(subsystemManager, REVERSE))
+                .whenInactive(new StopIntake(subsystemManager));
 
         driverGamepad.getGamepadButton(GamepadKeys.Button.RIGHT_BUMPER)
-                .whileActiveOnce(new SetFlowerToolState(flowerToolSubsystem, DOWN))
-                .whenInactive(new SetFlowerToolState(flowerToolSubsystem, UP));
+                .whileActiveOnce(new SetFlowerToolState(subsystemManager, DOWN))
+                .whenInactive(new SetFlowerToolState(subsystemManager, UP));
 
         //INTAKE
         Trigger leftTrigger = new Trigger(() -> driverGamepad.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER) > 0.2);
         leftTrigger
                 .whileActiveOnce(
                         new SequentialCommandGroup(
-                                new SetLaunchGateState(launchSubsystem, CLOSED),
-                                new RunIntake(intakeSubsystem, INTAKE)))
-                .whenInactive(new StopIntake(intakeSubsystem));
+                                new SetLaunchGateState(subsystemManager, CLOSED),
+                                new RunIntake(subsystemManager, INTAKE)))
+                .whenInactive(new StopIntake(subsystemManager));
 
         //SHOOT
         Trigger rightTrigger = new Trigger(() -> driverGamepad.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER) > 0.2);
         rightTrigger
-                .whileActiveOnce(new StartShooting(intakeSubsystem, launchSubsystem))
-                .whenInactive(new StopShooting(intakeSubsystem, launchSubsystem));
+                .whileActiveOnce(new StartShooting(subsystemManager))
+                .whenInactive(new StopShooting(subsystemManager));
     }
 }

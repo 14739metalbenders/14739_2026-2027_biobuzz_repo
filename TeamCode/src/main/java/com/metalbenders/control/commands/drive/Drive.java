@@ -2,6 +2,7 @@ package com.metalbenders.control.commands.drive;
 
 import com.arcrobotics.ftclib.command.CommandBase;
 import com.metalbenders.control.subsystems.DriveSubsystem;
+import com.metalbenders.control.subsystems.SubsystemManager;
 
 import java.util.function.DoubleSupplier;
 
@@ -12,11 +13,11 @@ public class Drive extends CommandBase {
     private final DoubleSupplier strafeSupplier;
     private final DoubleSupplier headingSupplier;
 
-    public Drive(DriveSubsystem driveSubsystem,
+    public Drive(SubsystemManager subsystemManager,
                  DoubleSupplier forwardSupplier,
                  DoubleSupplier strafeSupplier,
                  DoubleSupplier headingSupplier) {
-        this.driveSubsystem = driveSubsystem;
+        this.driveSubsystem = subsystemManager.getDriveSubsystem();
         this.forwardSupplier = forwardSupplier;
         this.strafeSupplier = strafeSupplier;
         this.headingSupplier = headingSupplier;

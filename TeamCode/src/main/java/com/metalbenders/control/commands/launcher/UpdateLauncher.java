@@ -1,24 +1,19 @@
 package com.metalbenders.control.commands.launcher;
 
 import com.arcrobotics.ftclib.command.CommandBase;
-import com.metalbenders.control.subsystems.LaunchSubsystem;
-import com.metalbenders.control.subsystems.LimelightSubsystem;
+import com.metalbenders.control.subsystems.SubsystemManager;
 
 public class UpdateLauncher extends CommandBase {
 
-    private final LaunchSubsystem launcherSubsystem;
-    private final LimelightSubsystem limelightSubsystem;
-
-    public UpdateLauncher(
-            LaunchSubsystem launcherSubsystem, LimelightSubsystem limelightSubsystem) {
-        this.launcherSubsystem = launcherSubsystem;
-        this.limelightSubsystem = limelightSubsystem;
-        addRequirements(launcherSubsystem);
+    private final SubsystemManager subsystemManager;
+    public UpdateLauncher(SubsystemManager subsystemManager) {
+        this.subsystemManager = subsystemManager;
+        addRequirements(subsystemManager.getLaunchSubsystem());
     }
 
     @Override
     public void execute() {
-        launcherSubsystem.updateLauncherVelocity(
-                limelightSubsystem.getTargetDistance());
+        subsystemManager.getLaunchSubsystem().updateLauncherVelocity(
+                subsystemManager.getLimelightSubsystem().getTargetDistance());
     }
 }

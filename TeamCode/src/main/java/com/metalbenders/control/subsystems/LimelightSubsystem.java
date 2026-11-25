@@ -4,6 +4,9 @@ import com.arcrobotics.ftclib.command.SubsystemBase;
 import com.metalbenders.constants.AprilTag;
 import com.metalbenders.constants.Constants;
 import com.metalbenders.constants.FieldSide;
+import com.metalbenders.constants.HiveAimOffsetConfig;
+import com.metalbenders.constants.LimelightLocalizationConstants;
+import com.metalbenders.util.HiveAimOffset;
 import com.metalbenders.util.TimedEntity;
 import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.limelightvision.LLResultTypes;
@@ -45,6 +48,11 @@ public class LimelightSubsystem extends SubsystemBase {
     private boolean hiveDetected = false;   // did we see hive tags during this scan?
     private double aimError = 0;            // turret error to the up cell visible tags (deg)
     private double tagDistance = 0;             // horizontal camera to tag cluster (m)
+    private FieldSide aimedCell;
+    private double viewingAngle = Double.NaN;
+    private double lateralOffset = Double.NaN;
+    private double centerAimError = Double.NaN;
+    private String aimOffsetStatus = "No target";
     private FieldSide activeHiveCellFieldSide;
     private Constants.HiveState hiveState;
     private final Map<AprilTag, TimedEntity<Double>> previousTagHeights = new HashMap<>();
@@ -78,6 +86,7 @@ public class LimelightSubsystem extends SubsystemBase {
             hiveDetected = false;
             aimError = 0;
             tagDistance = 0;
+            clearAimOffsetTelemetry("No target");
         }
         setState();
         telemetry.addLine(this.getClass().getSimpleName());
@@ -85,6 +94,11 @@ public class LimelightSubsystem extends SubsystemBase {
         telemetry.addData("Limelight State", limelightState);
         telemetry.addData("Target Distance (in)", tagDistance * CONVERT_METERS_TO_INCHES);
         telemetry.addData("Aim Error (deg)", aimError);
+        telemetry.addData("Aim Cell", "%s %s", allianceColor, aimedCell);
+        telemetry.addData("Center Aim (deg)", centerAimError);
+        telemetry.addData("Cell View Angle (deg)", viewingAngle);
+        telemetry.addData("Cell Offset (in)", lateralOffset);
+        telemetry.addData("Aim Offset Status", aimOffsetStatus);
         telemetry.addData("Hive State", hiveState);
         telemetry.addLine();
     }
@@ -103,12 +117,19 @@ public class LimelightSubsystem extends SubsystemBase {
         hiveDetected = false;
         long nowMs = System.currentTimeMillis();
         HiveFrameData frameData = new HiveFrameData();
+        boolean invalidCenter = false;
+        boolean useOffCenterAiming = HiveAimOffsetConfig.USE_OFF_CENTER_AIMING;
 
         double pitch = Math.toRadians(45); // Camera pitch 45 degrees up
         double[] sumDist = new double[4];
         double[] sumTx = new double[4];
         double[] sumHeight = new double[4];
         double[] sumTy = new double[4];
+        HiveAimOffset.Aggregate[] adjustedCells = {
+                new HiveAimOffset.Aggregate(), new HiveAimOffset.Aggregate(),
+                new HiveAimOffset.Aggregate(), new HiveAimOffset.Aggregate()};
+        boolean[] invalidCellCenter = new boolean[4];
+        FieldSide[] cellSides = new FieldSide[4];
         int[] count = new int[4];
         int[] count3d = new int[4];
         int[] distanceCount = new int[4];
@@ -120,10 +141,13 @@ public class LimelightSubsystem extends SubsystemBase {
             }
 
             int cell = (id - 30) / 4; // 0: red scoring, 1: red audience, 2: blue audience, 3: blue scoring for classing UP/DOWM and Alliance
+            cellSides[cell] = aprilTag.getFieldSide();
             // Rotate Tag location from camera reference frame to robot reference frame ----------------------
             Pose3D pose = tag.getTargetPoseCameraSpace();
             Pose3D offsetPose = computeCenterWithPoseOffset(id, pose);
             if (offsetPose == null) {
+                invalidCenter = true;
+                invalidCellCenter[cell] = true;
                 continue;
             }
 
@@ -170,6 +194,14 @@ public class LimelightSubsystem extends SubsystemBase {
             sumTx[cell] += bearing;
             sumTy[cell] += tag.getTargetYDegrees();
             count[cell]++;
+            if (useOffCenterAiming) {
+                HiveAimOffset.Result adjusted = HiveAimOffset.calculate(offsetPose,
+                        HiveAimOffsetConfig.forCell(allianceColor, aprilTag.getFieldSide()),
+                        LimelightLocalizationConstants.CAMERA_PITCH, LimelightLocalizationConstants.CAMERA_ROLL);
+                adjustedCells[cell].add(bearing, adjusted);
+            } else {
+                adjustedCells[cell].addCenter(bearing);
+            }
         }
 
         updateHiveStateFromFrame(frameData);
@@ -202,11 +234,37 @@ public class LimelightSubsystem extends SubsystemBase {
             hiveDetected = false;
             aimError = 0;
             tagDistance = 0;
+            clearAimOffsetTelemetry(invalidCenter ? "No target: invalid tag center geometry" : "No target");
             return;
         }
         hiveDetected = true;
         tagDistance = distanceCount[best] > 0 ? (sumDist[best] / distanceCount[best]) : 0;
-        aimError = sumTx[best] / count[best];
+        aimedCell = cellSides[best];
+        centerAimError = sumTx[best] / count[best];
+        HiveAimOffset.Result adjusted = adjustedCells[best].result(useOffCenterAiming);
+        aimError = adjusted.bearing;
+        viewingAngle = adjusted.viewingAngle;
+        lateralOffset = adjusted.offsetInches;
+        if (!useOffCenterAiming) {
+            aimOffsetStatus = "Disabled: center aim";
+        } else if (invalidCellCenter[best]) {
+            aimError = centerAimError;
+            viewingAngle = Double.NaN;
+            lateralOffset = Double.NaN;
+            aimOffsetStatus = "Center fallback: invalid tag center geometry";
+        } else if (adjusted.error != null) {
+            aimOffsetStatus = "Center fallback: " + adjusted.error;
+        } else {
+            aimOffsetStatus = "OK";
+        }
+    }
+
+    private void clearAimOffsetTelemetry(String status) {
+        aimedCell = null;
+        centerAimError = Double.NaN;
+        viewingAngle = Double.NaN;
+        lateralOffset = Double.NaN;
+        aimOffsetStatus = status;
     }
 
     /**
@@ -216,9 +274,10 @@ public class LimelightSubsystem extends SubsystemBase {
      * @param tagInCameraSpace The Limelight fiducial target object
      * @return Pose3D representing the exact position and orientation of the cell center relative to the camera lens
      */
-    private Pose3D computeCenterWithPoseOffset(int tagId, Pose3D tagInCameraSpace) {
+    static Pose3D computeCenterWithPoseOffset(int tagId, Pose3D tagInCameraSpace) {
 
-        if (tagInCameraSpace == null) return null;
+        if (tagInCameraSpace == null || tagInCameraSpace.getPosition() == null
+                || tagInCameraSpace.getOrientation() == null) return null;
 
         // Extract position and orientation data fields
         Position tagPos = tagInCameraSpace.getPosition().toUnit(DistanceUnit.METER);
@@ -228,6 +287,9 @@ public class LimelightSubsystem extends SubsystemBase {
         double yawRadians = Math.toRadians(tagAngles.getYaw(AngleUnit.DEGREES));
         double pitchRadians = Math.toRadians(tagAngles.getPitch(AngleUnit.DEGREES));
         double RollRadians = Math.toRadians(tagAngles.getRoll(AngleUnit.DEGREES));
+        if (!Double.isFinite(tagPos.x) || !Double.isFinite(tagPos.y) || !Double.isFinite(tagPos.z)
+                || !Double.isFinite(yawRadians) || !Double.isFinite(pitchRadians)
+                || !Double.isFinite(RollRadians)) return null;
 
         double xOffset = 0;
         double yOffset = -0.190;

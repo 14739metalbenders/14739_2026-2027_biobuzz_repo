@@ -1,4 +1,4 @@
-package com.metalbenders.control.subsystems;
+package com.metalbenders.constants;
 
 import java.util.Map;
 import java.util.TreeMap;

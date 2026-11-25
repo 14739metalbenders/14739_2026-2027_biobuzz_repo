@@ -10,15 +10,7 @@ import com.metalbenders.constants.FieldLocation;
 import com.metalbenders.constants.FieldSide;
 import com.metalbenders.control.commands.launcher.UpdateLauncher;
 import com.metalbenders.control.commands.turret.UpdateTurret;
-import com.metalbenders.control.subsystems.DriveSubsystem;
-import com.metalbenders.control.subsystems.FlowerToolSubsystem;
-import com.metalbenders.control.subsystems.HuskyLensSubsystem;
-import com.metalbenders.control.subsystems.IntakeSubsystem;
-import com.metalbenders.control.subsystems.LaunchSubsystem;
-import com.metalbenders.control.subsystems.LidarSubsystem;
-import com.metalbenders.control.subsystems.LightingSubsystem;
-import com.metalbenders.control.subsystems.LimelightSubsystem;
-import com.metalbenders.control.subsystems.TurretSubsystem;
+import com.metalbenders.control.subsystems.SubsystemManager;
 import com.metalbenders.util.AutonomousStorage;
 import com.metalbenders.util.ConfigFileUtil;
 import com.pedropathing.math.Pose;
@@ -29,16 +21,10 @@ import static com.metalbenders.constants.Constants.OpModeType.AUTO;
 public abstract class Base extends CommandOpMode {
 
     protected GamepadEx driverGamepad;
-    protected DriveSubsystem driveSubsystem;
-    protected IntakeSubsystem intakeSubsystem;
-    protected LimelightSubsystem limelightSubsystem;
-    protected TurretSubsystem turretSubsystem;
-    protected LidarSubsystem lidarSubsystem;
-    protected HuskyLensSubsystem huskyLensSubsystem;
-    protected FlowerToolSubsystem flowerToolSubsystem;
-    protected LaunchSubsystem launchSubsystem;
-    protected LightingSubsystem lightingSubsystem;
+    protected SubsystemManager subsystemManager;
     protected AllianceColor allianceColor;
+    private AutonomousStorage.Handoff handoff;
+    private boolean targetingInitialized;
 
     @Override
     public void initialize() {
@@ -48,52 +34,35 @@ public abstract class Base extends CommandOpMode {
 
         // Initialize configurations
         initializeConfigurations();
+        handoff = getOpModeType() == AUTO ? null : AutonomousStorage.consume(allianceColor);
+        targetingInitialized = false;
 
         // Initialize subsystems
-        intakeSubsystem = new IntakeSubsystem(hardwareMap, telemetry);
-        limelightSubsystem = new LimelightSubsystem(
-                hardwareMap, telemetry, allianceColor, getStartingActiveHiveCellFieldSide());
-        turretSubsystem = new TurretSubsystem(hardwareMap, telemetry);
-        driveSubsystem = new DriveSubsystem(hardwareMap, telemetry, getStartingPose(),
-                getOpModeType(), limelightSubsystem, turretSubsystem);
-        launchSubsystem = new LaunchSubsystem(hardwareMap, telemetry, getOpModeType());
-        flowerToolSubsystem = new FlowerToolSubsystem(hardwareMap, telemetry);
-        lightingSubsystem = new LightingSubsystem(hardwareMap, telemetry, allianceColor);
-
-        if (getOpModeType() == Constants.OpModeType.AUTO) {
-            lidarSubsystem = new LidarSubsystem(hardwareMap, telemetry);
-//            huskyLensSubsystem = new HuskyLensSubsystem(hardwareMap, telemetry, allianceColor);
-        } else {
-            turretSubsystem.setDefaultCommand(new UpdateTurret(
-                    turretSubsystem, limelightSubsystem, driveSubsystem, launchSubsystem));
-        }
-        launchSubsystem.setDefaultCommand(new UpdateLauncher(
-                launchSubsystem, limelightSubsystem));
-        subsystemHealthCheck();
+        subsystemManager = new SubsystemManager(
+                hardwareMap,
+                telemetry,
+                allianceColor,
+                getStartingActiveHiveCellFieldSide(),
+                getOpModeType(),
+                getStartingPose());
     }
 
     @Override
     public void run() {
         long startTime = System.currentTimeMillis();
+        if (!targetingInitialized) {
+//            if (getOpModeType() != AUTO) {
+                subsystemManager.getTurretSubsystem().setDefaultCommand(
+                        new UpdateTurret(subsystemManager));
+//            }
+            subsystemManager.getLaunchSubsystem().setDefaultCommand(
+                    new UpdateLauncher(subsystemManager));
+            targetingInitialized = true;
+        }
         super.run();
-        subsystemHealthCheck();
+        subsystemManager.healthCheck();
+        subsystemManager.updateReadinessIndicator();
         updateTelemetry(startTime);
-    }
-
-    private void subsystemHealthCheck() {
-        boolean errorDetected = !limelightSubsystem.isHealthy();
-        if (!errorDetected && getOpModeType() == AUTO) {
-            if (lidarSubsystem != null && !lidarSubsystem.isHealthy()) {
-                errorDetected = true;
-            } else if (huskyLensSubsystem != null && !huskyLensSubsystem.isHealthy()) {
-                errorDetected = true;
-            }
-        }
-        if (errorDetected) {
-            lightingSubsystem.setCurrentAnimation(Constants.IndicatorAnimationEnum.BLINK);
-        } else {
-            lightingSubsystem.setCurrentAnimation(Constants.IndicatorAnimationEnum.SOLID);
-        }
     }
 
     private void updateTelemetry(long startTime) {
@@ -107,6 +76,7 @@ public abstract class Base extends CommandOpMode {
             telemetry.addData("Starting On Active Side", auto.startingOnActiveSide);
             telemetry.addData("Auto Strategy", auto.autoStrategy);
             telemetry.addData("Waypoint Series Type", auto.waypointSeriesType);
+            telemetry.addData("Allow Field Crossing", auto.allowFieldCrossing);
             telemetry.addData("Active Hive Cell Field Side", auto.getStartingActiveHiveCellFieldSide());
         }
         telemetry.addLine();
@@ -125,22 +95,7 @@ public abstract class Base extends CommandOpMode {
 
     @Override
     public void reset() {
-        if (getOpModeType() == AUTO) {
-            //Store the end pose and alliance color for use in teleop
-            AutonomousStorage.endPose = driveSubsystem.getCurrentPose();
-            AutonomousStorage.currentActiveHiveSide = limelightSubsystem.getActiveHiveCellFieldSide();
-
-            //teardown subsystems that are only used in autonomous
-            lidarSubsystem.teardown();
-//            huskyLensSubsystem.teardown();
-        }
-        //teardown subsystems that are used in both autonomous and teleop
-        intakeSubsystem.teardown();
-        limelightSubsystem.teardown();
-        turretSubsystem.teardown();
-        launchSubsystem.teardown();
-        driveSubsystem.teardown();
-        flowerToolSubsystem.teardown();
+        subsystemManager.tearDown(targetingInitialized);
         super.reset();
     }
 
@@ -169,12 +124,13 @@ public abstract class Base extends CommandOpMode {
             auto.startingOnActiveSide = configFile.isStartingOnActiveSide();
             auto.autoStrategy = configFile.getAutoStrategy();
             auto.waypointSeriesType = configFile.getWaypointSeriesType();
+            auto.allowFieldCrossing = configFile.isFieldCrossingAllowed();
         }
     }
 
     public FieldSide getStartingActiveHiveCellFieldSide() {
         if (getOpModeType() == Constants.OpModeType.TELEOP) {
-            return AutonomousStorage.currentActiveHiveSide;
+            return handoff != null && handoff.hiveSide != null ? handoff.hiveSide : FieldSide.SCORING;
         }
         return FieldSide.getStartingHiveCellFieldSide(allianceColor);
     }

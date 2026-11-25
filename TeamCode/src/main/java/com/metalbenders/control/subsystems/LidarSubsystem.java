@@ -22,6 +22,20 @@ public class LidarSubsystem extends SubsystemBase {
         setState();
     }
 
+    public boolean isObstacleWithinDistanceBetweenRanges(double distance, int startDegreeRange, int endDegreeRange) {
+        double[] distances = getDistanceInDegreeRange(startDegreeRange, endDegreeRange);
+        return isObstacleWithinDistance(distances, distance);
+    }
+
+    static boolean isObstacleWithinDistance(double[] distances, double distance) {
+        for (double d : distances) {
+            if (d > 0 && d <= distance) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public double[] getDistanceInDegreeRange(int startDegreeRange, int endDegreeRange) {
         return Arrays.copyOfRange(studicaLidar.getRanges(true), startDegreeRange, endDegreeRange);
     }
