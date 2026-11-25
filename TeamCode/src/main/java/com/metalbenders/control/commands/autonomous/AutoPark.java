@@ -6,29 +6,29 @@ import com.arcrobotics.ftclib.command.SequentialCommandGroup;
 import com.metalbenders.constants.Constants;
 import com.metalbenders.constants.FieldLocation;
 import com.metalbenders.constants.FieldSide;
-import com.metalbenders.control.subsystems.DriveSubsystem;
+import com.metalbenders.control.subsystems.SubsystemManager;
 
 import static com.metalbenders.constants.AutoFieldBoundary.UNDER_HIVE_FIELD_BOUNDARY;
 
 public class AutoPark extends SequentialCommandGroup {
 
     public AutoPark(
-            DriveSubsystem driveSubsystem,
+            SubsystemManager subsystemManager,
             Constants.AllianceColor allianceColor,
             Constants.WaypointSeriesType waypointSeriesType) {
         super (
                 new ConditionalCommand(
                         new DriveToPosition(
-                                driveSubsystem,
+                                subsystemManager,
                                 () -> FieldLocation.getWaypointLocation(
                                         FieldSide.getParkFieldSide(allianceColor), waypointSeriesType).getPose(allianceColor)),
                         new InstantCommand(),
-                        () -> UNDER_HIVE_FIELD_BOUNDARY.isPoseWithinBoundary(driveSubsystem.getCurrentPose())),
+                        () -> UNDER_HIVE_FIELD_BOUNDARY.isPoseWithinBoundary(subsystemManager.getDriveSubsystem().getCurrentPose())),
                 new DriveToTargetFieldSide(
-                        driveSubsystem,
+                        subsystemManager,
                         () -> FieldSide.getParkFieldSide(allianceColor),
                         allianceColor,
                         waypointSeriesType),
-                new DriveToPosition(driveSubsystem, FieldLocation.getParkLocation().getPose(allianceColor)));
+                new DriveToPosition(subsystemManager, FieldLocation.getParkLocation().getPose(allianceColor)));
     }
 }

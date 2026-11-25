@@ -24,15 +24,16 @@ public class Constants {
     public static final long FLOWER_TOOL_POSITION_DELAY_MILLIS = 200;
     public static final double FLOWER_COLLECTION_MAX_SPEED = 1.0;
     public static final double FLOWER_DISTANCE_TO_BACKUP_WHEN_COLLECTING = 5.0;
-    public static final double FLOWER_DISTANCE_TO_BACKUP_WHEN_FINISHED_COLLECTING = 10.0;
     public static final double FLOWER_COLLECT_OSCILLATION_HEADING_VARIATION = Math.toRadians(8.0);
     public static final long MILLIS_TO_WAIT_FOR_OSCILLATION_ON_FLOWER = 200;
-    public static final double AUTO_SPEED_MULTIPLIER = 0.75;
+    public static final double AUTO_SPEED_MULTIPLIER = 0.5;
     public static final long AUTO_PARK_OVERRIDE_DELAY_MILLIS = 25000;
+    public static final int AUTO_LAUNCH_LIDAR_REAR_DEGREES = 180;
+    public static final int AUTO_LAUNCH_LIDAR_HALF_RANGE_DEGREES = 10;
+    public static final double AUTO_LAUNCH_OBSTACLE_DISTANCE_MM = 254.0;
     public static final long MAX_TIME_TO_COMPARE_TAG_DETECTIONS = 500;
     public static final double MIN_HEIGHT_DIFFERENCE_TO_DETECT_TRANSITION = 0.000254; //0.5 inches in meters
     public static final double MIN_ACTIVE_HIVE_CELL_HEIGHT = 1.2; //meters
-    public static final long DEFAULT_TIME_TO_WAIT_FOR_TRANSITION_STATE_MILLIS = 300;
     public static final long MAX_TIME_TO_WAIT_FOR_TRANSITION_WHEN_STARTING_INACTIVE = 2000;
 
     public enum OpModeType {
@@ -59,7 +60,7 @@ public class Constants {
     }
 
     public enum IntakeState {
-        SHOOT(1800),
+        SHOOT(1200),
         INTAKE(2400),
         REVERSE(-1500),
         STOP(0);

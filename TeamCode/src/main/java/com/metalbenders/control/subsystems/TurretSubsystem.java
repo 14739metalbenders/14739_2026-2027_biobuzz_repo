@@ -87,6 +87,11 @@ public class TurretSubsystem extends SubsystemBase {
         this.turretMotor.setPower(turretPower);
     }
 
+    public void stop() {
+        turretPower = 0;
+        setTurretPower(0);
+    }
+
     @Override
     public void periodic() {
         telemetry.addLine(this.getClass().getSimpleName());
@@ -100,6 +105,6 @@ public class TurretSubsystem extends SubsystemBase {
     }
 
     public void teardown() {
-        //TODO add any necessary teardown logic for the turret subsystem
+        stop();
     }
 }

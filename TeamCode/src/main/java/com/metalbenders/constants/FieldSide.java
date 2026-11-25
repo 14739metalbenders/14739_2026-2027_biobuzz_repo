@@ -26,6 +26,36 @@ public enum FieldSide {
         return getGardenFieldSide(allianceColor);
     }
 
+    public static FieldSide getChallengeFieldSide(Constants.AutoChallengeType challenge,
+                                                   Constants.AllianceColor allianceColor) {
+        switch (challenge) {
+            case GARDEN:
+                return getGardenFieldSide(allianceColor);
+            case PARK_SIDE_FLOWER:
+                return getParkSideFlowerFieldSide(allianceColor);
+            case HIVE_SIDE_FLOWER:
+                return getHiveSideFlowerFieldSide(allianceColor);
+            default:
+                throw new IllegalArgumentException("Challenge has no collection field side: " + challenge);
+        }
+    }
+
+    public static boolean shouldIncludeChallenge(Constants.AutoChallengeType challenge,
+                                                 Constants.AllianceColor allianceColor,
+                                                 FieldSide startingSide, boolean allowFieldCrossing) {
+        switch (challenge) {
+            case GARDEN:
+            case PARK_SIDE_FLOWER:
+            case HIVE_SIDE_FLOWER:
+                return allowFieldCrossing || getChallengeFieldSide(challenge, allianceColor) == startingSide;
+            case PRELOAD:
+            case PARK:
+                return true;
+            default:
+                throw new IllegalArgumentException("Unknown autonomous challenge: " + challenge);
+        }
+    }
+
     public static FieldSide getRobotStartingFieldSide(
             Constants.AllianceColor allianceColor, boolean startingOnActiveSide) {
         return startingOnActiveSide

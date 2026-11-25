@@ -1,34 +1,23 @@
 package com.metalbenders.control.commands.turret;
 
 import com.arcrobotics.ftclib.command.CommandBase;
-import com.metalbenders.control.subsystems.DriveSubsystem;
-import com.metalbenders.control.subsystems.LaunchSubsystem;
-import com.metalbenders.control.subsystems.LimelightSubsystem;
-import com.metalbenders.control.subsystems.TurretSubsystem;
+import com.metalbenders.control.subsystems.SubsystemManager;
 
 public class UpdateTurret extends CommandBase {
 
-    private final TurretSubsystem turretSubsystem;
-    private final LimelightSubsystem limelightSubsystem;
-    private final DriveSubsystem driveSubsystem;
-    private final LaunchSubsystem launchSubsystem;
-
-    public UpdateTurret(
-            TurretSubsystem turretSubsystem, LimelightSubsystem limelightSubsystem, DriveSubsystem driveSubsystem, LaunchSubsystem launchSubsystem) {
-        this.turretSubsystem = turretSubsystem;
-        this.limelightSubsystem = limelightSubsystem;
-        this.driveSubsystem = driveSubsystem;
-        this.launchSubsystem = launchSubsystem;
-        addRequirements(turretSubsystem);
+    private final SubsystemManager subsystemManager;
+    public UpdateTurret(SubsystemManager subsystemManager) {
+        this.subsystemManager = subsystemManager;
+        addRequirements(subsystemManager.getTurretSubsystem());
     }
 
     @Override
     public void execute() {
-        turretSubsystem.updateTurretPosition(
-                driveSubsystem.getCurrentTwist(),
-                limelightSubsystem.getAimError(),
-                launchSubsystem.getLauncherRPM(),
-                limelightSubsystem.getTargetDistance(),
-                limelightSubsystem.isHiveDetected());
+        subsystemManager.getTurretSubsystem().updateTurretPosition(
+                subsystemManager.getDriveSubsystem().getCurrentTwist(),
+                subsystemManager.getLimelightSubsystem().getAimError(),
+                subsystemManager.getLaunchSubsystem().getLauncherRPM(),
+                subsystemManager.getLimelightSubsystem().getTargetDistance(),
+                subsystemManager.getLimelightSubsystem().isHiveDetected());
     }
 }

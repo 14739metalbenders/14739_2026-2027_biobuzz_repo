@@ -5,13 +5,7 @@ import com.metalbenders.constants.Constants;
 import com.metalbenders.constants.FieldSide;
 import com.metalbenders.control.commands.intake.RunIntake;
 import com.metalbenders.control.commands.intake.StopIntake;
-import com.metalbenders.control.subsystems.DriveSubsystem;
-import com.metalbenders.control.subsystems.IntakeSubsystem;
-import com.metalbenders.control.subsystems.LaunchSubsystem;
-import com.metalbenders.control.subsystems.LimelightSubsystem;
-import com.metalbenders.control.subsystems.TurretSubsystem;
-
-import java.util.function.Supplier;
+import com.metalbenders.control.subsystems.SubsystemManager;
 
 import static com.metalbenders.constants.Constants.IntakeState.INTAKE;
 import static com.metalbenders.constants.Constants.MILLIS_TO_WAIT_FOR_GARDEN_INTAKE;
@@ -22,34 +16,28 @@ import static com.metalbenders.constants.FieldLocation.GARDEN_START;
 public class CollectAndShootGarden extends SequentialCommandGroup {
 
     public CollectAndShootGarden(
-            DriveSubsystem driveSubsystem,
-            IntakeSubsystem intakeSubsystem,
-            LaunchSubsystem launchSubsystem,
-            TurretSubsystem turretSubsystem,
-            LimelightSubsystem limelightSubsystem,
+            SubsystemManager subsystemManager,
             Constants.AllianceColor allianceColor,
             Constants.WaypointSeriesType waypointSeriesType,
-            Supplier<FieldSide> activeHiveCellFieldSideSupplier) {
+            boolean allowFieldCrossing,
+            AutoAbort abort) {
         super (
                 new DriveToTargetFieldSide(
-                        driveSubsystem,
-                        () -> FieldSide.getGardenFieldSide(allianceColor),
+                        subsystemManager,
+                        () -> FieldSide.getChallengeFieldSide(Constants.AutoChallengeType.GARDEN, allianceColor),
                         allianceColor,
                         waypointSeriesType),
-                new DriveToPosition(driveSubsystem, GARDEN_START.getPose(allianceColor))
+                new DriveToPosition(subsystemManager, GARDEN_START.getPose(allianceColor))
                         .withTimeout(MILLIS_TO_WAIT_FOR_GARDEN_TRAVEL),
-                new RunIntake(intakeSubsystem, INTAKE),
-                new DriveToPosition(driveSubsystem, GARDEN_END.getPose(allianceColor))
+                new RunIntake(subsystemManager, INTAKE),
+                new DriveToPosition(subsystemManager, GARDEN_END.getPose(allianceColor))
                         .withTimeout(MILLIS_TO_WAIT_FOR_GARDEN_INTAKE),
-                new StopIntake(intakeSubsystem),
+                new StopIntake(subsystemManager),
                 new DriveToLaunchAndShoot(
-                        driveSubsystem,
-                        intakeSubsystem,
-                        launchSubsystem,
-                        turretSubsystem,
-                        limelightSubsystem,
+                        subsystemManager,
                         allianceColor,
                         waypointSeriesType,
-                        activeHiveCellFieldSideSupplier));
+                        allowFieldCrossing,
+                        abort));
     }
 }

@@ -18,13 +18,17 @@ import java.util.LinkedHashSet;
 import java.util.List;
 
 @TeleOp(name = "Config", group = "Config")
-public class Config extends LinearOpMode {
+public class
+Config extends LinearOpMode {
 
+    private static final int AUTO_STRATEGY_INDEX = 3;
+    private static final int ALLOW_FIELD_CROSSING_INDEX = 4;
     private static final String[] CONFIG_LABELS = {
             "Alliance Color",
             "Starting on Active Side",
             "Waypoint Series Type",
             "Auto Strategy",
+            "Allow Field Crossing",
             "Save configuration"
     };
 
@@ -64,11 +68,19 @@ public class Config extends LinearOpMode {
             telemetry.addData("Starting on Active Side", configFile.isStartingOnActiveSide());
             telemetry.addData("Waypoint Series Type", configFile.getWaypointSeriesType());
             telemetry.addData("Auto Strategy", configFile.getAutoStrategy());
+            telemetry.addData("Allow Field Crossing", configFile.isFieldCrossingAllowed());
         } catch (IOException e) {
             telemetry.addData("Error saving configuration", e.getMessage());
         }
-        telemetry.update();
-        sleep(5000);
+
+        long startTime = System.currentTimeMillis();
+        boolean telemetryUpdated = false;
+        while(!isStopRequested() && System.currentTimeMillis() - startTime < 5000) {
+            if (!telemetryUpdated) {
+                telemetryUpdated = telemetry.update();
+            }
+            sleep(20);
+        }
     }
 
     private void promptForConfiguration(ConfigFileUtil.ConfigFile configFile) {
@@ -94,7 +106,7 @@ public class Config extends LinearOpMode {
             } else if (a) {
                 if (selected == CONFIG_LABELS.length - 1) {
                     return;
-                } else if (selected == 3) {
+                } else if (selected == AUTO_STRATEGY_INDEX) {
                     configFile.setAutoStrategy(promptForAutoStrategy(configFile.getAutoStrategy()));
                 }
             }
@@ -114,7 +126,8 @@ public class Config extends LinearOpMode {
                 getFormattedAllianceColor(configFile.getAllianceColor()),
                 configFile.isStartingOnActiveSide() ? "Active Side" : "Inactive Side",
                 configFile.getWaypointSeriesType(),
-                configFile.getAutoStrategy()
+                configFile.getAutoStrategy(),
+                configFile.isFieldCrossingAllowed()
         };
 
         for (int i = 0; i < CONFIG_LABELS.length; i++) {
@@ -127,7 +140,7 @@ public class Config extends LinearOpMode {
         }
     }
 
-    private void applyHorizontalConfigChange(
+    static void applyHorizontalConfigChange(
             ConfigFileUtil.ConfigFile configFile,
             int selected,
             int direction) {
@@ -147,6 +160,9 @@ public class Config extends LinearOpMode {
                         Constants.WaypointSeriesType.values(),
                         configFile.getWaypointSeriesType(),
                         direction));
+                break;
+            case ALLOW_FIELD_CROSSING_INDEX:
+                configFile.setFieldCrossingAllowed(!configFile.isFieldCrossingAllowed());
                 break;
             default:
                 // No horizontal change for other entries.
